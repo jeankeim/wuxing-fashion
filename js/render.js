@@ -5,6 +5,7 @@
 import { isFavorite } from './storage.js';
 import { renderExplanationCard } from './explanation.js';
 import { renderUserProfilePanel } from './profile.js';
+import { renderDataManagerPanel } from './data-manager.js';
 
 /**
  * 显示指定视图
@@ -229,6 +230,12 @@ export function renderProfileView() {
   if (!container) return;
   
   container.innerHTML = renderUserProfilePanel();
+  
+  // 同时渲染数据管理面板
+  const dataContainer = document.getElementById('data-manager-container');
+  if (dataContainer) {
+    dataContainer.innerHTML = renderDataManagerPanel();
+  }
 }
 
 /**

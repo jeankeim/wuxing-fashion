@@ -17,6 +17,7 @@ import { initGlobalErrorHandler, withErrorHandler, ErrorTypes } from './error-ha
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from './storage.js';
 import { store, StateKeys, ViewNames } from './store.js';
 import { showShareMenu } from './share.js';
+import { downloadExportFile, readImportFile, importData, clearAllData, getDataOverview } from './data-manager.js';
 
 // 便捷访问状态的方法
 const getState = (key) => store.get(key);
@@ -284,6 +285,69 @@ function bindEvents() {
     if (e.key === 'Escape') {
       closeModal('modal-detail');
     }
+  });
+  
+  // 数据管理按钮（委托绑定，因为面板是动态生成的）
+  document.addEventListener('click', (e) => {
+    // 导出数据
+    if (e.target.closest('#btn-export-data')) {
+      try {
+        const result = downloadExportFile();
+        showToast(`已导出: ${result.filename}`);
+      } catch (error) {
+        showToast('导出失败，请重试');
+      }
+    }
+    
+    // 导入数据 - 触发文件选择
+    if (e.target.closest('#btn-import-data')) {
+      document.getElementById('import-file-input')?.click();
+    }
+    
+    // 清除数据
+    if (e.target.closest('#btn-clear-data')) {
+      if (confirm('确定要清除所有数据吗？此操作不可恢复。')) {
+        clearAllData();
+        showToast('所有数据已清除');
+        // 刷新页面以更新显示
+        setTimeout(() => location.reload(), 1000);
+      }
+    }
+  });
+  
+  // 文件选择处理
+  document.getElementById('import-file-input')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      const data = await readImportFile(file);
+      
+      // 预览数据
+      const preview = importData(data, { preview: true });
+      if (!preview.success) {
+        showToast('数据格式错误: ' + preview.errors.join(', '));
+        return;
+      }
+      
+      // 确认导入
+      const confirmMsg = `确认导入备份文件？\n包含 ${preview.keys.length} 项数据\n收藏方案: ${preview.stats.hasFavorites ? preview.stats.favoritesCount + ' 个' : '无'}`;
+      
+      if (confirm(confirmMsg)) {
+        const result = importData(data, { merge: false });
+        if (result.success) {
+          showToast(`成功导入 ${result.importedCount} 项数据`);
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast('导入失败: ' + result.errors.join(', '));
+        }
+      }
+    } catch (error) {
+      showToast(error.message || '导入失败');
+    }
+    
+    // 清空 input 以便重复选择同一文件
+    e.target.value = '';
   });
 }
 

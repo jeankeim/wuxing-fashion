@@ -26,6 +26,7 @@ const PRECACHE_ASSETS = [
   '/js/recommendation.js',
   '/js/explanation.js',
   '/js/profile.js',
+  '/js/data-manager.js',
   '/js/lib/lunar.js',
   '/data/schemes.json',
   '/data/solar-terms.json',
