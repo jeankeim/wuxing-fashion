@@ -16,6 +16,7 @@ import { validateFile, compressImage, initUploadZone, getTodayString } from './u
 import { initGlobalErrorHandler, withErrorHandler, ErrorTypes } from './error-handler.js';
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from './storage.js';
 import { store, StateKeys, ViewNames } from './store.js';
+import { showShareMenu } from './share.js';
 
 // 便捷访问状态的方法
 const getState = (key) => store.get(key);
@@ -169,10 +170,11 @@ function bindEvents() {
   // 保存反馈
   document.getElementById('btn-save-feedback')?.addEventListener('click', handleSaveFeedback);
   
-  // 详情按钮和收藏按钮委托
+  // 详情按钮、收藏按钮和分享按钮委托
   document.getElementById('scheme-cards')?.addEventListener('click', (e) => {
     const detailBtn = e.target.closest('.scheme-detail-btn');
     const favoriteBtn = e.target.closest('.scheme-favorite-btn');
+    const shareBtn = e.target.closest('.scheme-share-btn');
     
     if (detailBtn) {
       const index = parseInt(detailBtn.dataset.index, 10);
@@ -203,6 +205,16 @@ function bindEvents() {
           favoriteBtn.querySelector('svg').setAttribute('fill', 'currentColor');
           showToast('已收藏');
         }
+      }
+    }
+    
+    if (shareBtn) {
+      const index = parseInt(shareBtn.dataset.index, 10);
+      const schemes = window.__currentSchemes;
+      if (schemes && schemes[index]) {
+        const scheme = schemes[index];
+        const termInfo = getState(StateKeys.CURRENT_TERM_INFO);
+        showShareMenu(scheme, termInfo);
       }
     }
   });
