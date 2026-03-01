@@ -16,6 +16,7 @@ import { EntryController } from './controllers/entry.js';
 import { ResultsController } from './controllers/results.js';
 import { FavoritesController } from './controllers/favorites.js';
 import { ProfileController } from './controllers/profile.js';
+import { DiaryController } from './controllers/diary.js';
 import { UploadController } from './controllers/upload.js';
 
 /**
@@ -68,6 +69,7 @@ class App {
     this.controllers.set('view-results', new ResultsController());
     this.controllers.set('view-favorites', new FavoritesController());
     this.controllers.set('view-profile', new ProfileController());
+    this.controllers.set('view-diary', new DiaryController());
     this.controllers.set('view-upload', new UploadController());
   }
 

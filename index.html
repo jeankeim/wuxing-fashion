@@ -185,6 +185,14 @@
             <circle cx="12" cy="7" r="4"/>
           </svg>
         </button>
+        <button id="btn-diary" class="btn btn-icon" aria-label="穿搭日记">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </button>
       </header>
       
       <div class="results-body">
@@ -238,6 +246,71 @@
         </div>
         <div id="data-manager-container">
           <!-- Data Manager rendered by JS -->
+        </div>
+      </div>
+    </section>
+    
+    <!-- Diary View -->
+    <section id="view-diary" class="view hidden" aria-label="穿搭日记">
+      <header class="diary-header">
+        <button id="btn-back-from-diary" class="btn btn-icon" aria-label="返回">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h2>穿搭日记</h2>
+        <div class="diary-view-switch">
+          <button class="diary-view-btn active" data-view="calendar">日历</button>
+          <button class="diary-view-btn" data-view="timeline">时间线</button>
+        </div>
+      </header>
+      
+      <div class="diary-body">
+        <!-- 统计卡片 -->
+        <div class="diary-stats">
+          <div class="stat-card">
+            <span class="stat-number streak-days">0</span>
+            <span class="stat-label">连续记录</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number total-records">0</span>
+            <span class="stat-label">总记录</span>
+          </div>
+        </div>
+        
+        <!-- 日历视图 -->
+        <div class="calendar-view">
+          <div class="calendar-nav">
+            <button id="btn-prev-month" class="btn btn-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <span class="current-month">2024年1月</span>
+            <button id="btn-next-month" class="btn btn-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+          <div class="calendar-grid">
+            <!-- Calendar rendered by JS -->
+          </div>
+        </div>
+        
+        <!-- 时间线视图 -->
+        <div class="timeline-view hidden">
+          <div class="timeline-list">
+            <!-- Timeline rendered by JS -->
+          </div>
+        </div>
+        
+        <!-- 颜色统计 -->
+        <div class="color-stats-section">
+          <h3>颜色偏好</h3>
+          <div class="color-stats">
+            <!-- Color stats rendered by JS -->
+          </div>
         </div>
       </div>
     </section>

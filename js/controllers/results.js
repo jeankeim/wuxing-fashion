@@ -47,6 +47,14 @@ export class ResultsController extends BaseController {
       });
     }
 
+    // 日记按钮
+    const diaryBtn = this.container.querySelector('#btn-diary');
+    if (diaryBtn) {
+      this.addEventListener(diaryBtn, 'click', () => {
+        navigateTo('/diary');
+      });
+    }
+
     // 换一批
     const regenerateBtn = this.container.querySelector('#btn-regenerate');
     if (regenerateBtn) {

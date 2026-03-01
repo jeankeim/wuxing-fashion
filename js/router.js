@@ -12,6 +12,7 @@ const ROUTES = {
   '/results': { view: 'view-results', title: '推荐结果' },
   '/favorites': { view: 'view-favorites', title: '我的收藏' },
   '/profile': { view: 'view-profile', title: '我的画像' },
+  '/diary': { view: 'view-diary', title: '穿搭日记' },
   '/upload': { view: 'view-upload', title: '上传照片' }
 };
 
