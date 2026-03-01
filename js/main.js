@@ -4,7 +4,7 @@
 
 import * as storage from './storage.js';
 import { detectCurrentTerm, getWuxingColor } from './solar-terms.js';
-import { analyzeBazi } from './bazi.js';
+import { analyzeBazi, analyzeBaziPrecise } from './bazi.js';
 import { generateRecommendation, regenerateRecommendation } from './engine.js';
 import {
   showView, initYearSelect, initDaySelect,
@@ -65,6 +65,10 @@ async function init() {
     restoreBaziForm(savedBazi);
   }
   
+  // 恢复精度设置
+  const savedPrecision = getPrecision();
+  switchPrecision(savedPrecision);
+  
   // 绑定事件
   bindEvents();
   
@@ -113,6 +117,14 @@ function bindEvents() {
     tag.addEventListener('click', () => {
       const wishId = tag.dataset.wish;
       selectWish(wishId);
+    });
+  });
+  
+  // 精度切换
+  document.querySelectorAll('.precision-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const precision = btn.dataset.precision;
+      switchPrecision(precision);
     });
   });
   
@@ -224,6 +236,40 @@ function selectWish(wishId) {
 }
 
 /**
+ * 切换八字精度模式
+ */
+function switchPrecision(precision) {
+  // 更新按钮状态
+  document.querySelectorAll('.precision-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.precision === precision);
+  });
+  
+  // 显示/隐藏精确字段
+  const preciseFields = document.querySelector('.precise-fields');
+  if (preciseFields) {
+    preciseFields.classList.toggle('hidden', precision !== 'precise');
+  }
+  
+  // 更新提示文字
+  const hint = document.getElementById('precision-hint');
+  if (hint) {
+    hint.textContent = precision === 'simple' 
+      ? '简版：仅需年月日时，快速计算'
+      : '精确：考虑节气交界和出生地时差，更准确';
+  }
+  
+  // 保存用户偏好
+  storage.set('bazi_precision', precision);
+}
+
+/**
+ * 获取当前精度模式
+ */
+function getPrecision() {
+  return storage.get('bazi_precision') || 'simple';
+}
+
+/**
  * 恢复八字表单
  */
 function restoreBaziForm(bazi) {
@@ -245,12 +291,23 @@ function getBaziFormData() {
   const hour = document.getElementById('bazi-hour')?.value;
   
   if (year && month && day && hour !== '') {
-    return {
+    const data = {
       year: parseInt(year, 10),
       month: parseInt(month, 10),
       day: parseInt(day, 10),
-      hour: parseInt(hour, 10)
+      hour: parseInt(hour, 10),
+      precision: getPrecision()
     };
+    
+    // 精确模式额外数据
+    if (data.precision === 'precise') {
+      const minute = document.getElementById('bazi-minute')?.value || '0';
+      const timezone = document.getElementById('bazi-timezone')?.value || '8';
+      data.minute = parseInt(minute, 10);
+      data.timezone = parseInt(timezone, 10);
+    }
+    
+    return data;
   }
   
   return null;
@@ -269,15 +326,31 @@ async function handleGenerate() {
   if (baziForm) {
     // 保存八字
     storage.saveLastBazi(baziForm);
-    // 计算八字
-    baziResult = analyzeBazi(
-      baziForm.year,
-      baziForm.month,
-      baziForm.day,
-      baziForm.hour
-    );
+    
+    // 根据精度模式计算八字
+    if (baziForm.precision === 'precise') {
+      // 精确模式：时辰(0-11) * 2 转换为 0-23小时
+      const realHour = baziForm.hour * 2;
+      baziResult = analyzeBaziPrecise(
+        baziForm.year,
+        baziForm.month,
+        baziForm.day,
+        realHour,
+        baziForm.minute,
+        baziForm.timezone
+      );
+    } else {
+      // 简版模式
+      baziResult = analyzeBazi(
+        baziForm.year,
+        baziForm.month,
+        baziForm.day,
+        baziForm.hour
+      );
+    }
+    
     setState(StateKeys.CURRENT_BAZI_RESULT, baziResult);
-    console.log('[App] Bazi:', baziResult?.bazi?.fullBazi);
+    console.log('[App] Bazi:', baziResult?.bazi?.fullBazi, 'Mode:', baziForm.precision);
   } else {
     setState(StateKeys.CURRENT_BAZI_RESULT, null);
   }

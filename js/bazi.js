@@ -1,5 +1,6 @@
 /**
- * Bazi Module - 八字计算 (简化版)
+ * Bazi Module - 八字计算
+ * 支持简版和精确模式
  */
 
 // 天干
@@ -26,18 +27,17 @@ const ZHI_WUXING = {
 
 // 五鼠遁 - 根据日干推时干
 const WU_SHU_DUN = {
-  '甲': 0, '己': 0,  // 甲己日起甲子时
-  '乙': 2, '庚': 2,  // 乙庚日起丙子时
-  '丙': 4, '辛': 4,  // 丙辛日起戊子时
-  '丁': 6, '壬': 6,  // 丁壬日起庚子时
-  '戊': 8, '癸': 8   // 戊癸日起壬子时
+  '甲': 0, '己': 0,
+  '乙': 2, '庚': 2,
+  '丙': 4, '辛': 4,
+  '丁': 6, '壬': 6,
+  '戊': 8, '癸': 8
 };
 
 /**
- * 计算年柱
+ * 计算年柱（简化版）
  */
 function calcYearPillar(year) {
-  // 以立春为界，简化处理使用公历年
   const ganIndex = (year - 4) % 10;
   const zhiIndex = (year - 4) % 12;
   return {
@@ -48,15 +48,12 @@ function calcYearPillar(year) {
 }
 
 /**
- * 计算月柱 (简化版，基于月份)
+ * 计算月柱（简化版）
  */
 function calcMonthPillar(year, month) {
-  // 简化：根据年干推月干
   const yearGanIndex = (year - 4) % 10;
   const monthGanBase = (yearGanIndex % 5) * 2;
   const monthGanIndex = (monthGanBase + month - 1) % 10;
-  
-  // 月支：正月寅，二月卯...
   const monthZhiIndex = (month + 1) % 12;
   
   return {
@@ -67,11 +64,10 @@ function calcMonthPillar(year, month) {
 }
 
 /**
- * 计算日柱 (简化版)
+ * 计算日柱（简化版）
  */
 function calcDayPillar(year, month, day) {
-  // 简化公式：基于固定基准日期计算
-  const baseDate = new Date(1900, 0, 31); // 1900年1月31日为甲子日
+  const baseDate = new Date(1900, 0, 31);
   const targetDate = new Date(year, month - 1, day);
   const diffDays = Math.floor((targetDate - baseDate) / (1000 * 60 * 60 * 24));
   
@@ -86,10 +82,9 @@ function calcDayPillar(year, month, day) {
 }
 
 /**
- * 计算时柱
+ * 计算时柱（简化版）
  */
 function calcHourPillar(dayGan, hour) {
-  // 五鼠遁
   const hourGanBase = WU_SHU_DUN[dayGan];
   const hourGanIndex = (hourGanBase + hour) % 10;
   
@@ -101,14 +96,9 @@ function calcHourPillar(dayGan, hour) {
 }
 
 /**
- * 计算八字
- * @param {number} year - 出生年
- * @param {number} month - 出生月 (1-12)
- * @param {number} day - 出生日
- * @param {number} hour - 时辰 (0-11: 子丑寅卯辰巳午未申酉戌亥)
- * @returns {Object} 四柱八字
+ * 简版八字计算
  */
-export function calcBazi(year, month, day, hour) {
+export function calcBaziSimple(year, month, day, hour) {
   const yearPillar = calcYearPillar(year);
   const monthPillar = calcMonthPillar(year, month);
   const dayPillar = calcDayPillar(year, month, day);
@@ -119,8 +109,77 @@ export function calcBazi(year, month, day, hour) {
     month: monthPillar,
     day: dayPillar,
     hour: hourPillar,
-    fullBazi: `${yearPillar.full} ${monthPillar.full} ${dayPillar.full} ${hourPillar.full}`
+    fullBazi: `${yearPillar.full} ${monthPillar.full} ${dayPillar.full} ${hourPillar.full}`,
+    precision: 'simple'
   };
+}
+
+/**
+ * 精确八字计算（使用 lunar-javascript）
+ * @param {number} year - 出生年
+ * @param {number} month - 出生月
+ * @param {number} day - 出生日
+ * @param {number} hour - 时辰 (0-23)
+ * @param {number} minute - 分钟
+ * @param {number} timezone - 时区偏移（默认8为北京时间）
+ * @returns {Object} 四柱八字
+ */
+export function calcBaziPrecise(year, month, day, hour, minute = 0, timezone = 8) {
+  // 检查 lunar-javascript 是否加载
+  if (typeof Lunar === 'undefined') {
+    console.warn('[Bazi] Lunar library not loaded, falling back to simple mode');
+    return calcBaziSimple(year, month, day, Math.floor(hour / 2) % 12);
+  }
+  
+  try {
+    // 创建农历日期对象
+    const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
+    const lunar = solar.getLunar();
+    const bazi = lunar.getEightChar();
+    
+    // 获取四柱
+    const yearGan = bazi.getYearGan();
+    const yearZhi = bazi.getYearZhi();
+    const monthGan = bazi.getMonthGan();
+    const monthZhi = bazi.getMonthZhi();
+    const dayGan = bazi.getDayGan();
+    const dayZhi = bazi.getDayZhi();
+    const timeGan = bazi.getTimeGan();
+    const timeZhi = bazi.getTimeZhi();
+    
+    return {
+      year: {
+        gan: yearGan,
+        zhi: yearZhi,
+        full: yearGan + yearZhi
+      },
+      month: {
+        gan: monthGan,
+        zhi: monthZhi,
+        full: monthGan + monthZhi
+      },
+      day: {
+        gan: dayGan,
+        zhi: dayZhi,
+        full: dayGan + dayZhi
+      },
+      hour: {
+        gan: timeGan,
+        zhi: timeZhi,
+        full: timeGan + timeZhi
+      },
+      fullBazi: `${yearGan}${yearZhi} ${monthGan}${monthZhi} ${dayGan}${dayZhi} ${timeGan}${timeZhi}`,
+      precision: 'precise',
+      lunar: {
+        year: lunar.getYear(),
+        month: lunar.getMonth(),
+        day: lunar.getDay()
+      }
+    };
+  } catch (error) {
+    console.error('[Bazi] Precise calculation failed:', error);
+    return calcBaziSimple(year, month, day, Math.floor(hour / 2) % 12);
+  }
 }
 
 /**
@@ -177,10 +236,25 @@ function getWuxingName(wuxing) {
 }
 
 /**
- * 完整的八字计算流程
+ * 完整的八字计算流程（简版）
  */
 export function analyzeBazi(year, month, day, hour) {
-  const bazi = calcBazi(year, month, day, hour);
+  const bazi = calcBaziSimple(year, month, day, hour);
+  const profile = calcWuxingProfile(bazi);
+  const recommend = getRecommendElement(profile);
+  
+  return {
+    bazi,
+    profile,
+    recommend
+  };
+}
+
+/**
+ * 完整的八字计算流程（精确版）
+ */
+export function analyzeBaziPrecise(year, month, day, hour, minute = 0, timezone = 8) {
+  const bazi = calcBaziPrecise(year, month, day, hour, minute, timezone);
   const profile = calcWuxingProfile(bazi);
   const recommend = getRecommendElement(profile);
   

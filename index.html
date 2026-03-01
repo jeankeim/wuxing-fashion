@@ -61,7 +61,14 @@
         
         <!-- Bazi Input -->
         <div class="bazi-section">
-          <p class="section-hint">输入生辰八字（可选，用于更精准推荐）</p>
+          <div class="bazi-header">
+            <p class="section-hint">输入生辰八字（可选，用于更精准推荐）</p>
+            <div class="precision-toggle">
+              <button class="precision-btn active" data-precision="simple" type="button">简版</button>
+              <button class="precision-btn" data-precision="precise" type="button">精确</button>
+            </div>
+          </div>
+          <p class="precision-hint" id="precision-hint">简版：仅需年月日时，快速计算</p>
           <div class="bazi-form">
             <div class="bazi-row">
               <label class="bazi-field">
@@ -112,6 +119,25 @@
                   <option value="9">酉时 (17:00-19:00)</option>
                   <option value="10">戌时 (19:00-21:00)</option>
                   <option value="11">亥时 (21:00-23:00)</option>
+                </select>
+              </label>
+            </div>
+            <!-- 精确模式额外输入 -->
+            <div class="bazi-row precise-fields hidden">
+              <label class="bazi-field">
+                <span class="bazi-label">分钟</span>
+                <select id="bazi-minute" class="bazi-select">
+                  <option value="0">00分</option>
+                  <option value="15">15分</option>
+                  <option value="30">30分</option>
+                  <option value="45">45分</option>
+                </select>
+              </label>
+              <label class="bazi-field">
+                <span class="bazi-label">出生地</span>
+                <select id="bazi-timezone" class="bazi-select">
+                  <option value="8">北京时间 (UTC+8)</option>
+                  <option value="6">新疆时间 (UTC+6)</option>
                 </select>
               </label>
             </div>
@@ -251,6 +277,9 @@
     </svg>
     <span>本地存储</span>
   </div>
+  
+  <!-- Lunar JavaScript Library -->
+  <script src="js/lib/lunar.js"></script>
   
   <!-- Main Script -->
   <script type="module" src="js/main.js"></script>
