@@ -2,6 +2,8 @@
  * Engine Module - 推荐引擎
  */
 
+import { safeFetch, safeJsonParse, withErrorHandler, ErrorTypes } from './error-handler.js';
+
 let schemesData = null;
 let intentionData = null;
 let baziTemplateData = null;
@@ -38,14 +40,9 @@ const TERM_ORDER = [
  */
 async function loadSchemes() {
   if (schemesData) return schemesData;
-  try {
-    const response = await fetch('data/schemes.json');
-    schemesData = await response.json();
-    return schemesData;
-  } catch (error) {
-    console.error('[Engine] Failed to load schemes:', error);
-    return null;
-  }
+  const response = await safeFetch('data/schemes.json');
+  schemesData = await safeJsonParse(response);
+  return schemesData;
 }
 
 /**
@@ -53,14 +50,9 @@ async function loadSchemes() {
  */
 async function loadIntentionTemplates() {
   if (intentionData) return intentionData;
-  try {
-    const response = await fetch('data/intention-templates.json');
-    intentionData = await response.json();
-    return intentionData;
-  } catch (error) {
-    console.error('[Engine] Failed to load intention templates:', error);
-    return null;
-  }
+  const response = await safeFetch('data/intention-templates.json');
+  intentionData = await safeJsonParse(response);
+  return intentionData;
 }
 
 /**
@@ -68,14 +60,9 @@ async function loadIntentionTemplates() {
  */
 async function loadBaziTemplates() {
   if (baziTemplateData) return baziTemplateData;
-  try {
-    const response = await fetch('data/bazi-templates.json');
-    baziTemplateData = await response.json();
-    return baziTemplateData;
-  } catch (error) {
-    console.error('[Engine] Failed to load bazi templates:', error);
-    return null;
-  }
+  const response = await safeFetch('data/bazi-templates.json');
+  baziTemplateData = await safeJsonParse(response);
+  return baziTemplateData;
 }
 
 /**

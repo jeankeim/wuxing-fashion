@@ -2,28 +2,28 @@
  * Storage Module - 本地存储管理
  */
 
+import { safeStorage } from './error-handler.js';
+
 const PREFIX = 'wuxing_';
 
 export function get(key) {
-  try {
+  return safeStorage(() => {
     const value = localStorage.getItem(PREFIX + key);
     return value ? JSON.parse(value) : null;
-  } catch {
-    return null;
-  }
+  });
 }
 
 export function set(key, value) {
-  try {
+  return safeStorage(() => {
     localStorage.setItem(PREFIX + key, JSON.stringify(value));
     return true;
-  } catch {
-    return false;
-  }
+  });
 }
 
 export function remove(key) {
-  localStorage.removeItem(PREFIX + key);
+  safeStorage(() => {
+    localStorage.removeItem(PREFIX + key);
+  });
 }
 
 export function getKeysByPrefix(prefix) {

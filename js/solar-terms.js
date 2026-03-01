@@ -2,6 +2,8 @@
  * Solar Terms Module - 节气识别
  */
 
+import { safeFetch, safeJsonParse } from './error-handler.js';
+
 let termsData = null;
 
 /**
@@ -18,14 +20,9 @@ export function getUTC8Date(date = new Date()) {
 export async function loadTermsData() {
   if (termsData) return termsData;
   
-  try {
-    const response = await fetch('data/solar-terms.json');
-    termsData = await response.json();
-    return termsData;
-  } catch (error) {
-    console.error('[SolarTerms] Failed to load data:', error);
-    return null;
-  }
+  const response = await safeFetch('data/solar-terms.json');
+  termsData = await safeJsonParse(response);
+  return termsData;
 }
 
 /**

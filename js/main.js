@@ -13,6 +13,7 @@ import {
   updateUploadPreview, showToast
 } from './render.js';
 import { validateFile, compressImage, initUploadZone, getTodayString } from './upload.js';
+import { initGlobalErrorHandler, withErrorHandler, ErrorTypes } from './error-handler.js';
 
 // 应用状态
 let currentTermInfo = null;
@@ -26,8 +27,14 @@ let currentResult = null;
 async function init() {
   console.log('[App] Initializing...');
   
+  // 初始化全局错误处理
+  initGlobalErrorHandler();
+  
   // 加载节气信息
-  currentTermInfo = await detectCurrentTerm();
+  currentTermInfo = await withErrorHandler(detectCurrentTerm, {
+    errorType: ErrorTypes.NETWORK,
+    customMessage: '节气数据加载失败'
+  })();
   console.log('[App] Current term:', currentTermInfo?.current?.name);
   
   // 初始化表单
