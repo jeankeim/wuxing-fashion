@@ -394,6 +394,338 @@
   color: var(--color-text-secondary);
 }
 
+/* === Explanation Card === */
+.explanation-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-top: var(--space-4);
+}
+
+.explanation-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-primary);
+}
+
+.reasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.reason-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-border-light);
+  border-radius: var(--radius-md);
+}
+
+.reason-icon {
+  font-size: var(--text-xl);
+  flex-shrink: 0;
+}
+
+.reason-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.reason-title {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+.reason-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* 不同类型理由的颜色 */
+.reason-term { border-left: 3px solid var(--color-wood); }
+.reason-bazi { border-left: 3px solid var(--color-fire); }
+.reason-scene { border-left: 3px solid var(--color-earth); }
+.reason-luck { border-left: 3px solid var(--color-metal); }
+.reason-personal { border-left: 3px solid var(--color-water); }
+
+/* 五行雷达图（小） */
+.wuxing-radar {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.radar-svg {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.radar-bg {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.radar-label {
+  font-size: 10px;
+  fill: var(--color-text-secondary);
+}
+
+.radar-label.active {
+  fill: var(--color-wood);
+  font-weight: 600;
+}
+
+.radar-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* === User Profile Panel === */
+.user-profile-panel {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.profile-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.stat-value {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-wood);
+}
+
+.stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.profile-section {
+  margin-bottom: var(--space-6);
+}
+
+.profile-section h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+/* 五行雷达图（大） */
+.wuxing-radar-chart {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
+  display: block;
+}
+
+.wuxing-radar-chart .radar-grid {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 0.5;
+}
+
+.wuxing-radar-chart .radar-axis {
+  stroke: var(--color-border);
+  stroke-width: 0.5;
+}
+
+.wuxing-radar-chart .radar-area {
+  fill: rgba(74, 124, 89, 0.3);
+  stroke: var(--color-wood);
+  stroke-width: 2;
+}
+
+.wuxing-radar-chart .radar-label {
+  font-size: 12px;
+  fill: var(--color-text-secondary);
+}
+
+/* 柱状图 */
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  animation: slideIn 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.bar-label {
+  width: 60px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background-color: var(--color-border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-wood), var(--color-wood-light));
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease-out;
+}
+
+.bar-value {
+  width: 30px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* 饼图 */
+.pie-chart-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.pie-chart {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.pie-slice {
+  transition: opacity 0.2s;
+}
+
+.pie-slice:hover {
+  opacity: 0.8;
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-name {
+  color: var(--color-text-secondary);
+}
+
+.legend-value {
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+
+/* 趋势图 */
+.trend-chart {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  display: block;
+}
+
+.trend-axis {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.trend-line {
+  stroke: var(--color-wood);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trend-point {
+  fill: var(--color-wood);
+  stroke: white;
+  stroke-width: 2;
+}
+
+.trend-label {
+  font-size: 10px;
+  fill: var(--color-text-secondary);
+}
+
+.chart-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  padding: var(--space-4);
+}
+
 /* === Share Menu === */
 .share-menu {
   position: fixed;

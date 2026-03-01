@@ -3,6 +3,8 @@
  */
 
 import { isFavorite } from './storage.js';
+import { renderExplanationCard } from './explanation.js';
+import { renderUserProfilePanel } from './profile.js';
 
 /**
  * 显示指定视图
@@ -173,10 +175,17 @@ function createSchemeCard(scheme, index) {
 
 /**
  * 渲染详情模态框
+ * @param {Object} scheme - 方案
+ * @param {Object} context - 推荐上下文（可选）
  */
-export function renderDetailModal(scheme) {
+export function renderDetailModal(scheme, context = null) {
   const body = document.getElementById('modal-detail-body');
   if (!body || !scheme) return;
+  
+  let explanationHtml = '';
+  if (context) {
+    explanationHtml = renderExplanationCard(scheme, context);
+  }
   
   body.innerHTML = `
     <div class="detail-section">
@@ -207,7 +216,19 @@ export function renderDetailModal(scheme) {
       <p class="detail-label">典籍出处</p>
       <div class="detail-quote">${scheme.source}</div>
     </div>
+    
+    ${explanationHtml}
   `;
+}
+
+/**
+ * 渲染用户画像视图
+ */
+export function renderProfileView() {
+  const container = document.getElementById('profile-container');
+  if (!container) return;
+  
+  container.innerHTML = renderUserProfilePanel();
 }
 
 /**

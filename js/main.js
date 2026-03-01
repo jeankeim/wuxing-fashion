@@ -10,7 +10,7 @@ import {
   showView, initYearSelect, initDaySelect,
   renderSolarBanner, renderResultHeader, renderSchemeCards,
   renderDetailModal, showModal, closeModal,
-  updateUploadPreview, showToast, renderFavoritesList
+  updateUploadPreview, showToast, renderFavoritesList, renderProfileView
 } from './render.js';
 import { validateFile, compressImage, initUploadZone, getTodayString } from './upload.js';
 import { initGlobalErrorHandler, withErrorHandler, ErrorTypes } from './error-handler.js';
@@ -173,6 +173,19 @@ function bindEvents() {
     setState(StateKeys.CURRENT_VIEW, ViewNames.RESULTS);
   });
   
+  // 画像按钮
+  document.getElementById('btn-profile')?.addEventListener('click', () => {
+    renderProfileView();
+    showView('view-profile');
+    setState(StateKeys.CURRENT_VIEW, 'view-profile');
+  });
+  
+  // 从画像页返回
+  document.getElementById('btn-back-results-from-profile')?.addEventListener('click', () => {
+    showView(ViewNames.RESULTS);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.RESULTS);
+  });
+  
   // 移除图片
   document.getElementById('btn-remove-image')?.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -193,8 +206,26 @@ function bindEvents() {
       const index = parseInt(detailBtn.dataset.index, 10);
       const schemes = window.__currentSchemes;
       if (schemes && schemes[index]) {
-        renderDetailModal(schemes[index]);
+        const scheme = schemes[index];
+        const result = getState(StateKeys.CURRENT_RESULT);
+        
+        // 构建推荐上下文
+        const context = result ? {
+          termWuxing: result.termInfo?.current?.wuxing,
+          termName: result.termInfo?.current?.name,
+          baziWuxing: result.baziResult?.recommend?.recommend,
+          sceneId: result.sceneId || 'daily'
+        } : null;
+        
+        renderDetailModal(scheme, context);
         showModal('modal-detail');
+        
+        // 记录查看反馈
+        recordFeedback(scheme.id, 'view', {
+          wuxing: scheme.color.wuxing,
+          color: scheme.color.name,
+          material: scheme.material
+        });
       }
     }
     
