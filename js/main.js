@@ -15,12 +15,11 @@ import {
 import { validateFile, compressImage, initUploadZone, getTodayString } from './upload.js';
 import { initGlobalErrorHandler, withErrorHandler, ErrorTypes } from './error-handler.js';
 import { addFavorite, removeFavorite, isFavorite, getFavorites } from './storage.js';
+import { store, StateKeys, ViewNames } from './store.js';
 
-// 应用状态
-let currentTermInfo = null;
-let currentWishId = null;
-let currentBaziResult = null;
-let currentResult = null;
+// 便捷访问状态的方法
+const getState = (key) => store.get(key);
+const setState = (key, value) => store.set(key, value);
 
 /**
  * 初始化应用
@@ -31,19 +30,28 @@ async function init() {
   // 初始化全局错误处理
   initGlobalErrorHandler();
   
+  // 订阅状态变化（用于调试）
+  store.subscribe(StateKeys.CURRENT_VIEW, (view) => {
+    console.log('[Store] View changed to:', view);
+  });
+  
   // 加载节气信息
-  currentTermInfo = await withErrorHandler(detectCurrentTerm, {
+  const termInfo = await withErrorHandler(detectCurrentTerm, {
     errorType: ErrorTypes.NETWORK,
     customMessage: '节气数据加载失败'
   })();
-  console.log('[App] Current term:', currentTermInfo?.current?.name);
+  
+  if (termInfo) {
+    setState(StateKeys.CURRENT_TERM_INFO, termInfo);
+    console.log('[App] Current term:', termInfo.current?.name);
+  }
   
   // 初始化表单
   initYearSelect();
   initDaySelect();
   
   // 渲染节气横幅
-  renderSolarBanner(currentTermInfo);
+  renderSolarBanner(getState(StateKeys.CURRENT_TERM_INFO));
   
   // 恢复上次选择的心愿
   const savedWish = storage.getSelectedWish();
@@ -80,20 +88,24 @@ async function init() {
 function bindEvents() {
   // 开始按钮
   document.getElementById('btn-start')?.addEventListener('click', () => {
-    showView('view-entry');
+    showView(ViewNames.ENTRY);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.ENTRY);
   });
   
   // 返回按钮
   document.getElementById('btn-back-welcome')?.addEventListener('click', () => {
-    showView('view-welcome');
+    showView(ViewNames.WELCOME);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.WELCOME);
   });
   
   document.getElementById('btn-back-entry')?.addEventListener('click', () => {
-    showView('view-entry');
+    showView(ViewNames.ENTRY);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.ENTRY);
   });
   
   document.getElementById('btn-back-results')?.addEventListener('click', () => {
-    showView('view-results');
+    showView(ViewNames.RESULTS);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.RESULTS);
   });
   
   // 心愿选择
@@ -112,7 +124,8 @@ function bindEvents() {
   
   // 上传按钮
   document.getElementById('btn-upload')?.addEventListener('click', () => {
-    showView('view-upload');
+    showView(ViewNames.UPLOAD);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.UPLOAD);
     // 检查今日是否有已上传的图片
     const todayImage = storage.getUploadedOutfit(getTodayString());
     if (todayImage) {
@@ -124,12 +137,14 @@ function bindEvents() {
   document.getElementById('btn-favorites')?.addEventListener('click', () => {
     const favorites = getFavorites();
     renderFavoritesList(favorites);
-    showView('view-favorites');
+    showView(ViewNames.FAVORITES);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.FAVORITES);
   });
   
   // 从收藏页返回
   document.getElementById('btn-back-results-from-fav')?.addEventListener('click', () => {
-    showView('view-results');
+    showView(ViewNames.RESULTS);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.RESULTS);
   });
   
   // 移除图片
@@ -204,7 +219,7 @@ function selectWish(wishId) {
   document.querySelectorAll('.wish-tag').forEach(tag => {
     tag.classList.toggle('active', tag.dataset.wish === wishId);
   });
-  currentWishId = wishId;
+  setState(StateKeys.CURRENT_WISH_ID, wishId);
   storage.saveSelectedWish(wishId);
 }
 
@@ -249,40 +264,46 @@ async function handleGenerate() {
   
   // 获取八字数据
   const baziForm = getBaziFormData();
+  let baziResult = null;
   
   if (baziForm) {
     // 保存八字
     storage.saveLastBazi(baziForm);
     // 计算八字
-    currentBaziResult = analyzeBazi(
+    baziResult = analyzeBazi(
       baziForm.year,
       baziForm.month,
       baziForm.day,
       baziForm.hour
     );
-    console.log('[App] Bazi:', currentBaziResult?.bazi?.fullBazi);
+    setState(StateKeys.CURRENT_BAZI_RESULT, baziResult);
+    console.log('[App] Bazi:', baziResult?.bazi?.fullBazi);
   } else {
-    currentBaziResult = null;
+    setState(StateKeys.CURRENT_BAZI_RESULT, null);
   }
   
   // 生成推荐
-  currentResult = await generateRecommendation(
-    currentTermInfo,
-    currentWishId,
-    currentBaziResult
+  const result = await generateRecommendation(
+    getState(StateKeys.CURRENT_TERM_INFO),
+    getState(StateKeys.CURRENT_WISH_ID),
+    baziResult
   );
   
-  if (currentResult && currentResult.schemes.length > 0) {
-    // 保存结果
-    storage.saveLastResult(currentResult);
+  if (result && result.schemes.length > 0) {
+    // 保存结果到 Store
+    setState(StateKeys.CURRENT_RESULT, result);
+    
+    // 持久化存储
+    storage.saveLastResult(result);
     storage.incrementUsage('generates');
     
     // 渲染结果
-    renderResultHeader(currentTermInfo);
-    renderSchemeCards(currentResult.schemes);
+    renderResultHeader(getState(StateKeys.CURRENT_TERM_INFO));
+    renderSchemeCards(result.schemes);
     
     // 切换视图
-    showView('view-results');
+    showView(ViewNames.RESULTS);
+    setState(StateKeys.CURRENT_VIEW, ViewNames.RESULTS);
   } else {
     showToast('生成失败，请重试');
   }
@@ -294,19 +315,20 @@ async function handleGenerate() {
 async function handleRegenerate() {
   console.log('[App] Regenerating...');
   
+  const currentResult = getState(StateKeys.CURRENT_RESULT);
   const excludeIds = currentResult?.schemes?.map(s => s.id) || [];
   
   const newResult = await regenerateRecommendation(
-    currentTermInfo,
-    currentWishId,
-    currentBaziResult,
+    getState(StateKeys.CURRENT_TERM_INFO),
+    getState(StateKeys.CURRENT_WISH_ID),
+    getState(StateKeys.CURRENT_BAZI_RESULT),
     excludeIds
   );
   
   if (newResult && newResult.schemes.length > 0) {
-    currentResult = newResult;
-    storage.saveLastResult(currentResult);
-    renderSchemeCards(currentResult.schemes);
+    setState(StateKeys.CURRENT_RESULT, newResult);
+    storage.saveLastResult(newResult);
+    renderSchemeCards(newResult.schemes);
     showToast('已为您换一批');
   } else {
     showToast('暂无更多推荐');

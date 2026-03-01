@@ -21,6 +21,7 @@ const PRECACHE_ASSETS = [
   '/js/storage.js',
   '/js/upload.js',
   '/js/error-handler.js',
+  '/js/store.js',
   '/data/schemes.json',
   '/data/solar-terms.json',
   '/data/intention-templates.json',
