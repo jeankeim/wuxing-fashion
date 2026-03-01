@@ -1,0 +1,271 @@
+/**
+ * Render Module - DOM渲染
+ */
+
+/**
+ * 显示指定视图
+ */
+export function showView(viewId) {
+  document.querySelectorAll('.view').forEach(view => {
+    view.classList.add('hidden');
+  });
+  const target = document.getElementById(viewId);
+  if (target) {
+    target.classList.remove('hidden');
+  }
+}
+
+/**
+ * 初始化年份选择器
+ */
+export function initYearSelect() {
+  const select = document.getElementById('bazi-year');
+  if (!select) return;
+  
+  const currentYear = new Date().getFullYear();
+  const startYear = 1950;
+  const endYear = currentYear - 16; // 至少16岁
+  
+  for (let year = endYear; year >= startYear; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year + '年';
+    select.appendChild(option);
+  }
+}
+
+/**
+ * 初始化日期选择器
+ */
+export function initDaySelect() {
+  const select = document.getElementById('bazi-day');
+  if (!select) return;
+  
+  for (let day = 1; day <= 31; day++) {
+    const option = document.createElement('option');
+    option.value = day;
+    option.textContent = day + '日';
+    select.appendChild(option);
+  }
+}
+
+/**
+ * 渲染节气横幅
+ */
+export function renderSolarBanner(termInfo) {
+  const banner = document.getElementById('solar-banner');
+  if (!banner || !termInfo) return;
+  
+  const nameEl = banner.querySelector('.solar-term-name');
+  const elementEl = banner.querySelector('.solar-term-element');
+  
+  if (nameEl) {
+    nameEl.textContent = termInfo.current.name;
+  }
+  
+  if (elementEl) {
+    elementEl.textContent = termInfo.current.wuxingName;
+    elementEl.style.backgroundColor = getWuxingBgColor(termInfo.current.wuxing);
+    elementEl.style.color = getWuxingTextColor(termInfo.current.wuxing);
+  }
+}
+
+/**
+ * 获取五行背景色
+ */
+function getWuxingBgColor(wuxing) {
+  const colors = {
+    wood: '#E8F5E9',
+    fire: '#FFEBEE',
+    earth: '#FFF8E1',
+    metal: '#F5F5F5',
+    water: '#E3F2FD'
+  };
+  return colors[wuxing] || '#F5F5F5';
+}
+
+/**
+ * 获取五行文字色
+ */
+function getWuxingTextColor(wuxing) {
+  const colors = {
+    wood: '#2E7D32',
+    fire: '#C62828',
+    earth: '#F57F17',
+    metal: '#616161',
+    water: '#1565C0'
+  };
+  return colors[wuxing] || '#666666';
+}
+
+/**
+ * 渲染结果页标题
+ */
+export function renderResultHeader(termInfo) {
+  const termEl = document.getElementById('results-term');
+  if (termEl && termInfo) {
+    termEl.textContent = `${termInfo.current.name} · ${termInfo.current.wuxingName}`;
+  }
+}
+
+/**
+ * 渲染方案卡片
+ */
+export function renderSchemeCards(schemes) {
+  const container = document.getElementById('scheme-cards');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  schemes.forEach((scheme, index) => {
+    const card = createSchemeCard(scheme, index);
+    container.appendChild(card);
+  });
+  
+  // 保存到全局供详情模态框使用
+  window.__currentSchemes = schemes;
+}
+
+/**
+ * 创建方案卡片
+ */
+function createSchemeCard(scheme, index) {
+  const card = document.createElement('div');
+  card.className = 'scheme-card';
+  card.style.animationDelay = `${index * 100}ms`;
+  
+  card.innerHTML = `
+    <div class="scheme-color-bar" style="background-color: ${scheme.color.hex}"></div>
+    <div class="scheme-keywords">
+      <span class="scheme-keyword">${scheme.color.name}</span>
+      <span class="scheme-keyword">${scheme.material}</span>
+      <span class="scheme-keyword">${scheme.feeling}</span>
+    </div>
+    <p class="scheme-annotation">${scheme.annotation}</p>
+    <p class="scheme-source">${scheme.source}</p>
+    <div class="scheme-actions">
+      <button class="scheme-detail-btn" data-index="${index}" type="button">
+        查看详解
+      </button>
+    </div>
+  `;
+  
+  return card;
+}
+
+/**
+ * 渲染详情模态框
+ */
+export function renderDetailModal(scheme) {
+  const body = document.getElementById('modal-detail-body');
+  if (!body || !scheme) return;
+  
+  body.innerHTML = `
+    <div class="detail-section">
+      <div class="scheme-color-bar" style="background-color: ${scheme.color.hex}; height: 40px; border-radius: 8px;"></div>
+    </div>
+    
+    <div class="detail-section">
+      <p class="detail-label">色彩</p>
+      <p class="detail-text">${scheme.color.name} (${scheme.color.hex})</p>
+    </div>
+    
+    <div class="detail-section">
+      <p class="detail-label">材质</p>
+      <p class="detail-text">${scheme.material}</p>
+    </div>
+    
+    <div class="detail-section">
+      <p class="detail-label">感受</p>
+      <p class="detail-text">${scheme.feeling}</p>
+    </div>
+    
+    <div class="detail-section">
+      <p class="detail-label">五行解读</p>
+      <p class="detail-text">${scheme.annotation}</p>
+    </div>
+    
+    <div class="detail-section">
+      <p class="detail-label">典籍出处</p>
+      <div class="detail-quote">${scheme.source}</div>
+    </div>
+  `;
+}
+
+/**
+ * 显示模态框
+ */
+export function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+/**
+ * 关闭模态框
+ */
+export function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+}
+
+/**
+ * 更新上传预览
+ */
+export function updateUploadPreview(imageData) {
+  const placeholder = document.querySelector('.upload-placeholder');
+  const preview = document.querySelector('.upload-preview');
+  const previewImg = document.getElementById('preview-image');
+  const feedbackSection = document.getElementById('feedback-section');
+  
+  if (imageData) {
+    placeholder?.classList.add('hidden');
+    preview?.classList.remove('hidden');
+    if (previewImg) previewImg.src = imageData;
+    feedbackSection?.classList.remove('hidden');
+  } else {
+    placeholder?.classList.remove('hidden');
+    preview?.classList.add('hidden');
+    if (previewImg) previewImg.src = '';
+    feedbackSection?.classList.add('hidden');
+  }
+}
+
+/**
+ * 显示Toast消息
+ */
+export function showToast(message, duration = 2000) {
+  // 移除已有toast
+  const existingToast = document.querySelector('.toast');
+  if (existingToast) existingToast.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 500;
+    animation: fadeInUp 0.3s ease;
+  `;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}

@@ -1,0 +1,252 @@
+[
+  {
+    "id": "job_qingming",
+    "intention": "求职",
+    "solarTerm": "清明",
+    "color": "素银",
+    "material": "精纺羊绒",
+    "feeling": "澄澈感",
+    "annotation": "金气肃清，羊绒密实如雾散后天光",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "job_xiazhi",
+    "intention": "求职",
+    "solarTerm": "夏至",
+    "color": "月白",
+    "material": "真丝绉",
+    "feeling": "匀净感",
+    "annotation": "白属金，金生水以润木，丝绉柔光显中和之态",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "job_chushu",
+    "intention": "求职",
+    "solarTerm": "处暑",
+    "color": "霜灰",
+    "material": "精纺羊毛",
+    "feeling": "清肃感",
+    "annotation": "金气肃降，羊毛挺括，助气机由散转收",
+    "source": "《淮南子·天文训》"
+  },
+  {
+    "id": "job_hanlu",
+    "intention": "求职",
+    "solarTerm": "寒露",
+    "color": "靛青",
+    "material": "羊绒",
+    "feeling": "深润感",
+    "annotation": "水气渐盛，羊绒密实，护肾水不外泄",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "job_dongzhi",
+    "intention": "求职",
+    "solarTerm": "冬至",
+    "color": "玄青",
+    "material": "真丝",
+    "feeling": "幽玄感",
+    "annotation": "阴极之色，丝质垂顺，应日南至之静极生动",
+    "source": "《周易·复卦·彖传》"
+  },
+  {
+    "id": "gui_ren_lichun",
+    "intention": "贵人运",
+    "solarTerm": "立春",
+    "color": "浅杏粉",
+    "material": "桑蚕丝",
+    "feeling": "温润感",
+    "annotation": "木火相生之色，丝滑亲肤，缓释冬藏郁气",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "gui_ren_jingzhe",
+    "intention": "贵人运",
+    "solarTerm": "惊蛰",
+    "color": "柳黄",
+    "material": "柞蚕丝",
+    "feeling": "柔韧感",
+    "annotation": "黄为土色以载木，丝光微亮如初阳破云",
+    "source": "《周易·说卦传》"
+  },
+  {
+    "id": "gui_ren_xiaozhi",
+    "intention": "贵人运",
+    "solarTerm": "小暑",
+    "color": "银杏",
+    "material": "再生涤纶",
+    "feeling": "明快感",
+    "annotation": "金气生发，涤纶挺括，提神醒脑防倦怠",
+    "source": "《天工开物·乃服》"
+  },
+  {
+    "id": "gui_ren_bailu",
+    "intention": "贵人运",
+    "solarTerm": "白露",
+    "color": "茶褐",
+    "material": "粗纺棉",
+    "feeling": "敦厚感",
+    "annotation": "土色载金，棉质微厚，护肺气不被燥伤",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "gui_ren_shuangjiang",
+    "intention": "贵人运",
+    "solarTerm": "霜降",
+    "color": "赭石",
+    "material": "陶染棉",
+    "feeling": "厚重感",
+    "annotation": "土色固本，陶染质朴，应霜始降之肃穆",
+    "source": "《周易·坤卦·文言》"
+  },
+  {
+    "id": "travel_liqiu",
+    "intention": "远行顺利",
+    "solarTerm": "立秋",
+    "color": "银杏",
+    "material": "柞蚕丝",
+    "feeling": "飒爽感",
+    "annotation": "金气初临，丝光微凛，应凉风至之序",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "travel_chushu",
+    "intention": "远行顺利",
+    "solarTerm": "处暑",
+    "color": "橄榄",
+    "material": "天丝麻",
+    "feeling": "内敛感",
+    "annotation": "木金相制，麻丝凉润，缓暑气潜藏之变",
+    "source": "《周易·兑卦·象传》"
+  },
+  {
+    "id": "travel_hanlu",
+    "intention": "远行顺利",
+    "solarTerm": "寒露",
+    "color": "靛蓝",
+    "material": "羊绒",
+    "feeling": "深润感",
+    "annotation": "水气渐盛，羊绒密实，护肾水不外泄",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "travel_lidong",
+    "intention": "远行顺利",
+    "solarTerm": "立冬",
+    "color": "墨蓝",
+    "material": "桑蚕丝",
+    "feeling": "蕴藉感",
+    "annotation": "水色深湛，丝光幽微，应水始冰之静气",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "travel_dahan",
+    "intention": "远行顺利",
+    "solarTerm": "大寒",
+    "color": "石青",
+    "material": "驼绒",
+    "feeling": "峻冷感",
+    "annotation": "水气凝坚，驼绒丰厚，护阳气不随寒泄",
+    "source": "《淮南子·天文训》"
+  },
+  {
+    "id": "calm_qingming",
+    "intention": "静心专注",
+    "solarTerm": "清明",
+    "color": "黛蓝",
+    "material": "丝绒混纺",
+    "feeling": "深静感",
+    "annotation": "水色藏木，丝绒微光如远山含烟",
+    "source": "《御定协纪辨方书》"
+  },
+  {
+    "id": "calm_xiazhi",
+    "intention": "静心专注",
+    "solarTerm": "夏至",
+    "color": "玄黑",
+    "material": "桑蚕丝",
+    "feeling": "深定感",
+    "annotation": "水色伏藏，丝质垂顺，守极阳中之静气",
+    "source": "《御定协纪辨方书》"
+  },
+  {
+    "id": "calm_bailu",
+    "intention": "静心专注",
+    "solarTerm": "白露",
+    "color": "露白",
+    "material": "桑蚕丝",
+    "feeling": "莹洁感",
+    "annotation": "金气凝露，丝质生光，应白露降之清寒",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "calm_shuangjiang",
+    "intention": "静心专注",
+    "solarTerm": "霜降",
+    "color": "玄青",
+    "material": "真丝",
+    "feeling": "均衡感",
+    "annotation": "水木相涵，丝光内敛，应昼夜均而寒暑平",
+    "source": "《周易·谦卦·彖传》"
+  },
+  {
+    "id": "calm_dongzhi",
+    "intention": "静心专注",
+    "solarTerm": "冬至",
+    "color": "玄青",
+    "material": "真丝",
+    "feeling": "幽玄感",
+    "annotation": "阴极之色，丝质垂顺，应日南至之静极生动",
+    "source": "《周易·复卦·彖传》"
+  },
+  {
+    "id": "health_liqiu",
+    "intention": "健康舒畅",
+    "solarTerm": "立秋",
+    "color": "姜黄",
+    "material": "粗纺棉麻",
+    "feeling": "温厚感",
+    "annotation": "土色厚德，棉麻交织如沃土育苗",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "health_chushu",
+    "intention": "健康舒畅",
+    "solarTerm": "处暑",
+    "color": "烟灰",
+    "material": "亚麻",
+    "feeling": "沉静感",
+    "annotation": "灰金制火，亚麻疏朗，防心火过亢",
+    "source": "《淮南子·天文训》"
+  },
+  {
+    "id": "health_hanlu",
+    "intention": "健康舒畅",
+    "solarTerm": "寒露",
+    "color": "靛青",
+    "material": "羊绒",
+    "feeling": "深润感",
+    "annotation": "水气渐盛，羊绒密实，护肾水不外泄",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "health_dongzhi",
+    "intention": "健康舒畅",
+    "solarTerm": "冬至",
+    "color": "墨棕",
+    "material": "羊绒",
+    "feeling": "温厚感",
+    "annotation": "土载水气，羊绒蓄温，助一阳来复之机",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "health_dahan",
+    "intention": "健康舒畅",
+    "solarTerm": "大寒",
+    "color": "玄黑",
+    "material": "牦牛绒",
+    "feeling": "凝重感",
+    "annotation": "寒气至极，牦绒密厚，封藏精气以待立春",
+    "source": "《本草纲目·服器部》"
+  }
+]

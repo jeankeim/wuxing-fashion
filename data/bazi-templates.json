@@ -1,0 +1,102 @@
+[
+  {
+    "id": "wood_2024",
+    "baZiKey": "日主木旺｜2024甲辰年",
+    "solarTerm": "谷雨",
+    "color": "黛青",
+    "material": "桑蚕丝",
+    "feeling": "蕴藉感",
+    "annotation": "青木得水润而深，丝光内敛如谷粒饱满",
+    "source": "《周易·艮卦·象传》"
+  },
+  {
+    "id": "wood_2025",
+    "baZiKey": "日主木旺｜2025乙巳年",
+    "solarTerm": "立夏",
+    "color": "樱桃红",
+    "material": "冰丝混纺",
+    "feeling": "灼灼感",
+    "annotation": "木旺需火泄秀，冰丝导热防燥而不损木根",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "fire_2024",
+    "baZiKey": "日主火旺｜2024甲辰年",
+    "solarTerm": "小暑",
+    "color": "桔梗",
+    "material": "天丝棉",
+    "feeling": "清扬感",
+    "annotation": "火土相生，棉质松软，散暑气不闭汗孔",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "fire_2025",
+    "baZiKey": "日主火旺｜2025乙巳年",
+    "solarTerm": "夏至",
+    "color": "月白",
+    "material": "真丝绉",
+    "feeling": "匀净感",
+    "annotation": "白属金，金生水以润火，丝绉柔光显中和之态",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "earth_2024",
+    "baZiKey": "日主土旺｜2024甲辰年",
+    "solarTerm": "白露",
+    "color": "茶褐",
+    "material": "粗纺棉",
+    "feeling": "敦厚感",
+    "annotation": "土色载金，棉质微厚，护肺气不被燥伤",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "earth_2025",
+    "baZiKey": "日主土旺｜2025乙巳年",
+    "solarTerm": "霜降",
+    "color": "赭石",
+    "material": "陶染棉",
+    "feeling": "厚重感",
+    "annotation": "土色固本，陶染质朴，应霜始降之肃穆",
+    "source": "《周易·坤卦·文言》"
+  },
+  {
+    "id": "metal_2024",
+    "baZiKey": "日主金旺｜2024甲辰年",
+    "solarTerm": "处暑",
+    "color": "霜灰",
+    "material": "精纺羊毛",
+    "feeling": "清肃感",
+    "annotation": "金气肃降，羊毛挺括，助气机由散转收",
+    "source": "《淮南子·天文训》"
+  },
+  {
+    "id": "metal_2025",
+    "baZiKey": "日主金旺｜2025乙巳年",
+    "solarTerm": "立秋",
+    "color": "银杏",
+    "material": "柞蚕丝",
+    "feeling": "飒爽感",
+    "annotation": "金气初临，丝光微凛，应凉风至之序",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "water_2024",
+    "baZiKey": "日主水旺｜2024甲辰年",
+    "solarTerm": "大雪",
+    "color": "靛蓝",
+    "material": "羊绒",
+    "feeling": "深润感",
+    "annotation": "水色沉潜，羊绒蓄温，应地始冻之藏象",
+    "source": "《御定协纪辨方书》"
+  },
+  {
+    "id": "water_2025",
+    "baZiKey": "日主水旺｜2025乙巳年",
+    "solarTerm": "冬至",
+    "color": "玄青",
+    "material": "真丝",
+    "feeling": "幽玄感",
+    "annotation": "阴极之色，丝质垂顺，应日南至之静极生动",
+    "source": "《周易·复卦·彖传》"
+  }
+]

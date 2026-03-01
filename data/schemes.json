@@ -1,0 +1,508 @@
+{
+  "schemes": [
+    {
+      "id": "lichun_01", "termId": "lichun", "rank": 1,
+      "color": {"name": "嫩芽绿", "hex": "#8FBE8E", "wuxing": "wood"},
+      "material": "天丝棉", "feeling": "轻盈感",
+      "annotation": "春始之色，柔韧之质，唤醒身体舒展本能",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "lichun_02", "termId": "lichun", "rank": 2,
+      "color": {"name": "浅杏粉", "hex": "#F5D5C8", "wuxing": "fire"},
+      "material": "桑蚕丝", "feeling": "温润感",
+      "annotation": "木火相生之色，丝滑亲肤，缓释冬藏郁气",
+      "source": "《本草纲目·服器部》"
+    },
+    {
+      "id": "lichun_03", "termId": "lichun", "rank": 3,
+      "color": {"name": "灰褐", "hex": "#8B7355", "wuxing": "earth"},
+      "material": "粗纺羊毛", "feeling": "扎根感",
+      "annotation": "土载木根，微粗纹理稳住初升之气",
+      "source": "《御定协纪辨方书》"
+    },
+    {
+      "id": "yushui_01", "termId": "yushui", "rank": 1,
+      "color": {"name": "烟青", "hex": "#7A8B8B", "wuxing": "water"},
+      "material": "防水尼龙", "feeling": "流动感",
+      "annotation": "水润木荣，轻薄防护应对早春细雨",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "yushui_02", "termId": "yushui", "rank": 2,
+      "color": {"name": "鹅黄", "hex": "#FFF4C1", "wuxing": "earth"},
+      "material": "纯棉针织", "feeling": "柔软感",
+      "annotation": "土色暖意，棉质亲肤，暖脾助运化",
+      "source": "《黄帝内经·素问》"
+    },
+    {
+      "id": "yushui_03", "termId": "yushui", "rank": 3,
+      "color": {"name": "苔藓绿", "hex": "#5E7153", "wuxing": "wood"},
+      "material": "亚麻混纺", "feeling": "透气感",
+      "annotation": "木气渐盛，麻质疏通，助春气升发",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "jingzhe_01", "termId": "jingzhe", "rank": 1,
+      "color": {"name": "雷青", "hex": "#4A5D6E", "wuxing": "water"},
+      "material": "弹力棉", "feeling": "蓄势感",
+      "annotation": "春雷震动，深沉蓄力，助阳气破土",
+      "source": "《易经·震卦》"
+    },
+    {
+      "id": "jingzhe_02", "termId": "jingzhe", "rank": 2,
+      "color": {"name": "嫩柳绿", "hex": "#A4C98E", "wuxing": "wood"},
+      "material": "莫代尔", "feeling": "舒展感",
+      "annotation": "木气勃发，柔软贴身，顺应生发之势",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "jingzhe_03", "termId": "jingzhe", "rank": 3,
+      "color": {"name": "桃粉", "hex": "#FFB6C1", "wuxing": "fire"},
+      "material": "雪纺", "feeling": "灵动感",
+      "annotation": "木火相生，轻盈飘逸，迎春花开之意",
+      "source": "《花镜》"
+    },
+    {
+      "id": "chunfen_01", "termId": "chunfen", "rank": 1,
+      "color": {"name": "青白", "hex": "#E8F0E8", "wuxing": "metal"},
+      "material": "精纺棉", "feeling": "平衡感",
+      "annotation": "昼夜平分，金木相制，刚柔并济",
+      "source": "《春秋繁露》"
+    },
+    {
+      "id": "chunfen_02", "termId": "chunfen", "rank": 2,
+      "color": {"name": "草绿", "hex": "#7CCD7C", "wuxing": "wood"},
+      "material": "竹纤维", "feeling": "清新感",
+      "annotation": "木气正盛，竹性清凉，平和肝气",
+      "source": "《本草纲目》"
+    },
+    {
+      "id": "chunfen_03", "termId": "chunfen", "rank": 3,
+      "color": {"name": "淡紫", "hex": "#D8BFD8", "wuxing": "fire"},
+      "material": "天丝", "feeling": "优雅感",
+      "annotation": "火色微显，丝质柔顺，春意渐浓",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "qingming_01", "termId": "qingming", "rank": 1,
+      "color": {"name": "翠绿", "hex": "#228B22", "wuxing": "wood"},
+      "material": "纯棉", "feeling": "生机感",
+      "annotation": "清明时节万物清洁明净，绿意盎然",
+      "source": "《岁时百问》"
+    },
+    {
+      "id": "qingming_02", "termId": "qingming", "rank": 2,
+      "color": {"name": "素白", "hex": "#FFFEF0", "wuxing": "metal"},
+      "material": "亚麻", "feeling": "素净感",
+      "annotation": "清明祭扫，素色庄重，麻质透气",
+      "source": "《历书》"
+    },
+    {
+      "id": "qingming_03", "termId": "qingming", "rank": 3,
+      "color": {"name": "柳黄", "hex": "#E6D933", "wuxing": "earth"},
+      "material": "丝棉混纺", "feeling": "温暖感",
+      "annotation": "柳絮飘飞，土色护脾，暖而不燥",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "guyu_01", "termId": "guyu", "rank": 1,
+      "color": {"name": "雨后青", "hex": "#6B8E6B", "wuxing": "wood"},
+      "material": "防水透气面料", "feeling": "润泽感",
+      "annotation": "谷雨润万物，绿意更浓，防雨透气",
+      "source": "《通纬·孝经援神契》"
+    },
+    {
+      "id": "guyu_02", "termId": "guyu", "rank": 2,
+      "color": {"name": "麦穗黄", "hex": "#E8D174", "wuxing": "earth"},
+      "material": "棉麻", "feeling": "丰盈感",
+      "annotation": "谷雨前后种瓜点豆，土色应时",
+      "source": "《农政全书》"
+    },
+    {
+      "id": "guyu_03", "termId": "guyu", "rank": 3,
+      "color": {"name": "牡丹粉", "hex": "#F4A7B9", "wuxing": "fire"},
+      "material": "丝绸", "feeling": "华贵感",
+      "annotation": "谷雨三朝看牡丹，火色明艳",
+      "source": "《花经》"
+    },
+    {
+      "id": "lixia_01", "termId": "lixia", "rank": 1,
+      "color": {"name": "榴红", "hex": "#C93756", "wuxing": "fire"},
+      "material": "轻薄棉", "feeling": "热烈感",
+      "annotation": "立夏火气始盛，红色应心火之气",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "lixia_02", "termId": "lixia", "rank": 2,
+      "color": {"name": "竹青", "hex": "#789262", "wuxing": "wood"},
+      "material": "竹纤维", "feeling": "清凉感",
+      "annotation": "木生火，竹质清凉，调和初夏暑气",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "lixia_03", "termId": "lixia", "rank": 3,
+      "color": {"name": "米白", "hex": "#F5F5DC", "wuxing": "metal"},
+      "material": "真丝", "feeling": "轻盈感",
+      "annotation": "金色制火，丝质轻薄，清心宁神",
+      "source": "《养生论》"
+    },
+    {
+      "id": "xiaoman_01", "termId": "xiaoman", "rank": 1,
+      "color": {"name": "麦浪金", "hex": "#DAA520", "wuxing": "earth"},
+      "material": "棉麻", "feeling": "饱满感",
+      "annotation": "小满麦渐黄，土色应脾，棉麻透气",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "xiaoman_02", "termId": "xiaoman", "rank": 2,
+      "color": {"name": "荷绿", "hex": "#40826D", "wuxing": "wood"},
+      "material": "冰丝", "feeling": "清爽感",
+      "annotation": "荷叶田田，木色养肝，冰丝凉爽",
+      "source": "《本草纲目》"
+    },
+    {
+      "id": "xiaoman_03", "termId": "xiaoman", "rank": 3,
+      "color": {"name": "晚霞橙", "hex": "#FF7F50", "wuxing": "fire"},
+      "material": "轻薄雪纺", "feeling": "灵动感",
+      "annotation": "火气渐旺，橙色明快，雪纺飘逸",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "mangzhong_01", "termId": "mangzhong", "rank": 1,
+      "color": {"name": "稻穗黄", "hex": "#F0E68C", "wuxing": "earth"},
+      "material": "纯棉", "feeling": "质朴感",
+      "annotation": "芒种忙收麦，土色厚重，棉质吸汗",
+      "source": "《农政全书》"
+    },
+    {
+      "id": "mangzhong_02", "termId": "mangzhong", "rank": 2,
+      "color": {"name": "青梅绿", "hex": "#6B8E23", "wuxing": "wood"},
+      "material": "竹节棉", "feeling": "自然感",
+      "annotation": "青梅煮酒，木色清新，竹棉舒适",
+      "source": "《花镜》"
+    },
+    {
+      "id": "mangzhong_03", "termId": "mangzhong", "rank": 3,
+      "color": {"name": "朱砂红", "hex": "#FF4500", "wuxing": "fire"},
+      "material": "速干面料", "feeling": "活力感",
+      "annotation": "火气正盛，红色助阳，速干清爽",
+      "source": "《黄帝内经》"
+    },
+    {
+      "id": "xiazhi_01", "termId": "xiazhi", "rank": 1,
+      "color": {"name": "正红", "hex": "#DC143C", "wuxing": "fire"},
+      "material": "冰丝", "feeling": "热情感",
+      "annotation": "夏至阳极，红色应心，冰丝消暑",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "xiazhi_02", "termId": "xiazhi", "rank": 2,
+      "color": {"name": "海蓝", "hex": "#0077BE", "wuxing": "water"},
+      "material": "莱卡", "feeling": "清凉感",
+      "annotation": "水克火，蓝色降温，弹力舒适",
+      "source": "《淮南子》"
+    },
+    {
+      "id": "xiazhi_03", "termId": "xiazhi", "rank": 3,
+      "color": {"name": "荷白", "hex": "#F0FFF0", "wuxing": "metal"},
+      "material": "真丝乔其", "feeling": "轻灵感",
+      "annotation": "金色制火，白色清心，丝质飘逸",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "xiaoshu_01", "termId": "xiaoshu", "rank": 1,
+      "color": {"name": "湖蓝", "hex": "#30A5BF", "wuxing": "water"},
+      "material": "冰棉", "feeling": "沁凉感",
+      "annotation": "小暑渐热，水色解暑，冰棉凉爽",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "xiaoshu_02", "termId": "xiaoshu", "rank": 2,
+      "color": {"name": "莲粉", "hex": "#FFB7C5", "wuxing": "fire"},
+      "material": "轻薄棉", "feeling": "柔美感",
+      "annotation": "荷花盛开，火色应心，棉质吸汗",
+      "source": "《本草纲目》"
+    },
+    {
+      "id": "xiaoshu_03", "termId": "xiaoshu", "rank": 3,
+      "color": {"name": "薄荷绿", "hex": "#98FB98", "wuxing": "wood"},
+      "material": "竹纤维", "feeling": "清新感",
+      "annotation": "木色养肝，竹质清凉，解暑提神",
+      "source": "《养生论》"
+    },
+    {
+      "id": "dashu_01", "termId": "dashu", "rank": 1,
+      "color": {"name": "藕荷色", "hex": "#E6C3C3", "wuxing": "fire"},
+      "material": "真丝", "feeling": "淡雅感",
+      "annotation": "大暑极热，淡火色柔和，丝质清凉",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "dashu_02", "termId": "dashu", "rank": 2,
+      "color": {"name": "深海蓝", "hex": "#003366", "wuxing": "water"},
+      "material": "冰丝", "feeling": "深沉感",
+      "annotation": "水色镇暑，深蓝沉静，冰丝消热",
+      "source": "《黄帝内经》"
+    },
+    {
+      "id": "dashu_03", "termId": "dashu", "rank": 3,
+      "color": {"name": "雪白", "hex": "#FFFAFA", "wuxing": "metal"},
+      "material": "棉纱", "feeling": "清净感",
+      "annotation": "金色制火，白色反热，棉纱透气",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "liqiu_01", "termId": "liqiu", "rank": 1,
+      "color": {"name": "银白", "hex": "#C0C0C0", "wuxing": "metal"},
+      "material": "精纺棉", "feeling": "清爽感",
+      "annotation": "立秋金气始生，白色应肺，棉质舒适",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "liqiu_02", "termId": "liqiu", "rank": 2,
+      "color": {"name": "橙黄", "hex": "#FFA500", "wuxing": "earth"},
+      "material": "棉麻", "feeling": "温暖感",
+      "annotation": "土生金，黄色护脾，棉麻透气",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "liqiu_03", "termId": "liqiu", "rank": 3,
+      "color": {"name": "墨绿", "hex": "#013220", "wuxing": "wood"},
+      "material": "天丝", "feeling": "沉稳感",
+      "annotation": "木色收敛，深绿养肝，天丝柔顺",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "chushu_01", "termId": "chushu", "rank": 1,
+      "color": {"name": "象牙白", "hex": "#FFFFF0", "wuxing": "metal"},
+      "material": "亚麻", "feeling": "素净感",
+      "annotation": "处暑暑气渐消，金色润肺，麻质凉爽",
+      "source": "《养生论》"
+    },
+    {
+      "id": "chushu_02", "termId": "chushu", "rank": 2,
+      "color": {"name": "秋香绿", "hex": "#8B8B00", "wuxing": "wood"},
+      "material": "纯棉", "feeling": "质朴感",
+      "annotation": "木色转淡，绿中带黄，棉质亲肤",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "chushu_03", "termId": "chushu", "rank": 3,
+      "color": {"name": "浅蓝", "hex": "#87CEEB", "wuxing": "water"},
+      "material": "莫代尔", "feeling": "清透感",
+      "annotation": "水气微显，蓝色安神，莫代尔柔软",
+      "source": "《本草纲目》"
+    },
+    {
+      "id": "bailu_01", "termId": "bailu", "rank": 1,
+      "color": {"name": "月白", "hex": "#F0FFFF", "wuxing": "metal"},
+      "material": "丝棉", "feeling": "清冷感",
+      "annotation": "白露凝霜，金气正盛，丝棉保暖",
+      "source": "《诗经·秦风》"
+    },
+    {
+      "id": "bailu_02", "termId": "bailu", "rank": 2,
+      "color": {"name": "枯叶黄", "hex": "#D4A017", "wuxing": "earth"},
+      "material": "薄羊毛", "feeling": "温润感",
+      "annotation": "土色护脾，黄色暖意，羊毛保温",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "bailu_03", "termId": "bailu", "rank": 3,
+      "color": {"name": "藏蓝", "hex": "#2F4F4F", "wuxing": "water"},
+      "material": "混纺棉", "feeling": "沉稳感",
+      "annotation": "水色收藏，深蓝安神，混纺舒适",
+      "source": "《黄帝内经》"
+    },
+    {
+      "id": "qiufen_01", "termId": "qiufen", "rank": 1,
+      "color": {"name": "银灰", "hex": "#A8A8A8", "wuxing": "metal"},
+      "material": "精纺毛", "feeling": "平衡感",
+      "annotation": "秋分昼夜平分，金气中正，毛料温和",
+      "source": "《春秋繁露》"
+    },
+    {
+      "id": "qiufen_02", "termId": "qiufen", "rank": 2,
+      "color": {"name": "桂花黄", "hex": "#FFD700", "wuxing": "earth"},
+      "material": "纯棉", "feeling": "甜蜜感",
+      "annotation": "桂花飘香，土色润脾，棉质亲肤",
+      "source": "《花镜》"
+    },
+    {
+      "id": "qiufen_03", "termId": "qiufen", "rank": 3,
+      "color": {"name": "枫叶红", "hex": "#B22222", "wuxing": "fire"},
+      "material": "羊绒", "feeling": "热烈感",
+      "annotation": "火色点缀，红叶似火，羊绒柔软",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "hanlu_01", "termId": "hanlu", "rank": 1,
+      "color": {"name": "霜白", "hex": "#FFFAF0", "wuxing": "metal"},
+      "material": "羊毛", "feeling": "清寒感",
+      "annotation": "寒露霜降，金气肃杀，羊毛保暖",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "hanlu_02", "termId": "hanlu", "rank": 2,
+      "color": {"name": "柿红", "hex": "#FF6347", "wuxing": "fire"},
+      "material": "摇粒绒", "feeling": "温暖感",
+      "annotation": "柿子红透，火色暖身，绒质保温",
+      "source": "《本草纲目》"
+    },
+    {
+      "id": "hanlu_03", "termId": "hanlu", "rank": 3,
+      "color": {"name": "深褐", "hex": "#654321", "wuxing": "earth"},
+      "material": "粗花呢", "feeling": "厚重感",
+      "annotation": "土色沉稳，褐色护脾，呢质挡风",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "shuangjiang_01", "termId": "shuangjiang", "rank": 1,
+      "color": {"name": "冷灰", "hex": "#708090", "wuxing": "metal"},
+      "material": "羊绒", "feeling": "肃穆感",
+      "annotation": "霜降草木黄落，金气收敛，羊绒御寒",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "shuangjiang_02", "termId": "shuangjiang", "rank": 2,
+      "color": {"name": "枯黄", "hex": "#BDB76B", "wuxing": "earth"},
+      "material": "厚棉", "feeling": "收藏感",
+      "annotation": "土色应时，枯黄似秋，厚棉保暖",
+      "source": "《农政全书》"
+    },
+    {
+      "id": "shuangjiang_03", "termId": "shuangjiang", "rank": 3,
+      "color": {"name": "酒红", "hex": "#722F37", "wuxing": "fire"},
+      "material": "羊毛混纺", "feeling": "醇厚感",
+      "annotation": "火色暖意，酒红养心，羊毛御寒",
+      "source": "《养生论》"
+    },
+    {
+      "id": "lidong_01", "termId": "lidong", "rank": 1,
+      "color": {"name": "玄青", "hex": "#1C1C1C", "wuxing": "water"},
+      "material": "羊绒大衣", "feeling": "深沉感",
+      "annotation": "立冬水气始盛，玄色应肾，羊绒保暖",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "lidong_02", "termId": "lidong", "rank": 2,
+      "color": {"name": "银灰", "hex": "#B8B8B8", "wuxing": "metal"},
+      "material": "羊毛", "feeling": "清冷感",
+      "annotation": "金生水，灰色润肺，羊毛保温",
+      "source": "《黄帝内经》"
+    },
+    {
+      "id": "lidong_03", "termId": "lidong", "rank": 3,
+      "color": {"name": "暖棕", "hex": "#A67C52", "wuxing": "earth"},
+      "material": "皮革", "feeling": "厚实感",
+      "annotation": "土色护脾，棕色沉稳，皮革挡风",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "xiaoxue_01", "termId": "xiaoxue", "rank": 1,
+      "color": {"name": "墨黑", "hex": "#0D0D0D", "wuxing": "water"},
+      "material": "羽绒", "feeling": "内敛感",
+      "annotation": "小雪水气渐盛，黑色养肾，羽绒保暖",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "xiaoxue_02", "termId": "xiaoxue", "rank": 2,
+      "color": {"name": "雪青", "hex": "#B0C4DE", "wuxing": "metal"},
+      "material": "羊毛呢", "feeling": "清雅感",
+      "annotation": "金色润肺，浅蓝似雪，呢质挡风",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "xiaoxue_03", "termId": "xiaoxue", "rank": 3,
+      "color": {"name": "炭灰", "hex": "#36454F", "wuxing": "earth"},
+      "material": "厚棉", "feeling": "稳重感",
+      "annotation": "土色护脾，灰色沉稳，厚棉舒适",
+      "source": "《养生论》"
+    },
+    {
+      "id": "daxue_01", "termId": "daxue", "rank": 1,
+      "color": {"name": "纯黑", "hex": "#000000", "wuxing": "water"},
+      "material": "羽绒服", "feeling": "庄重感",
+      "annotation": "大雪封山，水气正盛，黑色藏精",
+      "source": "《黄帝内经》"
+    },
+    {
+      "id": "daxue_02", "termId": "daxue", "rank": 2,
+      "color": {"name": "银白", "hex": "#E8E8E8", "wuxing": "metal"},
+      "material": "毛呢", "feeling": "纯净感",
+      "annotation": "银装素裹，金色润肺，毛呢保暖",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "daxue_03", "termId": "daxue", "rank": 3,
+      "color": {"name": "焦糖色", "hex": "#AF6E4D", "wuxing": "earth"},
+      "material": "皮毛一体", "feeling": "奢华感",
+      "annotation": "土色暖身，棕色护脾，皮毛极暖",
+      "source": "《遵生八笺》"
+    },
+    {
+      "id": "dongzhi_01", "termId": "dongzhi", "rank": 1,
+      "color": {"name": "玄黑", "hex": "#080808", "wuxing": "water"},
+      "material": "羊绒", "feeling": "至阴感",
+      "annotation": "冬至阴极，玄色应肾，羊绒养藏",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "dongzhi_02", "termId": "dongzhi", "rank": 2,
+      "color": {"name": "朱红", "hex": "#E34234", "wuxing": "fire"},
+      "material": "羊毛", "feeling": "喜庆感",
+      "annotation": "阴极阳生，红色助阳，羊毛保暖",
+      "source": "《易经》"
+    },
+    {
+      "id": "dongzhi_03", "termId": "dongzhi", "rank": 3,
+      "color": {"name": "松针绿", "hex": "#2E8B57", "wuxing": "wood"},
+      "material": "加绒棉", "feeling": "生机感",
+      "annotation": "木色蓄春，松柏常青，加绒御寒",
+      "source": "《群芳谱》"
+    },
+    {
+      "id": "xiaohan_01", "termId": "xiaohan", "rank": 1,
+      "color": {"name": "铁灰", "hex": "#4A4A4A", "wuxing": "metal"},
+      "material": "羽绒", "feeling": "坚韧感",
+      "annotation": "小寒大冷，金色收敛，羽绒极暖",
+      "source": "《月令七十二候集解》"
+    },
+    {
+      "id": "xiaohan_02", "termId": "xiaohan", "rank": 2,
+      "color": {"name": "深蓝", "hex": "#00008B", "wuxing": "water"},
+      "material": "加厚羊毛", "feeling": "深邃感",
+      "annotation": "水气正盛，深蓝养肾，羊毛保温",
+      "source": "《黄帝内经》"
+    },
+    {
+      "id": "xiaohan_03", "termId": "xiaohan", "rank": 3,
+      "color": {"name": "驼色", "hex": "#C19A6B", "wuxing": "earth"},
+      "material": "驼绒", "feeling": "温厚感",
+      "annotation": "土色护脾，驼色暖身，驼绒轻暖",
+      "source": "《本草纲目》"
+    },
+    {
+      "id": "dahan_01", "termId": "dahan", "rank": 1,
+      "color": {"name": "漆黑", "hex": "#050505", "wuxing": "water"},
+      "material": "鹅绒", "feeling": "极寒感",
+      "annotation": "大寒至冷，黑色藏精，鹅绒极暖",
+      "source": "《礼记·月令》"
+    },
+    {
+      "id": "dahan_02", "termId": "dahan", "rank": 2,
+      "color": {"name": "瑞雪白", "hex": "#F8F8FF", "wuxing": "metal"},
+      "material": "貂绒", "feeling": "祥瑞感",
+      "annotation": "瑞雪兆丰年，金色润肺，貂绒珍贵",
+      "source": "《农政全书》"
+    },
+    {
+      "id": "dahan_03", "termId": "dahan", "rank": 3,
+      "color": {"name": "喜庆红", "hex": "#CC0000", "wuxing": "fire"},
+      "material": "羊绒", "feeling": "迎春感",
+      "annotation": "大寒迎年，红色纳福，羊绒温暖",
+      "source": "《岁时百问》"
+    }
+  ]
+}

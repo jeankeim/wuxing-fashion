@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>五行穿搭建议</title>
+  <meta name="description" content="基于节气与五行的个性化穿搭建议">
+  
+  <!-- Fonts from jsDelivr CDN -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Welcome View -->
+    <section id="view-welcome" class="view" aria-label="欢迎页">
+      <div class="welcome-content">
+        <h1 class="welcome-title">五行穿搭建议</h1>
+        <p class="welcome-subtitle">顺应节气，以色养身</p>
+        <div class="solar-banner" id="solar-banner">
+          <span class="solar-term-name"></span>
+          <span class="solar-term-element"></span>
+        </div>
+        <button id="btn-start" class="btn btn-primary btn-large" type="button">
+          开始体验
+        </button>
+      </div>
+    </section>
+    
+    <!-- Entry View: Wish + Bazi -->
+    <section id="view-entry" class="view hidden" aria-label="信息输入">
+      <header class="entry-header">
+        <button id="btn-back-welcome" class="btn btn-icon" aria-label="返回">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h2>选择你的心愿</h2>
+      </header>
+      
+      <div class="entry-body">
+        <!-- Wish Selection -->
+        <div class="wish-section">
+          <p class="section-hint">选择一个当下的心愿（可选）</p>
+          <div class="wish-tags" role="radiogroup" aria-label="心愿选择">
+            <button class="wish-tag" data-wish="career" type="button">求职顺利</button>
+            <button class="wish-tag" data-wish="guiren" type="button">贵人运</button>
+            <button class="wish-tag" data-wish="travel" type="button">远行顺利</button>
+            <button class="wish-tag" data-wish="focus" type="button">静心专注</button>
+            <button class="wish-tag" data-wish="health" type="button">健康舒畅</button>
+          </div>
+        </div>
+        
+        <!-- Bazi Input -->
+        <div class="bazi-section">
+          <p class="section-hint">输入生辰八字（可选，用于更精准推荐）</p>
+          <div class="bazi-form">
+            <div class="bazi-row">
+              <label class="bazi-field">
+                <span class="bazi-label">年</span>
+                <select id="bazi-year" class="bazi-select">
+                  <option value="">选择年份</option>
+                </select>
+              </label>
+              <label class="bazi-field">
+                <span class="bazi-label">月</span>
+                <select id="bazi-month" class="bazi-select">
+                  <option value="">选择月份</option>
+                  <option value="1">1月</option>
+                  <option value="2">2月</option>
+                  <option value="3">3月</option>
+                  <option value="4">4月</option>
+                  <option value="5">5月</option>
+                  <option value="6">6月</option>
+                  <option value="7">7月</option>
+                  <option value="8">8月</option>
+                  <option value="9">9月</option>
+                  <option value="10">10月</option>
+                  <option value="11">11月</option>
+                  <option value="12">12月</option>
+                </select>
+              </label>
+            </div>
+            <div class="bazi-row">
+              <label class="bazi-field">
+                <span class="bazi-label">日</span>
+                <select id="bazi-day" class="bazi-select">
+                  <option value="">选择日期</option>
+                </select>
+              </label>
+              <label class="bazi-field">
+                <span class="bazi-label">时</span>
+                <select id="bazi-hour" class="bazi-select">
+                  <option value="">选择时辰</option>
+                  <option value="0">子时 (23:00-01:00)</option>
+                  <option value="1">丑时 (01:00-03:00)</option>
+                  <option value="2">寅时 (03:00-05:00)</option>
+                  <option value="3">卯时 (05:00-07:00)</option>
+                  <option value="4">辰时 (07:00-09:00)</option>
+                  <option value="5">巳时 (09:00-11:00)</option>
+                  <option value="6">午时 (11:00-13:00)</option>
+                  <option value="7">未时 (13:00-15:00)</option>
+                  <option value="8">申时 (15:00-17:00)</option>
+                  <option value="9">酉时 (17:00-19:00)</option>
+                  <option value="10">戌时 (19:00-21:00)</option>
+                  <option value="11">亥时 (21:00-23:00)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <button id="btn-generate" class="btn btn-primary btn-large" type="button">
+          生成穿搭建议
+        </button>
+      </div>
+    </section>
+    
+    <!-- Results View -->
+    <section id="view-results" class="view hidden" aria-label="推荐结果">
+      <header class="results-header">
+        <button id="btn-back-entry" class="btn btn-icon" aria-label="返回">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="results-title">
+          <h2>今日推荐</h2>
+          <span class="results-term" id="results-term"></span>
+        </div>
+      </header>
+      
+      <div class="results-body">
+        <div class="scheme-cards" id="scheme-cards">
+          <!-- Cards rendered by JS -->
+        </div>
+        
+        <div class="results-actions">
+          <button id="btn-regenerate" class="btn btn-secondary" type="button">
+            换一批
+          </button>
+          <button id="btn-upload" class="btn btn-ghost" type="button">
+            上传穿搭照片
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Upload View -->
+    <section id="view-upload" class="view hidden" aria-label="上传照片">
+      <header class="upload-header">
+        <button id="btn-back-results" class="btn btn-icon" aria-label="返回">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h2>上传穿搭照片</h2>
+      </header>
+      
+      <div class="upload-body">
+        <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="点击或拖拽上传图片">
+          <input type="file" id="upload-input" accept="image/jpeg,image/png" hidden>
+          <div class="upload-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+            <p>点击或拖拽上传图片</p>
+            <span class="upload-hint">支持 JPG、PNG，最大 5MB</span>
+          </div>
+          <div class="upload-preview hidden">
+            <img id="preview-image" src="" alt="预览图片">
+            <button id="btn-remove-image" class="btn btn-icon" type="button" aria-label="移除图片">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="feedback-section hidden" id="feedback-section">
+          <h3>穿搭反馈</h3>
+          <textarea id="feedback-text" class="feedback-textarea" placeholder="记录今日穿搭感受..." rows="3"></textarea>
+          <button id="btn-save-feedback" class="btn btn-primary" type="button">
+            保存反馈
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Detail Modal -->
+    <div id="modal-detail" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-detail-title">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <header class="modal-header">
+          <h3 id="modal-detail-title">穿搭详解</h3>
+          <button class="btn btn-icon modal-close" aria-label="关闭">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </header>
+        <div class="modal-body" id="modal-detail-body">
+          <!-- Content rendered by JS -->
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Disclaimer -->
+  <footer class="disclaimer-bar">
+    <p>本应用仅供娱乐参考，穿搭建议基于传统文化理念，不构成任何专业建议。</p>
+  </footer>
+  
+  <!-- Privacy Badge -->
+  <div class="privacy-badge" title="所有数据仅存储在您的设备上">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0110 0v4"/>
+    </svg>
+    <span>本地存储</span>
+  </div>
+  
+  <!-- Main Script -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

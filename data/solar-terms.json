@@ -1,0 +1,41 @@
+{
+  "terms": [
+    {"id": "lichun", "name": "立春", "wuxing": "wood", "month": 2, "dayRange": [3, 5]},
+    {"id": "yushui", "name": "雨水", "wuxing": "wood", "month": 2, "dayRange": [18, 20]},
+    {"id": "jingzhe", "name": "惊蛰", "wuxing": "wood", "month": 3, "dayRange": [5, 7]},
+    {"id": "chunfen", "name": "春分", "wuxing": "wood", "month": 3, "dayRange": [20, 22]},
+    {"id": "qingming", "name": "清明", "wuxing": "wood", "month": 4, "dayRange": [4, 6]},
+    {"id": "guyu", "name": "谷雨", "wuxing": "wood", "month": 4, "dayRange": [19, 21]},
+    {"id": "lixia", "name": "立夏", "wuxing": "fire", "month": 5, "dayRange": [5, 7]},
+    {"id": "xiaoman", "name": "小满", "wuxing": "fire", "month": 5, "dayRange": [20, 22]},
+    {"id": "mangzhong", "name": "芒种", "wuxing": "fire", "month": 6, "dayRange": [5, 7]},
+    {"id": "xiazhi", "name": "夏至", "wuxing": "fire", "month": 6, "dayRange": [21, 22]},
+    {"id": "xiaoshu", "name": "小暑", "wuxing": "fire", "month": 7, "dayRange": [6, 8]},
+    {"id": "dashu", "name": "大暑", "wuxing": "fire", "month": 7, "dayRange": [22, 24]},
+    {"id": "liqiu", "name": "立秋", "wuxing": "metal", "month": 8, "dayRange": [7, 9]},
+    {"id": "chushu", "name": "处暑", "wuxing": "metal", "month": 8, "dayRange": [22, 24]},
+    {"id": "bailu", "name": "白露", "wuxing": "metal", "month": 9, "dayRange": [7, 9]},
+    {"id": "qiufen", "name": "秋分", "wuxing": "metal", "month": 9, "dayRange": [22, 24]},
+    {"id": "hanlu", "name": "寒露", "wuxing": "metal", "month": 10, "dayRange": [8, 9]},
+    {"id": "shuangjiang", "name": "霜降", "wuxing": "metal", "month": 10, "dayRange": [23, 24]},
+    {"id": "lidong", "name": "立冬", "wuxing": "water", "month": 11, "dayRange": [7, 8]},
+    {"id": "xiaoxue", "name": "小雪", "wuxing": "water", "month": 11, "dayRange": [22, 23]},
+    {"id": "daxue", "name": "大雪", "wuxing": "water", "month": 12, "dayRange": [6, 8]},
+    {"id": "dongzhi", "name": "冬至", "wuxing": "water", "month": 12, "dayRange": [21, 23]},
+    {"id": "xiaohan", "name": "小寒", "wuxing": "water", "month": 1, "dayRange": [5, 7]},
+    {"id": "dahan", "name": "大寒", "wuxing": "water", "month": 1, "dayRange": [20, 21]}
+  ],
+  "seasons": {
+    "spring": {"wuxing": "wood", "terms": ["lichun", "yushui", "jingzhe", "chunfen", "qingming", "guyu"]},
+    "summer": {"wuxing": "fire", "terms": ["lixia", "xiaoman", "mangzhong", "xiazhi", "xiaoshu", "dashu"]},
+    "autumn": {"wuxing": "metal", "terms": ["liqiu", "chushu", "bailu", "qiufen", "hanlu", "shuangjiang"]},
+    "winter": {"wuxing": "water", "terms": ["lidong", "xiaoxue", "daxue", "dongzhi", "xiaohan", "dahan"]}
+  },
+  "wuxingNames": {
+    "wood": "木",
+    "fire": "火",
+    "earth": "土",
+    "metal": "金",
+    "water": "水"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "wishes": [
+    {
+      "id": "career",
+      "name": "求职顺利",
+      "colorBias": ["wood", "fire"],
+      "materialBias": ["棉", "麻"],
+      "advice": "选择清爽利落的色调，展现自信与活力"
+    },
+    {
+      "id": "guiren",
+      "name": "贵人运",
+      "colorBias": ["earth", "metal"],
+      "materialBias": ["丝", "绸"],
+      "advice": "温润典雅的色调有助于吸引贵人相助"
+    },
+    {
+      "id": "travel",
+      "name": "远行顺利",
+      "colorBias": ["water", "wood"],
+      "materialBias": ["棉", "涤纶"],
+      "advice": "舒适透气的材质让旅途更加轻松"
+    },
+    {
+      "id": "focus",
+      "name": "静心专注",
+      "colorBias": ["water", "metal"],
+      "materialBias": ["棉", "麻"],
+      "advice": "沉稳内敛的色调有助于集中精神"
+    },
+    {
+      "id": "health",
+      "name": "健康舒畅",
+      "colorBias": ["wood", "earth"],
+      "materialBias": ["棉", "天丝"],
+      "advice": "自然舒适的材质让身心放松"
+    }
+  ],
+  "seasonModifiers": {
+    "wood": {"boost": ["wood", "water"], "avoid": ["metal"]},
+    "fire": {"boost": ["fire", "wood"], "avoid": ["water"]},
+    "earth": {"boost": ["earth", "fire"], "avoid": ["wood"]},
+    "metal": {"boost": ["metal", "earth"], "avoid": ["fire"]},
+    "water": {"boost": ["water", "metal"], "avoid": ["earth"]}
+  }
+}
