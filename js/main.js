@@ -5,7 +5,7 @@
 import * as storage from './storage.js';
 import { detectCurrentTerm, getWuxingColor } from './solar-terms.js';
 import { analyzeBazi, analyzeBaziPrecise } from './bazi.js';
-import { generateRecommendation, regenerateRecommendation } from './engine.js';
+import { generateRecommendation, regenerateRecommendation, recordFeedback, SCENES } from './engine.js';
 import {
   showView, initYearSelect, initDaySelect,
   renderSolarBanner, renderResultHeader, renderSchemeCards,
@@ -88,6 +88,11 @@ async function init() {
 }
 
 /**
+ * 当前场景
+ */
+let currentSceneId = 'daily';
+
+/**
  * 绑定事件
  */
 function bindEvents() {
@@ -95,6 +100,14 @@ function bindEvents() {
   document.getElementById('btn-start')?.addEventListener('click', () => {
     showView(ViewNames.ENTRY);
     setState(StateKeys.CURRENT_VIEW, ViewNames.ENTRY);
+  });
+  
+  // 场景选择
+  document.querySelectorAll('.scene-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const sceneId = tag.dataset.scene;
+      selectScene(sceneId);
+    });
   });
   
   // 返回按钮
@@ -204,6 +217,13 @@ function bindEvents() {
           favoriteBtn.setAttribute('aria-label', '取消收藏');
           favoriteBtn.querySelector('svg').setAttribute('fill', 'currentColor');
           showToast('已收藏');
+          
+          // 记录反馈
+          recordFeedback(scheme.id, 'favorite', {
+            wuxing: scheme.color.wuxing,
+            color: scheme.color.name,
+            material: scheme.material
+          });
         }
       }
     }
@@ -245,6 +265,17 @@ function selectWish(wishId) {
   });
   setState(StateKeys.CURRENT_WISH_ID, wishId);
   storage.saveSelectedWish(wishId);
+}
+
+/**
+ * 选择场景
+ */
+function selectScene(sceneId) {
+  document.querySelectorAll('.scene-tag').forEach(tag => {
+    tag.classList.toggle('active', tag.dataset.scene === sceneId);
+  });
+  currentSceneId = sceneId;
+  storage.set('last_scene', sceneId);
 }
 
 /**
@@ -371,7 +402,8 @@ async function handleGenerate() {
   const result = await generateRecommendation(
     getState(StateKeys.CURRENT_TERM_INFO),
     getState(StateKeys.CURRENT_WISH_ID),
-    baziResult
+    baziResult,
+    { sceneId: currentSceneId }
   );
   
   if (result && result.schemes.length > 0) {
@@ -407,7 +439,8 @@ async function handleRegenerate() {
     getState(StateKeys.CURRENT_TERM_INFO),
     getState(StateKeys.CURRENT_WISH_ID),
     getState(StateKeys.CURRENT_BAZI_RESULT),
-    excludeIds
+    excludeIds,
+    { sceneId: currentSceneId }
   );
   
   if (newResult && newResult.schemes.length > 0) {

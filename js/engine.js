@@ -3,6 +3,7 @@
  */
 
 import { safeFetch, safeJsonParse, withErrorHandler, ErrorTypes } from './error-handler.js';
+import { smartSelectSchemes, recordFeedback, getDailyLuckDescription, SCENES } from './recommendation.js';
 
 let schemesData = null;
 let intentionData = null;
@@ -200,49 +201,11 @@ function isGenerating(from, to) {
 }
 
 /**
- * 选择方案
+ * 选择方案（使用智能推荐算法）
  */
-function selectSchemes(schemes, context, count = 3) {
-  // 过滤当前节气相关方案
-  const termSchemes = schemes.filter(s => s.termId === context.termId);
-  
-  if (termSchemes.length >= count) {
-    return termSchemes.slice(0, count);
-  }
-  
-  // 否则按得分选择
-  const scored = schemes.map(scheme => ({
-    scheme,
-    score: scoreScheme(scheme, context)
-  }));
-  
-  scored.sort((a, b) => b.score - a.score);
-  
-  // 确保五行多样性
-  const selected = [];
-  const usedWuxing = new Set();
-  
-  for (const item of scored) {
-    if (selected.length >= count) break;
-    
-    const wuxing = item.scheme.color.wuxing;
-    if (selected.length < 2 || !usedWuxing.has(wuxing)) {
-      selected.push(item.scheme);
-      usedWuxing.add(wuxing);
-    }
-  }
-  
-  // 如果不够，补充高分方案
-  if (selected.length < count) {
-    for (const item of scored) {
-      if (selected.length >= count) break;
-      if (!selected.includes(item.scheme)) {
-        selected.push(item.scheme);
-      }
-    }
-  }
-  
-  return selected;
+function selectSchemes(schemes, context, count = 3, sceneId = 'daily') {
+  // 使用智能推荐算法
+  return smartSelectSchemes(schemes, context, { count, sceneId });
 }
 
 /**
@@ -250,9 +213,12 @@ function selectSchemes(schemes, context, count = 3) {
  * @param {Object} termInfo - 节气信息
  * @param {string} wishId - 心愿ID
  * @param {Object} baziResult - 八字分析结果
+ * @param {Object} options - 选项
  * @returns {Object} 推荐结果
  */
-export async function generateRecommendation(termInfo, wishId, baziResult) {
+export async function generateRecommendation(termInfo, wishId, baziResult, options = {}) {
+  const { sceneId = 'daily' } = options;
+  
   // 加载数据
   const [schemes, intentions, baziTemplates] = await Promise.all([
     loadSchemes(),
@@ -269,8 +235,8 @@ export async function generateRecommendation(termInfo, wishId, baziResult) {
   const context = buildContext(termInfo, wishId, baziResult);
   context.termId = termInfo?.current?.id;
   
-  // 选择方案
-  const selectedSchemes = selectSchemes(schemes.schemes, context, 3);
+  // 选择方案（使用智能推荐）
+  const selectedSchemes = selectSchemes(schemes.schemes, context, 3, sceneId);
   
   // 获取心愿模板建议
   let intentionTemplate = null;
@@ -285,13 +251,18 @@ export async function generateRecommendation(termInfo, wishId, baziResult) {
     baziTemplate = findBestBaziTemplate(baziResult, baziTemplates);
   }
   
+  // 获取今日运势
+  const dailyLuck = getDailyLuckDescription();
+  
   return {
     schemes: selectedSchemes,
     termInfo,
     wishId,
+    sceneId,
     intentionTemplate,  // 25组心愿模板中匹配的
     baziResult,
     baziTemplate,       // 10组八字模板中匹配的
+    dailyLuck,          // 今日运势
     generatedAt: new Date().toISOString()
   };
 }
@@ -299,7 +270,8 @@ export async function generateRecommendation(termInfo, wishId, baziResult) {
 /**
  * 重新生成 (换一批)
  */
-export async function regenerateRecommendation(termInfo, wishId, baziResult, excludeIds = []) {
+export async function regenerateRecommendation(termInfo, wishId, baziResult, excludeIds = [], options = {}) {
+  const { sceneId = 'daily' } = options;
   const schemes = await loadSchemes();
   if (!schemes || !schemes.schemes) return null;
   
@@ -309,13 +281,19 @@ export async function regenerateRecommendation(termInfo, wishId, baziResult, exc
   const context = buildContext(termInfo, wishId, baziResult);
   context.termId = termInfo?.current?.id;
   
-  const selectedSchemes = selectSchemes(available, context, 3);
+  const selectedSchemes = selectSchemes(available, context, 3, sceneId);
+  const dailyLuck = getDailyLuckDescription();
   
   return {
     schemes: selectedSchemes,
     termInfo,
     wishId,
+    sceneId,
     baziResult,
+    dailyLuck,
     generatedAt: new Date().toISOString()
   };
 }
+
+// 导出反馈记录函数和场景定义
+export { recordFeedback, SCENES };

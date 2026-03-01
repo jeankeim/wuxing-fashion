@@ -23,6 +23,7 @@ const PRECACHE_ASSETS = [
   '/js/error-handler.js',
   '/js/store.js',
   '/js/share.js',
+  '/js/recommendation.js',
   '/js/lib/lunar.js',
   '/data/schemes.json',
   '/data/solar-terms.json',
