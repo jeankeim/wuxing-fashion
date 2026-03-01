@@ -152,6 +152,28 @@
   color: var(--color-text-secondary);
 }
 
+/* === Favorites View === */
+.favorites-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: var(--space-6);
+}
+
+.favorites-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 .scheme-cards {
   display: flex;
   flex-direction: column;

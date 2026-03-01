@@ -10,10 +10,11 @@ import {
   showView, initYearSelect, initDaySelect,
   renderSolarBanner, renderResultHeader, renderSchemeCards,
   renderDetailModal, showModal, closeModal,
-  updateUploadPreview, showToast
+  updateUploadPreview, showToast, renderFavoritesList
 } from './render.js';
 import { validateFile, compressImage, initUploadZone, getTodayString } from './upload.js';
 import { initGlobalErrorHandler, withErrorHandler, ErrorTypes } from './error-handler.js';
+import { addFavorite, removeFavorite, isFavorite, getFavorites } from './storage.js';
 
 // 应用状态
 let currentTermInfo = null;
@@ -119,6 +120,18 @@ function bindEvents() {
     }
   });
   
+  // 收藏按钮
+  document.getElementById('btn-favorites')?.addEventListener('click', () => {
+    const favorites = getFavorites();
+    renderFavoritesList(favorites);
+    showView('view-favorites');
+  });
+  
+  // 从收藏页返回
+  document.getElementById('btn-back-results-from-fav')?.addEventListener('click', () => {
+    showView('view-results');
+  });
+  
   // 移除图片
   document.getElementById('btn-remove-image')?.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -129,15 +142,40 @@ function bindEvents() {
   // 保存反馈
   document.getElementById('btn-save-feedback')?.addEventListener('click', handleSaveFeedback);
   
-  // 详情按钮委托
+  // 详情按钮和收藏按钮委托
   document.getElementById('scheme-cards')?.addEventListener('click', (e) => {
-    const btn = e.target.closest('.scheme-detail-btn');
-    if (btn) {
-      const index = parseInt(btn.dataset.index, 10);
+    const detailBtn = e.target.closest('.scheme-detail-btn');
+    const favoriteBtn = e.target.closest('.scheme-favorite-btn');
+    
+    if (detailBtn) {
+      const index = parseInt(detailBtn.dataset.index, 10);
       const schemes = window.__currentSchemes;
       if (schemes && schemes[index]) {
         renderDetailModal(schemes[index]);
         showModal('modal-detail');
+      }
+    }
+    
+    if (favoriteBtn) {
+      const index = parseInt(favoriteBtn.dataset.index, 10);
+      const schemes = window.__currentSchemes;
+      if (schemes && schemes[index]) {
+        const scheme = schemes[index];
+        const favorited = isFavorite(scheme.id);
+        
+        if (favorited) {
+          removeFavorite(scheme.id);
+          favoriteBtn.classList.remove('active');
+          favoriteBtn.setAttribute('aria-label', '收藏');
+          favoriteBtn.querySelector('svg').setAttribute('fill', 'none');
+          showToast('已取消收藏');
+        } else {
+          addFavorite(scheme);
+          favoriteBtn.classList.add('active');
+          favoriteBtn.setAttribute('aria-label', '取消收藏');
+          favoriteBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+          showToast('已收藏');
+        }
       }
     }
   });

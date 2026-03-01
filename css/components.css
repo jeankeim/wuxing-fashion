@@ -139,6 +139,28 @@
 .scheme-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.scheme-favorite-btn {
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.scheme-favorite-btn:hover {
+  background-color: var(--color-border-light);
+  color: var(--color-fire);
+}
+
+.scheme-favorite-btn.active {
+  color: var(--color-fire);
+}
+
+.scheme-favorite-btn svg {
+  display: block;
 }
 
 .scheme-detail-btn {
@@ -150,6 +172,18 @@
 .scheme-detail-btn:hover {
   color: var(--color-water-dark);
   text-decoration: underline;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-text-secondary);
+}
+
+.empty-state p:first-child {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-2);
 }
 
 /* === Upload Zone === */

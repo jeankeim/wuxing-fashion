@@ -113,3 +113,32 @@ export function getSelectedWish() {
 export function saveSelectedWish(wishId) {
   return set('selected_wish', wishId);
 }
+
+// 收藏相关方法
+export function getFavorites() {
+  return get('favorites') || [];
+}
+
+export function addFavorite(scheme) {
+  const favorites = getFavorites();
+  // 检查是否已收藏
+  if (!favorites.some(f => f.id === scheme.id)) {
+    favorites.push({
+      ...scheme,
+      favoritedAt: new Date().toISOString()
+    });
+    return set('favorites', favorites);
+  }
+  return true;
+}
+
+export function removeFavorite(schemeId) {
+  const favorites = getFavorites();
+  const filtered = favorites.filter(f => f.id !== schemeId);
+  return set('favorites', filtered);
+}
+
+export function isFavorite(schemeId) {
+  const favorites = getFavorites();
+  return favorites.some(f => f.id === schemeId);
+}
