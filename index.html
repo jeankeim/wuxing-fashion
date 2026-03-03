@@ -11,8 +11,22 @@
   <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/components.css">
+  
+  <!-- GitHub Pages SPA 路由处理 -->
+  <script>
+    (function() {
+      // 处理从 404.html 重定向过来的路径
+      var params = new URLSearchParams(window.location.search);
+      var path = params.get('path');
+      if (path) {
+        // 移除查询参数，使用 history API 恢复路径
+        var newUrl = window.location.pathname + '#' + path;
+        window.history.replaceState(null, '', newUrl);
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="app-container">
@@ -52,7 +66,7 @@
   </div>
   
   <!-- Lunar JavaScript Library -->
-  <script src="js/lib/lunar.js"></script>
+  <script src="./js/lib/lunar.js"></script>
   
   <!-- App Script (MVC Architecture) -->
   <script type="module">
@@ -64,7 +78,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('./sw.js')
           .then((registration) => {
             console.log('[SW] Registered:', registration.scope);
           })

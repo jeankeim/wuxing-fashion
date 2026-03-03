@@ -1,6 +1,7 @@
 /**
  * Router Module - 前端路由系统
  * 支持浏览器前进后退，URL 反映应用状态
+ * 适配 GitHub Pages 部署（使用 Hash 路由）
  */
 
 import { store, StateKeys } from './store.js';
@@ -19,18 +20,41 @@ const ROUTES = {
 // 当前路由状态
 let currentRoute = '/';
 
+// 检测是否在 GitHub Pages 环境
+const isGitHubPages = window.location.hostname.includes('github.io');
+
+/**
+ * 获取当前路径（支持 Hash 路由）
+ */
+function getCurrentPath() {
+  if (isGitHubPages) {
+    // GitHub Pages 使用 hash 路由
+    const hash = window.location.hash;
+    return hash ? hash.substring(1) : '/';
+  }
+  // 正常环境使用 pathname
+  return window.location.pathname;
+}
+
 /**
  * 初始化路由系统
  */
 export function initRouter() {
   // 监听浏览器前进后退
-  window.addEventListener('popstate', (e) => {
-    const path = window.location.pathname;
-    navigateTo(path, false);
-  });
+  if (isGitHubPages) {
+    window.addEventListener('hashchange', () => {
+      const path = getCurrentPath();
+      navigateTo(path, false);
+    });
+  } else {
+    window.addEventListener('popstate', () => {
+      const path = getCurrentPath();
+      navigateTo(path, false);
+    });
+  }
   
   // 处理初始路由
-  const initialPath = window.location.pathname;
+  const initialPath = getCurrentPath();
   if (ROUTES[initialPath]) {
     navigateTo(initialPath, false);
   } else {
@@ -63,7 +87,12 @@ export function navigateTo(path, pushState = true) {
   
   // 更新浏览器历史
   if (pushState) {
-    window.history.pushState({ path }, route.title, path);
+    if (isGitHubPages) {
+      // GitHub Pages 使用 hash 路由
+      window.location.hash = path;
+    } else {
+      window.history.pushState({ path }, route.title, path);
+    }
   }
   
   // 更新页面标题

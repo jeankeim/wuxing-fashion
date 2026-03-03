@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>五行穿搭建议</title>
+  <script>
+    // GitHub Pages SPA 路由重定向
+    // 将 404 路径重定向到 index.html，保留路径信息
+    (function() {
+      var path = window.location.pathname;
+      var repo = '/wuxing-fashion';
+      
+      // 如果路径包含仓库名
+      if (path.indexOf(repo) === 0) {
+        // 提取子路径
+        var subPath = path.substring(repo.length);
+        // 重定向到根，保留路径作为查询参数
+        window.location.replace(repo + '/?path=' + encodeURIComponent(subPath));
+      } else {
+        // 根部署，直接重定向
+        window.location.replace('/?path=' + encodeURIComponent(path));
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>页面加载中...</p>
+</body>
+</html>
