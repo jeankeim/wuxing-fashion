@@ -7,9 +7,15 @@
       </svg>
     </button>
     <h2>上传穿搭照片</h2>
+    <button id="btn-close-app" class="btn btn-icon" aria-label="关闭应用" title="关闭应用">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
   </header>
   
   <div class="upload-body">
+    <!-- 上传区域 -->
     <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="点击或拖拽上传图片">
       <input type="file" id="upload-input" accept="image/jpeg,image/png" hidden>
       <div class="upload-placeholder">
@@ -20,15 +26,47 @@
         <span class="upload-hint">支持 JPG、PNG，最大 5MB</span>
       </div>
       <div class="upload-preview hidden">
-        <img id="preview-image" src="" alt="预览图片">
-        <button id="btn-remove-image" class="btn btn-icon" type="button" aria-label="移除图片">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
+        <div class="preview-image-container">
+          <img id="preview-image" src="" alt="预览图片">
+        </div>
+      </div>
+    </div>
+    
+    <!-- 成功提示 -->
+    <div class="upload-success hidden" id="upload-success">
+      <div class="success-icon">✓</div>
+      <p>上传成功！</p>
+      <span class="success-hint">照片已保存到日记</span>
+    </div>
+    
+    <!-- 操作按钮区域 -->
+    <div class="action-section hidden" id="action-section">
+      <h3>穿搭操作</h3>
+      <div class="action-buttons">
+        <button id="btn-change-image" class="btn btn-secondary btn-small" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
           </svg>
+          修改
+        </button>
+        <button id="btn-remove-image" class="btn btn-danger btn-small" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          删除
+        </button>
+        <button id="btn-share-moments" class="btn btn-primary btn-share" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8M12 8v8"/>
+          </svg>
+          发朋友圈
         </button>
       </div>
     </div>
     
+    <!-- 反馈区域 -->
     <div class="feedback-section hidden" id="feedback-section">
       <h3>穿搭反馈</h3>
       <textarea id="feedback-text" class="feedback-textarea" placeholder="记录今日穿搭感受..." rows="3"></textarea>

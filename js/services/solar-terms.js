@@ -18,6 +18,14 @@ export function getUTC8Date(date = new Date()) {
  * 获取基础路径（支持GitHub Pages子目录部署）
  */
 function getBasePath() {
+  // 检测是否在 GitHub Pages 环境
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  
+  if (!isGitHubPages) {
+    // 本地开发环境，直接使用根路径
+    return '';
+  }
+  
   const pathSegments = window.location.pathname.split('/');
   if (pathSegments.length > 1 && pathSegments[1] && pathSegments[1] !== '') {
     return '/' + pathSegments[1];

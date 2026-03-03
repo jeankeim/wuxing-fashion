@@ -223,7 +223,10 @@ export class DiaryController extends BaseController {
     
     let html = '';
     records.forEach(record => {
-      const mood = MOODS[record.mood] || MOODS.happy;
+      // 有心情显示心情，没有心情不显示
+      const moodHtml = record.mood && MOODS[record.mood] 
+        ? `<span class="timeline-mood" style="background: ${MOODS[record.mood].color}">${MOODS[record.mood].icon} ${MOODS[record.mood].label}</span>`
+        : '';
       
       html += `
         <div class="timeline-item" data-date="${record.date}">
@@ -234,9 +237,7 @@ export class DiaryController extends BaseController {
           <div class="timeline-content">
             ${record.image ? `<img src="${record.image}" class="timeline-image" alt="穿搭照片">` : ''}
             <div class="timeline-info">
-              <span class="timeline-mood" style="background: ${mood.color}">
-                ${mood.icon} ${mood.label}
-              </span>
+              ${moodHtml}
               ${record.color ? `<span class="timeline-color">${record.color}</span>` : ''}
               ${record.material ? `<span class="timeline-material">${record.material}</span>` : ''}
               ${record.note ? `<p class="timeline-note">${record.note}</p>` : ''}

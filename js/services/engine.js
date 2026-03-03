@@ -58,6 +58,14 @@ const TERM_ORDER = [
  * 获取基础路径（支持GitHub Pages子目录部署）
  */
 function getBasePath() {
+  // 检测是否在 GitHub Pages 环境
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  
+  if (!isGitHubPages) {
+    // 本地开发环境，直接使用根路径
+    return '';
+  }
+  
   // 在GitHub Pages上，仓库名会作为路径前缀
   const pathSegments = window.location.pathname.split('/');
   // 如果路径包含仓库名（如 /wuxing-fashion/entry），返回 /wuxing-fashion/

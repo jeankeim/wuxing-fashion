@@ -2,9 +2,9 @@
  * Service Worker - 离线缓存
  * 版本号用于缓存更新
  */
-const CACHE_NAME = 'wuxing-fashion-v2';
+const CACHE_NAME = 'wuxing-fashion-v4';
 
-// 预缓存资源列表
+// 预缓存资源列表（只缓存核心静态资源，不缓存数据文件）
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -38,12 +38,8 @@ const PRECACHE_ASSETS = [
   '/js/controllers/profile.js',
   '/js/controllers/diary.js',
   '/js/controllers/upload.js',
-  '/js/lib/lunar.js',
-  '/data/schemes.json',
-  '/data/solar-terms.json',
-  '/data/intention-templates.json',
-  '/data/bazi-templates.json',
-  '/data/wish-templates.json'
+  '/js/lib/lunar.js'
+  // 注意：数据文件 /data/*.json 不预缓存，由应用动态加载
 ];
 
 /**
@@ -106,6 +102,13 @@ self.addEventListener('fetch', (event) => {
   
   // 跳过非同源请求（如 CDN 字体）
   if (!request.url.startsWith(self.location.origin)) {
+    return;
+  }
+  
+  // 数据文件直接走网络，不缓存
+  const url = new URL(request.url);
+  if (url.pathname.startsWith('/data/')) {
+    event.respondWith(fetch(request));
     return;
   }
   
