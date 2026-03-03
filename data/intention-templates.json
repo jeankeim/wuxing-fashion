@@ -248,5 +248,245 @@
     "feeling": "凝重感",
     "annotation": "寒气至极，牦绒密厚，封藏精气以待立春",
     "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "promotion_lichun",
+    "intention": "升职加薪",
+    "solarTerm": "立春",
+    "color": "赭石红",
+    "material": "精纺羊毛",
+    "feeling": "稳重感",
+    "annotation": "火土相生，羊毛挺括，助阳气升发以镇场",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "promotion_xiazhi",
+    "intention": "升职加薪",
+    "solarTerm": "夏至",
+    "color": "正红",
+    "material": "真丝",
+    "feeling": "热情感",
+    "annotation": "阳极之火，丝光流转，增强气场以显威",
+    "source": "《黄帝内经》"
+  },
+  {
+    "id": "promotion_qiufen",
+    "intention": "升职加薪",
+    "solarTerm": "秋分",
+    "color": "琥珀金",
+    "material": "羊绒",
+    "feeling": "贵气感",
+    "annotation": "金气正盛，羊绒温润，收聚秋实以固位",
+    "source": "《周易·乾卦》"
+  },
+  {
+    "id": "deal_shuangjiang",
+    "intention": "签单顺利",
+    "solarTerm": "霜降",
+    "color": "霜白",
+    "material": "高支棉",
+    "feeling": "利落感",
+    "annotation": "金气肃杀，棉质挺括，增强说服力以成事",
+    "source": "《天工开物》"
+  },
+  {
+    "id": "deal_dashui",
+    "intention": "签单顺利",
+    "solarTerm": "大雪",
+    "color": "玄青",
+    "material": "丝绒",
+    "feeling": "深邃感",
+    "annotation": "水色藏金，丝绒流转，助流通顺畅以聚财",
+    "source": "《周易·坎卦》"
+  },
+  {
+    "id": "avoid_xiaohan",
+    "intention": "防小人避坑",
+    "solarTerm": "小寒",
+    "color": "墨黑",
+    "material": "厚呢",
+    "feeling": "防御感",
+    "annotation": "水色深沉，呢料厚实，低调隐蔽以避祸",
+    "source": "《御定协纪辨方书》"
+  },
+  {
+    "id": "taohua_jingzhe",
+    "intention": "桃花朵朵",
+    "solarTerm": "惊蛰",
+    "color": "桃粉",
+    "material": "雪纺",
+    "feeling": "灵动感",
+    "annotation": "木火相生，桃色明艳，增强吸引力以招缘",
+    "source": "《花镜》"
+  },
+  {
+    "id": "taohua_xiazhi",
+    "intention": "桃花朵朵",
+    "solarTerm": "夏至",
+    "color": "胭脂红",
+    "material": "真丝",
+    "feeling": "妩媚感",
+    "annotation": "火气正旺，丝光流转，热情外放以引蝶",
+    "source": "《群芳谱》"
+  },
+  {
+    "id": "taohua_bailu",
+    "intention": "桃花朵朵",
+    "solarTerm": "白露",
+    "color": "藕荷粉",
+    "material": "蕾丝",
+    "feeling": "朦胧感",
+    "annotation": "金气凝露，蕾丝轻盈，含蓄婉约以动情",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "family_guyu",
+    "intention": "家庭和睦",
+    "solarTerm": "谷雨",
+    "color": "麦穗黄",
+    "material": "棉麻",
+    "feeling": "温暖感",
+    "annotation": "土色厚德，棉麻质朴，增强包容以睦家",
+    "source": "《农政全书》"
+  },
+  {
+    "id": "family_lidong",
+    "intention": "家庭和睦",
+    "solarTerm": "立冬",
+    "color": "驼色",
+    "material": "羊绒",
+    "feeling": "温馨感",
+    "annotation": "土载水气，羊绒温润，温和稳定以聚亲",
+    "source": "《本草纲目·服器部》"
+  },
+  {
+    "id": "reconcile_yushui",
+    "intention": "挽回缓和",
+    "solarTerm": "雨水",
+    "color": "天青",
+    "material": "莫代尔",
+    "feeling": "柔和感",
+    "annotation": "水色润木，莫代尔柔顺，以柔克刚以和解",
+    "source": "《周易·师卦》"
+  },
+  {
+    "id": "reconcile_hanlu",
+    "intention": "挽回缓和",
+    "solarTerm": "寒露",
+    "color": "湖蓝",
+    "material": "真丝",
+    "feeling": "沉静感",
+    "annotation": "水气渐盛，丝光内敛，冷静沟通以破冰",
+    "source": "《周易·需卦》"
+  },
+  {
+    "id": "energy_lixia",
+    "intention": "精力充沛",
+    "solarTerm": "立夏",
+    "color": "榴红",
+    "material": "弹力棉",
+    "feeling": "活力感",
+    "annotation": "火气始盛，红色振奋，补充能量以提神",
+    "source": "《黄帝内经》"
+  },
+  {
+    "id": "energy_mangzhong",
+    "intention": "精力充沛",
+    "solarTerm": "芒种",
+    "color": "朱砂红",
+    "material": "速干面料",
+    "feeling": "热情感",
+    "annotation": "火土相生，速干透气，提振精神以应忙",
+    "source": "《礼记·月令》"
+  },
+  {
+    "id": "sleep_xiazhi",
+    "intention": "安神助眠",
+    "solarTerm": "夏至",
+    "color": "玄黑",
+    "material": "真丝",
+    "feeling": "深定感",
+    "annotation": "水色伏藏，丝质垂顺，沉静内敛以安眠",
+    "source": "《御定协纪辨方书》"
+  },
+  {
+    "id": "sleep_dongzhi",
+    "intention": "安神助眠",
+    "solarTerm": "冬至",
+    "color": "藏蓝",
+    "material": "绒布",
+    "feeling": "包裹感",
+    "annotation": "阴极水旺，绒布温软，降低能耗以养神",
+    "source": "《周易·复卦》"
+  },
+  {
+    "id": "confidence_qiufen",
+    "intention": "增强自信",
+    "solarTerm": "秋分",
+    "color": "月白",
+    "material": "精纺羊毛",
+    "feeling": "清朗感",
+    "annotation": "金气正盛，白色明澈，清晰边界以自信",
+    "source": "《周易·兑卦》"
+  },
+  {
+    "id": "confidence_daxue",
+    "intention": "增强自信",
+    "solarTerm": "大雪",
+    "color": "银白",
+    "material": "羊绒",
+    "feeling": "贵气感",
+    "annotation": "金水相生，羊绒温润，自我肯定以从容",
+    "source": "《天工开物》"
+  },
+  {
+    "id": "recovery_lichun",
+    "intention": "身体康复",
+    "solarTerm": "立春",
+    "color": "嫩芽绿",
+    "material": "纯棉",
+    "feeling": "生机感",
+    "annotation": "木气生发，绿意盎然，生机复苏以养病",
+    "source": "《本草纲目》"
+  },
+  {
+    "id": "recovery_jingzhe",
+    "intention": "身体康复",
+    "solarTerm": "惊蛰",
+    "color": "柳绿",
+    "material": "莫代尔",
+    "feeling": "舒展感",
+    "annotation": "春雷震动，木气勃发，五行平衡以复原",
+    "source": "《黄帝内经》"
+  },
+  {
+    "id": "safety_guyu",
+    "intention": "出行平安",
+    "solarTerm": "谷雨",
+    "color": "土黄",
+    "material": "棉麻",
+    "feeling": "踏实感",
+    "annotation": "土色厚德，棉麻舒适，脚踏实地以保行",
+    "source": "《御定协纪辨方书》"
+  },
+  {
+    "id": "safety_xiaoman",
+    "intention": "出行平安",
+    "solarTerm": "小满",
+    "color": "麦金",
+    "material": "牛仔",
+    "feeling": "稳健感",
+    "annotation": "土气丰盈，牛仔耐磨，稳稳当当以远行",
+    "source": "《农政全书》"
+  },
+  {
+    "id": "safety_shuangjiang",
+    "intention": "出行平安",
+    "solarTerm": "霜降",
+    "color": "赭石",
+    "material": "厚棉",
+    "feeling": "厚重感",
+    "annotation": "土色固本，厚棉保暖，应霜降之肃穆以安归",
+    "source": "《周易·坤卦》"
   }
 ]

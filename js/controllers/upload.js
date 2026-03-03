@@ -3,19 +3,28 @@
  */
 
 import { BaseController } from './base.js';
-import { goBack } from '../router.js';
-import { updateUploadPreview } from '../render.js';
-import { outfitRepo } from '../repository.js';
-import { getTodayString } from '../upload.js';
+import { goBack } from '../core/router.js';
+import { updateUploadPreview } from '../utils/render.js';
+import { outfitRepo } from '../data/repository.js';
+import { getTodayString } from '../utils/upload.js';
 
 export class UploadController extends BaseController {
-  init() {
-    this.container = document.getElementById('view-upload');
-    this.uploadZone = this.container.querySelector('#upload-zone');
-    this.fileInput = this.container.querySelector('#upload-input');
+  constructor() {
+    super();
+    this.containerId = 'view-upload';
   }
 
+
   onMount() {
+    // 动态获取容器（视图是动态加载的）
+    this.container = document.getElementById(this.containerId);
+    if (!this.container) {
+      console.error('[UploadController] Container not found');
+      return;
+    }
+    
+    // 重新绑定事件
+    this.bindEvents();
     // 检查今日是否已有上传
     const todayImage = outfitRepo.getByDate(getTodayString());
     if (todayImage) {
@@ -24,6 +33,10 @@ export class UploadController extends BaseController {
   }
 
   bindEvents() {
+    // 避免重复绑定
+    if (this.eventsBound) return;
+    this.eventsBound = true;
+    
     // 返回按钮
     const backBtn = this.container.querySelector('#btn-back-results');
     if (backBtn) {
@@ -97,5 +110,9 @@ export class UploadController extends BaseController {
     // TODO: 保存反馈
     this.showToast('反馈已保存');
     if (textarea) textarea.value = '';
+  }
+
+  onUnmount() {
+    this.eventsBound = false;
   }
 }

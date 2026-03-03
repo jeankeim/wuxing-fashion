@@ -3,7 +3,7 @@
  */
 
 import { BaseController } from './base.js';
-import { navigateTo, goBack } from '../router.js';
+import { navigateTo, goBack } from '../core/router.js';
 import { 
   getCalendarData, 
   getTimelineData, 
@@ -13,27 +13,48 @@ import {
   saveDiaryRecord,
   deleteDiaryRecord,
   MOODS 
-} from '../diary.js';
-import { getTodayString } from '../upload.js';
+} from '../utils/diary.js';
+import { getTodayString } from '../utils/upload.js';
 
 export class DiaryController extends BaseController {
   init() {
-    this.container = document.getElementById('view-diary');
     this.currentDate = new Date();
     this.viewMode = 'calendar'; // 'calendar' | 'timeline'
   }
 
   onMount() {
+    // 动态获取容器（视图是动态加载的）
+    this.container = document.getElementById('view-diary');
+    if (!this.container) {
+      console.error('[DiaryController] Container not found');
+      return;
+    }
+    
+    // 重新绑定事件（因为视图刚加载）
+    this.bindEvents();
+    
     this.renderCalendar();
     this.renderStats();
   }
 
   bindEvents() {
+    // 避免重复绑定
+    if (this.eventsBound) return;
+    this.eventsBound = true;
+    
     // 返回按钮
     const backBtn = this.container.querySelector('#btn-back-from-diary');
     if (backBtn) {
       this.addEventListener(backBtn, 'click', () => {
         goBack();
+      });
+    }
+
+    // 添加记录按钮
+    const addBtn = this.container.querySelector('#btn-add-diary');
+    if (addBtn) {
+      this.addEventListener(addBtn, 'click', () => {
+        this.openDiaryEditor();
       });
     }
 
@@ -72,6 +93,50 @@ export class DiaryController extends BaseController {
           this.openDiaryEditor(date);
         }
       });
+    }
+
+    // 弹窗关闭
+    const modal = this.container.querySelector('#modal-diary-editor');
+    const backdrop = modal?.querySelector('.modal-backdrop');
+    const closeBtn = modal?.querySelector('.modal-close');
+    const cancelBtn = modal?.querySelector('#btn-cancel-diary');
+    
+    if (backdrop) {
+      this.addEventListener(backdrop, 'click', () => this.closeDiaryEditor());
+    }
+    if (closeBtn) {
+      this.addEventListener(closeBtn, 'click', () => this.closeDiaryEditor());
+    }
+    if (cancelBtn) {
+      this.addEventListener(cancelBtn, 'click', () => this.closeDiaryEditor());
+    }
+
+    // 心情选择
+    this.container.querySelectorAll('.mood-btn').forEach(btn => {
+      this.addEventListener(btn, 'click', () => this.selectMood(btn));
+    });
+
+    // 照片选择
+    const photoInput = this.container.querySelector('#diary-photo');
+    const selectPhotoBtn = this.container.querySelector('#btn-select-photo');
+    
+    if (selectPhotoBtn && photoInput) {
+      this.addEventListener(selectPhotoBtn, 'click', () => photoInput.click());
+      this.addEventListener(photoInput, 'change', (e) => {
+        this.handlePhotoSelect(e.target.files[0]);
+      });
+    }
+
+    // 表单提交
+    const form = this.container.querySelector('#diary-form');
+    if (form) {
+      this.addEventListener(form, 'submit', (e) => this.saveDiaryRecord(e));
+    }
+
+    // 删除按钮
+    const deleteBtn = this.container.querySelector('#btn-delete-diary');
+    if (deleteBtn) {
+      this.addEventListener(deleteBtn, 'click', () => this.deleteDiaryRecord());
     }
   }
 
@@ -220,7 +285,155 @@ export class DiaryController extends BaseController {
   }
 
   openDiaryEditor(date) {
-    // TODO: 打开编辑弹窗
-    this.showToast(`编辑 ${date} 的穿搭记录`);
+    const modal = this.container.querySelector('#modal-diary-editor');
+    const dateInput = this.container.querySelector('#diary-date');
+    const deleteBtn = this.container.querySelector('#btn-delete-diary');
+    
+    // 设置日期
+    const selectedDate = date || new Date().toISOString().split('T')[0];
+    dateInput.value = selectedDate;
+    this.currentEditingDate = selectedDate;
+    
+    // 加载已有记录
+    const existingRecord = getDiaryByDate(selectedDate);
+    if (existingRecord) {
+      this.loadDiaryRecord(existingRecord);
+      // 显示删除按钮
+      if (deleteBtn) deleteBtn.classList.remove('hidden');
+    } else {
+      this.resetDiaryForm();
+      // 隐藏删除按钮
+      if (deleteBtn) deleteBtn.classList.add('hidden');
+    }
+    
+    // 显示弹窗
+    modal.classList.remove('hidden');
+  }
+
+  closeDiaryEditor() {
+    const modal = this.container.querySelector('#modal-diary-editor');
+    modal.classList.add('hidden');
+    this.resetDiaryForm();
+    this.currentEditingDate = null;
+  }
+
+  deleteDiaryRecord() {
+    if (!this.currentEditingDate) return;
+    
+    if (confirm('确定要删除这条记录吗？')) {
+      deleteDiaryRecord(this.currentEditingDate);
+      this.showToast('记录已删除');
+      this.closeDiaryEditor();
+      this.renderCalendar();
+      this.renderStats();
+    }
+  }
+
+  loadDiaryRecord(record) {
+    const colorInput = this.container.querySelector('#diary-color');
+    const materialInput = this.container.querySelector('#diary-material');
+    const noteInput = this.container.querySelector('#diary-note');
+    
+    if (colorInput) colorInput.value = record.color || '';
+    if (materialInput) materialInput.value = record.material || '';
+    if (noteInput) noteInput.value = record.note || '';
+    
+    // 设置心情
+    if (record.mood) {
+      this.container.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mood === record.mood);
+      });
+    }
+    
+    // 设置照片预览
+    if (record.image) {
+      this.showPhotoPreview(record.image);
+    }
+  }
+
+  resetDiaryForm() {
+    const form = this.container.querySelector('#diary-form');
+    if (form) form.reset();
+    
+    this.container.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    this.hidePhotoPreview();
+  }
+
+  selectMood(moodBtn) {
+    this.container.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    moodBtn.classList.add('active');
+  }
+
+  handlePhotoSelect(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.showPhotoPreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  showPhotoPreview(imageSrc) {
+    const preview = this.container.querySelector('#diary-photo-preview');
+    if (preview) {
+      preview.innerHTML = `<img src="${imageSrc}" alt="预览">`;
+      preview.classList.remove('hidden');
+    }
+  }
+
+  hidePhotoPreview() {
+    const preview = this.container.querySelector('#diary-photo-preview');
+    if (preview) {
+      preview.innerHTML = '';
+      preview.classList.add('hidden');
+    }
+  }
+
+  saveDiaryRecord(e) {
+    e.preventDefault();
+    
+    const date = this.container.querySelector('#diary-date').value;
+    const color = this.container.querySelector('#diary-color').value;
+    const material = this.container.querySelector('#diary-material').value;
+    const note = this.container.querySelector('#diary-note').value;
+    
+    const selectedMood = this.container.querySelector('.mood-btn.active');
+    const mood = selectedMood ? selectedMood.dataset.mood : 'happy';
+    
+    const preview = this.container.querySelector('#diary-photo-preview img');
+    const image = preview ? preview.src : null;
+    
+    const record = {
+      color,
+      material,
+      note,
+      mood,
+      image
+    };
+    
+    saveDiaryRecord(date, record);
+    this.showToast('记录已保存');
+    this.closeDiaryEditor();
+    this.renderCalendar();
+    this.renderStats();
+  }
+
+  showToast(message) {
+    // 使用全局 toast 或简单 alert
+    if (window.showToast) {
+      window.showToast(message);
+    } else {
+      alert(message);
+    }
+  }
+
+  onUnmount() {
+    this.eventsBound = false;
   }
 }

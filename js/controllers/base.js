@@ -3,7 +3,7 @@
  * 每个视图对应一个控制器
  */
 
-import { store } from '../store.js';
+import { store } from '../core/store.js';
 
 /**
  * 基础控制器类
@@ -22,10 +22,11 @@ export class BaseController {
     if (this.isMounted) return;
     
     this.init();
-    this.bindEvents();
     this.subscribeStore();
     this.isMounted = true;
     this.onMount();
+    // 事件绑定移到 onMount 之后，因为子类需要在 onMount 中设置容器
+    this.bindEvents();
   }
 
   /**

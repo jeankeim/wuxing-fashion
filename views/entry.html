@@ -1,0 +1,233 @@
+<!-- Entry View: Wish + Bazi -->
+<section id="view-entry" class="view hidden" aria-label="信息输入">
+  <header class="entry-header">
+    <button id="btn-back-welcome" class="btn btn-icon" aria-label="返回">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <div class="entry-brand">
+      <span class="brand-mini-icon">🌿</span>
+      <span class="brand-mini-name">顺时裳</span>
+    </div>
+    <div class="entry-header-spacer"></div>
+  </header>
+  
+  <!-- Page Title -->
+  <div class="entry-page-title">
+    <h2 class="page-title">定制你的穿搭</h2>
+    <p class="page-subtitle">选择场景和心愿，获取专属五行推荐</p>
+  </div>
+  
+  <div class="entry-body">
+    <!-- Weather Widget -->
+    <div id="weather-widget-container"></div>
+    
+    <!-- Scene Selection -->
+    <div class="scene-section">
+      <p class="section-hint">选择今日场景</p>
+      <div class="scene-categories">
+        <!-- 常用场景 -->
+        <div class="scene-category">
+          <span class="category-label">常用</span>
+          <div class="scene-tags" role="radiogroup" aria-label="常用场景">
+            <button class="scene-tag active" data-scene="daily" type="button">🌿 日常</button>
+            <button class="scene-tag" data-scene="work" type="button">💼 职场</button>
+            <button class="scene-tag" data-scene="commute" type="button">🚇 通勤</button>
+            <button class="scene-tag" data-scene="home" type="button">🏠 居家</button>
+          </div>
+        </div>
+        <!-- 工作场景 -->
+        <div class="scene-category">
+          <span class="category-label">工作</span>
+          <div class="scene-tags" role="radiogroup" aria-label="工作场景">
+            <button class="scene-tag" data-scene="interview" type="button">🎤 面试/答辩</button>
+            <button class="scene-tag" data-scene="negotiation" type="button">🤝 商务谈判</button>
+          </div>
+        </div>
+        <!-- 情感场景 -->
+        <div class="scene-category">
+          <span class="category-label">情感</span>
+          <div class="scene-tags" role="radiogroup" aria-label="情感场景">
+            <button class="scene-tag" data-scene="date" type="button">💕 约会</button>
+            <button class="scene-tag" data-scene="blind_date" type="button">🌸 初次见面</button>
+            <button class="scene-tag" data-scene="romantic_date" type="button">🍷 浪漫约会</button>
+          </div>
+        </div>
+        <!-- 社交场景 -->
+        <div class="scene-category">
+          <span class="category-label">社交</span>
+          <div class="scene-tags" role="radiogroup" aria-label="社交场景">
+            <button class="scene-tag" data-scene="party" type="button">🎉 聚会</button>
+            <button class="scene-tag" data-scene="friend_gathering" type="button">🍻 朋友聚餐</button>
+            <button class="scene-tag" data-scene="celebration" type="button">🎊 重要庆典</button>
+          </div>
+        </div>
+        <!-- 生活场景 -->
+        <div class="scene-category">
+          <span class="category-label">生活</span>
+          <div class="scene-tags" role="radiogroup" aria-label="生活场景">
+            <button class="scene-tag" data-scene="sport" type="button">⚡ 运动</button>
+            <button class="scene-tag" data-scene="travel" type="button">✈️ 旅行/户外</button>
+            <button class="scene-tag" data-scene="study" type="button">📚 考试/学习</button>
+          </div>
+        </div>
+        <!-- 运势场景 -->
+        <div class="scene-category">
+          <span class="category-label">运势</span>
+          <div class="scene-tags" role="radiogroup" aria-label="运势场景">
+            <button class="scene-tag" data-scene="benming" type="button">🧧 本命年化煞</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Wish Selection -->
+    <div class="wish-section">
+      <p class="section-hint">选择一个当下的心愿（可选）</p>
+      <div class="wish-categories">
+        <!-- 事业财运 -->
+        <div class="wish-category">
+          <span class="category-label">事业财运</span>
+          <div class="wish-tags" role="radiogroup" aria-label="事业财运心愿">
+            <button class="wish-tag" data-wish="求职" type="button">求职顺利</button>
+            <button class="wish-tag" data-wish="升职加薪" type="button">升职加薪</button>
+            <button class="wish-tag" data-wish="签单顺利" type="button">签单顺利</button>
+            <button class="wish-tag" data-wish="贵人运" type="button">贵人运</button>
+            <button class="wish-tag" data-wish="防小人避坑" type="button">防小人避坑</button>
+          </div>
+        </div>
+        <!-- 情感人际 -->
+        <div class="wish-category">
+          <span class="category-label">情感人际</span>
+          <div class="wish-tags" role="radiogroup" aria-label="情感人际心愿">
+            <button class="wish-tag" data-wish="桃花朵朵" type="button">桃花朵朵</button>
+            <button class="wish-tag" data-wish="家庭和睦" type="button">家庭和睦</button>
+            <button class="wish-tag" data-wish="挽回缓和" type="button">挽回缓和</button>
+          </div>
+        </div>
+        <!-- 身心状态 -->
+        <div class="wish-category">
+          <span class="category-label">身心状态</span>
+          <div class="wish-tags" role="radiogroup" aria-label="身心状态心愿">
+            <button class="wish-tag" data-wish="精力充沛" type="button">精力充沛</button>
+            <button class="wish-tag" data-wish="安神助眠" type="button">安神助眠</button>
+            <button class="wish-tag" data-wish="增强自信" type="button">增强自信</button>
+            <button class="wish-tag" data-wish="静心专注" type="button">静心专注</button>
+          </div>
+        </div>
+        <!-- 健康平安 -->
+        <div class="wish-category">
+          <span class="category-label">健康平安</span>
+          <div class="wish-tags" role="radiogroup" aria-label="健康平安心愿">
+            <button class="wish-tag" data-wish="健康舒畅" type="button">健康舒畅</button>
+            <button class="wish-tag" data-wish="身体康复" type="button">身体康复</button>
+            <button class="wish-tag" data-wish="出行平安" type="button">出行平安</button>
+            <button class="wish-tag" data-wish="远行顺利" type="button">远行顺利</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bazi Input -->
+    <div class="bazi-section">
+      <div class="bazi-section-header">
+        <div class="bazi-title">
+          <span class="bazi-icon">📿</span>
+          <span>生辰八字</span>
+        </div>
+        <span class="bazi-badge">可选</span>
+      </div>
+      <p class="bazi-desc">输入八字可获得更精准的五行推荐</p>
+      
+      <div class="bazi-header">
+        <div class="precision-toggle">
+          <button class="precision-btn active" data-precision="simple" type="button">简版</button>
+          <button class="precision-btn" data-precision="precise" type="button">精确</button>
+        </div>
+      </div>
+      <p class="precision-hint" id="precision-hint">简版：仅需年月日时，快速计算</p>
+      <div class="bazi-form">
+        <div class="bazi-row">
+          <label class="bazi-field">
+            <span class="bazi-label">年</span>
+            <select id="bazi-year" class="bazi-select">
+              <option value="">选择年份</option>
+            </select>
+          </label>
+          <label class="bazi-field">
+            <span class="bazi-label">月</span>
+            <select id="bazi-month" class="bazi-select">
+              <option value="">选择月份</option>
+              <option value="1">1月</option>
+              <option value="2">2月</option>
+              <option value="3">3月</option>
+              <option value="4">4月</option>
+              <option value="5">5月</option>
+              <option value="6">6月</option>
+              <option value="7">7月</option>
+              <option value="8">8月</option>
+              <option value="9">9月</option>
+              <option value="10">10月</option>
+              <option value="11">11月</option>
+              <option value="12">12月</option>
+            </select>
+          </label>
+        </div>
+        <div class="bazi-row">
+          <label class="bazi-field">
+            <span class="bazi-label">日</span>
+            <select id="bazi-day" class="bazi-select">
+              <option value="">选择日期</option>
+            </select>
+          </label>
+          <label class="bazi-field">
+            <span class="bazi-label">时</span>
+            <select id="bazi-hour" class="bazi-select">
+              <option value="">选择时辰</option>
+              <option value="0">子时 (23:00-01:00)</option>
+              <option value="1">丑时 (01:00-03:00)</option>
+              <option value="2">寅时 (03:00-05:00)</option>
+              <option value="3">卯时 (05:00-07:00)</option>
+              <option value="4">辰时 (07:00-09:00)</option>
+              <option value="5">巳时 (09:00-11:00)</option>
+              <option value="6">午时 (11:00-13:00)</option>
+              <option value="7">未时 (13:00-15:00)</option>
+              <option value="8">申时 (15:00-17:00)</option>
+              <option value="9">酉时 (17:00-19:00)</option>
+              <option value="10">戌时 (19:00-21:00)</option>
+              <option value="11">亥时 (21:00-23:00)</option>
+            </select>
+          </label>
+        </div>
+        <!-- 精确模式额外输入 -->
+        <div class="bazi-row precise-fields hidden">
+          <label class="bazi-field">
+            <span class="bazi-label">分钟</span>
+            <select id="bazi-minute" class="bazi-select">
+              <option value="0">00分</option>
+              <option value="15">15分</option>
+              <option value="30">30分</option>
+              <option value="45">45分</option>
+            </select>
+          </label>
+          <label class="bazi-field">
+            <span class="bazi-label">出生地</span>
+            <select id="bazi-timezone" class="bazi-select">
+              <option value="8">北京时间 (UTC+8)</option>
+              <option value="6">新疆时间 (UTC+6)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <button id="btn-generate" class="btn btn-generate" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+      生成今日穿搭
+    </button>
+  </div>
+</section>

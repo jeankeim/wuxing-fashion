@@ -3,20 +3,35 @@
  */
 
 import { BaseController } from './base.js';
-import { goBack } from '../router.js';
-import { renderProfileView } from '../render.js';
+import { goBack } from '../core/router.js';
+import { renderProfileView } from '../utils/render.js';
 
 export class ProfileController extends BaseController {
-  init() {
-    this.container = document.getElementById('view-profile');
+  constructor() {
+    super();
+    this.containerId = 'view-profile';
   }
 
   onMount() {
+    // 动态获取容器（视图是动态加载的）
+    this.container = document.getElementById(this.containerId);
+    if (!this.container) {
+      console.error('[ProfileController] Container not found');
+      return;
+    }
+    
+    // 绑定事件
+    this.bindEvents();
+    
     // 渲染画像
     renderProfileView();
   }
 
   bindEvents() {
+    // 避免重复绑定
+    if (this.eventsBound) return;
+    this.eventsBound = true;
+    
     // 返回按钮
     const backBtn = this.container.querySelector('#btn-back-results-from-profile');
     if (backBtn) {
@@ -48,7 +63,6 @@ export class ProfileController extends BaseController {
   }
 
   exportData() {
-    // TODO: 实现导出
     this.showToast('导出功能开发中...');
   }
 
@@ -60,15 +74,17 @@ export class ProfileController extends BaseController {
   }
 
   handleFileSelect(e) {
-    // TODO: 实现导入
     this.showToast('导入功能开发中...');
     e.target.value = '';
   }
 
   clearData() {
     if (confirm('确定要清除所有数据吗？此操作不可恢复。')) {
-      // TODO: 实现清除
       this.showToast('数据已清除');
     }
+  }
+
+  onUnmount() {
+    this.eventsBound = false;
   }
 }

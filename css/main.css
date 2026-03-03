@@ -1,0 +1,963 @@
+/* ============================================
+   Design Tokens - 五行穿搭建议
+   ============================================ */
+
+:root {
+  /* === 五行色彩系统（品牌升级）=== */
+  /* 木 - 春 - 生发 - 青绿系 */
+  --color-wood: #7CB342;
+  --color-wood-light: #AED581;
+  --color-wood-dark: #558B2F;
+  --color-wood-bg: #F1F8E9;
+  --color-wood-gradient: linear-gradient(135deg, #7CB342 0%, #558B2F 100%);
+  
+  /* 火 - 夏 - 旺盛 - 红紫系 */
+  --color-fire: #E53935;
+  --color-fire-light: #FF6F60;
+  --color-fire-dark: #C62828;
+  --color-fire-bg: #FFEBEE;
+  --color-fire-gradient: linear-gradient(135deg, #FF6F60 0%, #E53935 100%);
+  
+  /* 土 - 长夏 - 中和 - 黄棕系 */
+  --color-earth: #F9A825;
+  --color-earth-light: #FFD54F;
+  --color-earth-dark: #F57F17;
+  --color-earth-bg: #FFFDE7;
+  --color-earth-gradient: linear-gradient(135deg, #FFD54F 0%, #F9A825 100%);
+  
+  /* 金 - 秋 - 肃杀 - 白金系 */
+  --color-metal: #9E9E9E;
+  --color-metal-light: #E0E0E0;
+  --color-metal-dark: #616161;
+  --color-metal-bg: #FAFAFA;
+  --color-metal-gradient: linear-gradient(135deg, #E0E0E0 0%, #9E9E9E 100%);
+  
+  /* 水 - 冬 - 润下 - 黑蓝系 */
+  --color-water: #1E88E5;
+  --color-water-light: #64B5F6;
+  --color-water-dark: #1565C0;
+  --color-water-bg: #E3F2FD;
+  --color-water-gradient: linear-gradient(135deg, #64B5F6 0%, #1E88E5 100%);
+  
+  /* 五行主题色映射（根据当前节气动态切换） */
+  --theme-primary: var(--color-wood);
+  --theme-primary-light: var(--color-wood-light);
+  --theme-primary-dark: var(--color-wood-dark);
+  --theme-primary-bg: var(--color-wood-bg);
+  --theme-primary-gradient: var(--color-wood-gradient);
+  
+  /* === 中性色 === */
+  --color-bg: #FAFAF8;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E5E0;
+  --color-border-light: #F0F0EB;
+  
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #666666;
+  --color-text-muted: #999999;
+  --color-text-inverse: #FFFFFF;
+  
+  /* === 功能色 === */
+  --color-success: #4A7C59;
+  --color-warning: #C9A84C;
+  --color-error: #C0392B;
+  --color-info: #4A6FA5;
+  
+  /* === 字体 === */
+  --font-display: 'LXGW WenKai', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  
+  /* === 字号 === */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  
+  /* === 行高 === */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+  
+  /* === 间距 (4px Grid) === */
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  
+  /* === 圆角 === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* === 阴影 === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* === 动画 === */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* === Z-Index === */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  
+  /* === 断点 (参考值) === */
+  /* --bp-sm: 360px */
+  /* --bp-md: 768px */
+  /* --bp-lg: 1024px */
+}
+/* ============================================
+   Base Styles - 五行穿搭建议
+   ============================================ */
+
+/* === Reset === */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === Typography === */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+}
+
+h1 { font-size: var(--text-4xl); }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-xl); }
+h4 { font-size: var(--text-lg); }
+
+p {
+  margin-bottom: var(--space-4);
+}
+
+a {
+  color: var(--color-water);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--color-water-dark);
+}
+
+/* === Lists === */
+ul, ol {
+  list-style: none;
+}
+
+/* === Images === */
+img, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* === Forms === */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+input, select, textarea {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-wood);
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.15);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  padding-right: var(--space-8);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* === Accessibility === */
+:focus-visible {
+  outline: 2px solid var(--color-wood);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-border-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* === Selection === */
+::selection {
+  background-color: var(--color-wood-light);
+  color: var(--color-text-primary);
+}
+
+/* === Utility Classes === */
+.hidden {
+  display: none !important;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+/* ============================================
+   Animation Styles - 五行穿搭建议
+   ============================================ */
+
+/* === Keyframes === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* === View Transitions === */
+.view {
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+/* === Card Stagger Animation === */
+.scheme-card {
+  animation: fadeInUp var(--duration-normal) var(--ease-out) both;
+}
+
+.scheme-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.scheme-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.scheme-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+/* === Modal Animation === */
+.modal:not(.hidden) .modal-backdrop {
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+.modal:not(.hidden) .modal-content {
+  animation: fadeInScale var(--duration-normal) var(--ease-spring);
+}
+
+/* === Button Hover Effects === */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: transform var(--duration-fast) var(--ease-out),
+              opacity var(--duration-fast) var(--ease-out);
+}
+
+.btn:active::after {
+  opacity: 1;
+  transform: scale(2);
+}
+
+/* === Wish Tag Selection === */
+.wish-tag {
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.wish-tag.active {
+  animation: bounce var(--duration-normal) var(--ease-spring);
+}
+
+/* === Upload Zone Drag State === */
+.upload-zone.dragover {
+  animation: pulse 1s var(--ease-in-out) infinite;
+}
+
+/* === Loading Spinner === */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-wood);
+  border-radius: 50%;
+  animation: spin var(--duration-slow) linear infinite;
+}
+
+/* === Utility Animation Classes === */
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--duration-normal) var(--ease-out);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--duration-normal) var(--ease-out);
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--duration-normal) var(--ease-out);
+}
+
+.animate-pulse {
+  animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+/* Layout Styles - 五行穿搭建议 */
+/* ============================================
+   Layout Styles - 五行穿搭建议
+   ============================================ */
+
+/* === App Container === */
+.app-container {
+  min-height: 100vh;
+  padding-bottom: 60px; /* Space for disclaimer */
+  position: relative;
+}
+
+/* === View System === */
+.view {
+  min-height: 100vh;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+}
+
+.view.hidden {
+  display: none;
+}
+
+/* === Welcome View === */
+.welcome-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.welcome-title {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.welcome-subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.solar-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-8);
+}
+
+.solar-term-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+}
+
+.solar-term-element {
+  font-size: var(--text-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-wood-light);
+  color: var(--color-wood-dark);
+}
+
+/* === Entry View === */
+.entry-header,
+.results-header,
+.upload-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: var(--space-6);
+}
+
+.entry-body,
+.results-body,
+.upload-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+/* === Wish Section === */
+.wish-section {
+  margin-bottom: var(--space-8);
+}
+
+.wish-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* === Bazi Section === */
+.bazi-section {
+  margin-bottom: var(--space-8);
+}
+
+.bazi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.bazi-header .section-hint {
+  margin-bottom: 0;
+}
+
+.precision-toggle {
+  display: flex;
+  gap: var(--space-1);
+  background-color: var(--color-border-light);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+}
+
+.precision-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.precision-btn.active {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.precision-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-border-light);
+  border-radius: var(--radius-md);
+}
+
+.bazi-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.precise-fields {
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.bazi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.bazi-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bazi-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.bazi-select {
+  width: 100%;
+}
+
+/* === Results View === */
+.results-title {
+  flex: 1;
+}
+
+.results-title h2 {
+  margin-bottom: var(--space-1);
+}
+
+.results-term {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* === Favorites View === */
+.favorites-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: var(--space-6);
+}
+
+.favorites-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.scheme-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.results-actions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+}
+
+/* === Upload View === */
+.upload-body {
+  align-items: center;
+}
+
+.feedback-section {
+  width: 100%;
+  max-width: 400px;
+  margin-top: var(--space-6);
+}
+
+.feedback-section h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-4);
+}
+
+/* === Disclaimer Bar === */
+.disclaimer-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border-light);
+  text-align: center;
+  z-index: var(--z-sticky);
+}
+
+.disclaimer-bar p {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* === Privacy Badge === */
+.privacy-badge {
+  position: fixed;
+  bottom: 52px;
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  z-index: var(--z-sticky);
+}
+
+.privacy-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* === Responsive === */
+@media (min-width: 768px) {
+  .view {
+    padding: var(--space-8);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .welcome-title {
+    font-size: var(--text-4xl);
+  }
+  
+  .scheme-cards {
+    gap: var(--space-6);
+  }
+}
+
+/* ============================================
+   Welcome Page Styles - 欢迎页专用样式
+   ============================================ */
+
+.view-welcome {
+  background: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.welcome-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Logo Area */
+.logo-area {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.logo-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.app-name {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.app-name-en {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.slogan {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  font-weight: 300;
+}
+
+/* Term Card */
+.term-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+.term-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.term-name {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.term-info {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.term-wuxing {
+  display: inline-block;
+  background: var(--color-wood-bg);
+  color: var(--color-wood);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.term-wuxing .wuxing-tag {
+  font-weight: 500;
+}
+
+/* CTA Button */
+.cta-button {
+  background: linear-gradient(135deg, var(--color-wood) 0%, var(--color-wood-dark) 100%);
+  color: white;
+  border: none;
+  padding: 16px 64px;
+  font-size: 18px;
+  font-family: var(--font-body);
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(124, 179, 66, 0.3);
+  transition: all 0.3s ease;
+  margin-bottom: 32px;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(124, 179, 66, 0.4);
+}
+
+.cta-button:active {
+  transform: scale(0.98);
+}
+
+/* Fortune Tips */
+.fortune-tips {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.fortune-tips .stars {
+  color: #FFB300;
+  margin-left: 8px;
+}
+
+@media (min-width: 1024px) {
+  .view {
+    max-width: 800px;
+  }
+  
+  .scheme-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

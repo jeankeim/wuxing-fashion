@@ -3,22 +3,37 @@
  */
 
 import { BaseController } from './base.js';
-import { navigateTo, goBack } from '../router.js';
-import { renderFavoritesList } from '../render.js';
-import { favoritesRepo } from '../repository.js';
+import { navigateTo, goBack } from '../core/router.js';
+import { renderFavoritesList } from '../utils/render.js';
+import { favoritesRepo } from '../data/repository.js';
 
 export class FavoritesController extends BaseController {
-  init() {
-    this.container = document.getElementById('view-favorites');
+  constructor() {
+    super();
+    this.containerId = 'view-favorites';
   }
 
   onMount() {
+    // 动态获取容器（视图是动态加载的）
+    this.container = document.getElementById(this.containerId);
+    if (!this.container) {
+      console.error('[FavoritesController] Container not found');
+      return;
+    }
+    
+    // 绑定事件
+    this.bindEvents();
+    
     // 渲染收藏列表
     const favorites = favoritesRepo.getAll();
     renderFavoritesList(favorites);
   }
 
   bindEvents() {
+    // 避免重复绑定
+    if (this.eventsBound) return;
+    this.eventsBound = true;
+    
     // 返回按钮
     const backBtn = this.container.querySelector('#btn-back-results-from-fav');
     if (backBtn) {
@@ -64,7 +79,10 @@ export class FavoritesController extends BaseController {
   }
 
   showDetail(index) {
-    // TODO: 显示详情
     this.showToast('详情功能开发中...');
+  }
+
+  onUnmount() {
+    this.eventsBound = false;
   }
 }

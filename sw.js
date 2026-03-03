@@ -2,37 +2,34 @@
  * Service Worker - 离线缓存
  * 版本号用于缓存更新
  */
-const CACHE_NAME = 'wuxing-fashion-v1';
+const CACHE_NAME = 'wuxing-fashion-v2';
 
 // 预缓存资源列表
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/css/tokens.css',
-  '/css/base.css',
-  '/css/layout.css',
+  '/css/main.css',
   '/css/components.css',
-  '/css/animations.css',
-  '/js/main.js',
-  '/js/engine.js',
-  '/js/bazi.js',
-  '/js/solar-terms.js',
-  '/js/render.js',
-  '/js/storage.js',
-  '/js/upload.js',
-  '/js/error-handler.js',
-  '/js/store.js',
-  '/js/share.js',
-  '/js/recommendation.js',
-  '/js/explanation.js',
-  '/js/profile.js',
-  '/js/data-manager.js',
-  '/js/router.js',
-  '/js/repository.js',
-  '/js/app.js',
-  '/js/diary.js',
-  '/js/weather.js',
+  '/js/core/app.js',
+  '/js/core/router.js',
+  '/js/core/store.js',
+  '/js/core/error-handler.js',
+  '/js/services/engine.js',
+  '/js/services/bazi.js',
+  '/js/services/solar-terms.js',
+  '/js/services/weather.js',
+  '/js/services/recommendation.js',
+  '/js/services/explanation.js',
+  '/js/data/data-manager.js',
+  '/js/data/repository.js',
+  '/js/data/storage.js',
+  '/js/utils/render.js',
+  '/js/utils/share.js',
+  '/js/utils/profile.js',
+  '/js/utils/diary.js',
+  '/js/utils/upload.js',
   '/js/components/base.js',
+  '/js/components/weather-widget.js',
   '/js/controllers/base.js',
   '/js/controllers/welcome.js',
   '/js/controllers/entry.js',
@@ -45,7 +42,8 @@ const PRECACHE_ASSETS = [
   '/data/schemes.json',
   '/data/solar-terms.json',
   '/data/intention-templates.json',
-  '/data/bazi-templates.json'
+  '/data/bazi-templates.json',
+  '/data/wish-templates.json'
 ];
 
 /**

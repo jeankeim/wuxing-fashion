@@ -1,0 +1,127 @@
+<!-- Results View -->
+<section id="view-results" class="view hidden" aria-label="推荐结果">
+  <header class="results-header">
+    <button id="btn-back-entry" class="btn btn-icon" aria-label="返回">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <div class="results-brand">
+      <span class="brand-mini-icon">🌿</span>
+      <span class="brand-mini-name">顺时裳</span>
+    </div>
+    <div class="results-actions-header">
+      <button id="btn-favorites" class="btn btn-icon" aria-label="我的收藏">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+      <button id="btn-diary" class="btn btn-icon" aria-label="穿搭日记">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </button>
+      <button id="btn-profile" class="btn btn-icon" aria-label="我的画像">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+  
+  <!-- Page Title Section -->
+  <div class="results-page-title">
+    <h2 class="page-title">今日穿搭推荐</h2>
+    <p class="page-subtitle" id="results-subtitle">根据雨水节气，为您精选 3 套五行搭配</p>
+  </div>
+  
+  <div class="results-body">
+    <!-- Bazi Hint (shown when no bazi) -->
+    <div id="bazi-hint-container" class="hidden">
+      <div class="bazi-hint">
+        <span class="hint-icon">📿</span>
+        <span class="hint-text">填写八字后，推荐精准度可提升 30%</span>
+        <button class="hint-btn" id="btn-add-bazi" type="button">去填写</button>
+      </div>
+    </div>
+    
+    <!-- Daily Fortune Card -->
+    <div id="daily-fortune-container" class="daily-fortune-card">
+      <div class="fortune-header">
+        <span class="fortune-icon">🔮</span>
+        <span class="fortune-title">今日穿搭运势</span>
+      </div>
+      <div class="fortune-meta">
+        <span class="fortune-scene" id="fortune-scene"></span>
+        <span class="fortune-wish" id="fortune-wish"></span>
+      </div>
+      <div class="fortune-colors" id="fortune-colors"></div>
+      <div class="fortune-analysis" id="fortune-analysis"></div>
+      <div class="fortune-tip" id="fortune-tip"></div>
+    </div>
+    
+    <!-- Weather Impact -->
+    <div id="weather-impact-container"></div>
+    
+    <div class="scheme-cards" id="scheme-cards">
+      <!-- Cards rendered by JS -->
+    </div>
+    
+    <div class="results-actions">
+      <button id="btn-regenerate" class="btn btn-secondary btn-refresh" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        换一批
+      </button>
+      <button id="btn-upload" class="btn btn-primary btn-upload" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        记录今日穿搭
+      </button>
+    </div>
+  </div>
+  
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>为什么不喜欢这套？</h3>
+        <button class="modal-close" id="btn-close-feedback" type="button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="feedback-options">
+          <button class="feedback-option" data-reason="color" type="button">
+            <span class="option-icon">🎨</span>
+            <span class="option-text">颜色不喜欢</span>
+          </button>
+          <button class="feedback-option" data-reason="style" type="button">
+            <span class="option-icon">👔</span>
+            <span class="option-text">款式不合适</span>
+          </button>
+          <button class="feedback-option" data-reason="wuxing" type="button">
+            <span class="option-icon">☯️</span>
+            <span class="option-text">五行不认同</span>
+          </button>
+          <button class="feedback-option" data-reason="material" type="button">
+            <span class="option-icon">🧵</span>
+            <span class="option-text">材质不合适</span>
+          </button>
+          <button class="feedback-option" data-reason="other" type="button">
+            <span class="option-icon">🤔</span>
+            <span class="option-text">其他原因</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

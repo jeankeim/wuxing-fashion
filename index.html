@@ -11,369 +11,30 @@
   <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/animations.css">
 </head>
 <body>
   <div class="app-container">
-    
-    <!-- Welcome View -->
-    <section id="view-welcome" class="view" aria-label="欢迎页">
-      <div class="welcome-content">
-        <h1 class="welcome-title">五行穿搭建议</h1>
-        <p class="welcome-subtitle">顺应节气，以色养身</p>
-        <div class="solar-banner" id="solar-banner">
-          <span class="solar-term-name"></span>
-          <span class="solar-term-element"></span>
-        </div>
-        <button id="btn-start" class="btn btn-primary btn-large" type="button">
-          开始体验
-        </button>
-      </div>
-    </section>
-    
-    <!-- Entry View: Wish + Bazi -->
-    <section id="view-entry" class="view hidden" aria-label="信息输入">
-      <header class="entry-header">
-        <button id="btn-back-welcome" class="btn btn-icon" aria-label="返回">
+    <!-- Views will be loaded dynamically by app.js -->
+  </div>
+  
+  <!-- Detail Modal (Global) -->
+  <div id="modal-detail" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-detail-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modal-detail-title">穿搭详解</h3>
+        <button class="btn btn-icon modal-close" aria-label="关闭">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h2>选择你的心愿</h2>
-      </header>
-      
-      <div class="entry-body">
-        <!-- Scene Selection -->
-        <div class="scene-section">
-          <p class="section-hint">选择今日场景</p>
-          <div class="scene-tags" role="radiogroup" aria-label="场景选择">
-            <button class="scene-tag active" data-scene="daily" type="button">🌿 日常</button>
-            <button class="scene-tag" data-scene="work" type="button">💼 职场</button>
-            <button class="scene-tag" data-scene="date" type="button">💕 约会</button>
-            <button class="scene-tag" data-scene="party" type="button">🎉 聚会</button>
-            <button class="scene-tag" data-scene="sport" type="button">⚡ 运动</button>
-          </div>
-        </div>
-        
-        <!-- Wish Selection -->
-        <div class="wish-section">
-          <p class="section-hint">选择一个当下的心愿（可选）</p>
-          <div class="wish-tags" role="radiogroup" aria-label="心愿选择">
-            <button class="wish-tag" data-wish="career" type="button">求职顺利</button>
-            <button class="wish-tag" data-wish="guiren" type="button">贵人运</button>
-            <button class="wish-tag" data-wish="travel" type="button">远行顺利</button>
-            <button class="wish-tag" data-wish="focus" type="button">静心专注</button>
-            <button class="wish-tag" data-wish="health" type="button">健康舒畅</button>
-          </div>
-        </div>
-        
-        <!-- Bazi Input -->
-        <div class="bazi-section">
-          <div class="bazi-header">
-            <p class="section-hint">输入生辰八字（可选，用于更精准推荐）</p>
-            <div class="precision-toggle">
-              <button class="precision-btn active" data-precision="simple" type="button">简版</button>
-              <button class="precision-btn" data-precision="precise" type="button">精确</button>
-            </div>
-          </div>
-          <p class="precision-hint" id="precision-hint">简版：仅需年月日时，快速计算</p>
-          <div class="bazi-form">
-            <div class="bazi-row">
-              <label class="bazi-field">
-                <span class="bazi-label">年</span>
-                <select id="bazi-year" class="bazi-select">
-                  <option value="">选择年份</option>
-                </select>
-              </label>
-              <label class="bazi-field">
-                <span class="bazi-label">月</span>
-                <select id="bazi-month" class="bazi-select">
-                  <option value="">选择月份</option>
-                  <option value="1">1月</option>
-                  <option value="2">2月</option>
-                  <option value="3">3月</option>
-                  <option value="4">4月</option>
-                  <option value="5">5月</option>
-                  <option value="6">6月</option>
-                  <option value="7">7月</option>
-                  <option value="8">8月</option>
-                  <option value="9">9月</option>
-                  <option value="10">10月</option>
-                  <option value="11">11月</option>
-                  <option value="12">12月</option>
-                </select>
-              </label>
-            </div>
-            <div class="bazi-row">
-              <label class="bazi-field">
-                <span class="bazi-label">日</span>
-                <select id="bazi-day" class="bazi-select">
-                  <option value="">选择日期</option>
-                </select>
-              </label>
-              <label class="bazi-field">
-                <span class="bazi-label">时</span>
-                <select id="bazi-hour" class="bazi-select">
-                  <option value="">选择时辰</option>
-                  <option value="0">子时 (23:00-01:00)</option>
-                  <option value="1">丑时 (01:00-03:00)</option>
-                  <option value="2">寅时 (03:00-05:00)</option>
-                  <option value="3">卯时 (05:00-07:00)</option>
-                  <option value="4">辰时 (07:00-09:00)</option>
-                  <option value="5">巳时 (09:00-11:00)</option>
-                  <option value="6">午时 (11:00-13:00)</option>
-                  <option value="7">未时 (13:00-15:00)</option>
-                  <option value="8">申时 (15:00-17:00)</option>
-                  <option value="9">酉时 (17:00-19:00)</option>
-                  <option value="10">戌时 (19:00-21:00)</option>
-                  <option value="11">亥时 (21:00-23:00)</option>
-                </select>
-              </label>
-            </div>
-            <!-- 精确模式额外输入 -->
-            <div class="bazi-row precise-fields hidden">
-              <label class="bazi-field">
-                <span class="bazi-label">分钟</span>
-                <select id="bazi-minute" class="bazi-select">
-                  <option value="0">00分</option>
-                  <option value="15">15分</option>
-                  <option value="30">30分</option>
-                  <option value="45">45分</option>
-                </select>
-              </label>
-              <label class="bazi-field">
-                <span class="bazi-label">出生地</span>
-                <select id="bazi-timezone" class="bazi-select">
-                  <option value="8">北京时间 (UTC+8)</option>
-                  <option value="6">新疆时间 (UTC+6)</option>
-                </select>
-              </label>
-            </div>
-          </div>
-        </div>
-        
-        <button id="btn-generate" class="btn btn-primary btn-large" type="button">
-          生成穿搭建议
-        </button>
-      </div>
-    </section>
-    
-    <!-- Results View -->
-    <section id="view-results" class="view hidden" aria-label="推荐结果">
-      <header class="results-header">
-        <button id="btn-back-entry" class="btn btn-icon" aria-label="返回">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <div class="results-title">
-          <h2>今日推荐</h2>
-          <span class="results-term" id="results-term"></span>
-        </div>
-        <button id="btn-favorites" class="btn btn-icon" aria-label="我的收藏">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-        <button id="btn-profile" class="btn btn-icon" aria-label="我的画像">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        </button>
-        <button id="btn-diary" class="btn btn-icon" aria-label="穿搭日记">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
+            <path d="M18 6L6 18M6 6l12 12"/>
           </svg>
         </button>
       </header>
-      
-      <div class="results-body">
-        <div class="scheme-cards" id="scheme-cards">
-          <!-- Cards rendered by JS -->
-        </div>
-        
-        <div class="results-actions">
-          <button id="btn-regenerate" class="btn btn-secondary" type="button">
-            换一批
-          </button>
-          <button id="btn-upload" class="btn btn-ghost" type="button">
-            上传穿搭照片
-          </button>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Favorites View -->
-    <section id="view-favorites" class="view hidden" aria-label="我的收藏">
-      <header class="favorites-header">
-        <button id="btn-back-results-from-fav" class="btn btn-icon" aria-label="返回">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h2>我的收藏</h2>
-      </header>
-      
-      <div class="favorites-body">
-        <div class="favorites-list" id="favorites-list">
-          <!-- Favorites rendered by JS -->
-        </div>
-      </div>
-    </section>
-    
-    <!-- Profile View -->
-    <section id="view-profile" class="view hidden" aria-label="我的画像">
-      <header class="profile-header">
-        <button id="btn-back-results-from-profile" class="btn btn-icon" aria-label="返回">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h2>我的画像</h2>
-      </header>
-      
-      <div class="profile-body">
-        <div id="profile-container">
-          <!-- Profile rendered by JS -->
-        </div>
-        <div id="data-manager-container">
-          <!-- Data Manager rendered by JS -->
-        </div>
-      </div>
-    </section>
-    
-    <!-- Diary View -->
-    <section id="view-diary" class="view hidden" aria-label="穿搭日记">
-      <header class="diary-header">
-        <button id="btn-back-from-diary" class="btn btn-icon" aria-label="返回">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h2>穿搭日记</h2>
-        <div class="diary-view-switch">
-          <button class="diary-view-btn active" data-view="calendar">日历</button>
-          <button class="diary-view-btn" data-view="timeline">时间线</button>
-        </div>
-      </header>
-      
-      <div class="diary-body">
-        <!-- 统计卡片 -->
-        <div class="diary-stats">
-          <div class="stat-card">
-            <span class="stat-number streak-days">0</span>
-            <span class="stat-label">连续记录</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number total-records">0</span>
-            <span class="stat-label">总记录</span>
-          </div>
-        </div>
-        
-        <!-- 日历视图 -->
-        <div class="calendar-view">
-          <div class="calendar-nav">
-            <button id="btn-prev-month" class="btn btn-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-              </svg>
-            </button>
-            <span class="current-month">2024年1月</span>
-            <button id="btn-next-month" class="btn btn-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </button>
-          </div>
-          <div class="calendar-grid">
-            <!-- Calendar rendered by JS -->
-          </div>
-        </div>
-        
-        <!-- 时间线视图 -->
-        <div class="timeline-view hidden">
-          <div class="timeline-list">
-            <!-- Timeline rendered by JS -->
-          </div>
-        </div>
-        
-        <!-- 颜色统计 -->
-        <div class="color-stats-section">
-          <h3>颜色偏好</h3>
-          <div class="color-stats">
-            <!-- Color stats rendered by JS -->
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Upload View -->
-    <section id="view-upload" class="view hidden" aria-label="上传照片">
-      <header class="upload-header">
-        <button id="btn-back-results" class="btn btn-icon" aria-label="返回">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <h2>上传穿搭照片</h2>
-      </header>
-      
-      <div class="upload-body">
-        <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="点击或拖拽上传图片">
-          <input type="file" id="upload-input" accept="image/jpeg,image/png" hidden>
-          <div class="upload-placeholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-            </svg>
-            <p>点击或拖拽上传图片</p>
-            <span class="upload-hint">支持 JPG、PNG，最大 5MB</span>
-          </div>
-          <div class="upload-preview hidden">
-            <img id="preview-image" src="" alt="预览图片">
-            <button id="btn-remove-image" class="btn btn-icon" type="button" aria-label="移除图片">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 6L6 18M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <div class="feedback-section hidden" id="feedback-section">
-          <h3>穿搭反馈</h3>
-          <textarea id="feedback-text" class="feedback-textarea" placeholder="记录今日穿搭感受..." rows="3"></textarea>
-          <button id="btn-save-feedback" class="btn btn-primary" type="button">
-            保存反馈
-          </button>
-        </div>
-      </div>
-    </section>
-    
-    <!-- Detail Modal -->
-    <div id="modal-detail" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-detail-title">
-      <div class="modal-backdrop"></div>
-      <div class="modal-content">
-        <header class="modal-header">
-          <h3 id="modal-detail-title">穿搭详解</h3>
-          <button class="btn btn-icon modal-close" aria-label="关闭">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
-          </button>
-        </header>
-        <div class="modal-body" id="modal-detail-body">
-          <!-- Content rendered by JS -->
-        </div>
+      <div class="modal-body" id="modal-detail-body">
+        <!-- Content rendered by JS -->
       </div>
     </div>
-    
   </div>
   
   <!-- Disclaimer -->
@@ -393,8 +54,11 @@
   <!-- Lunar JavaScript Library -->
   <script src="js/lib/lunar.js"></script>
   
-  <!-- Main Script -->
-  <script type="module" src="js/main.js"></script>
+  <!-- App Script (MVC Architecture) -->
+  <script type="module">
+    import { bootstrap } from './js/core/app.js';
+    bootstrap();
+  </script>
   
   <!-- Service Worker Registration -->
   <script>

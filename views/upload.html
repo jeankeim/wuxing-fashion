@@ -1,0 +1,40 @@
+<!-- Upload View -->
+<section id="view-upload" class="view hidden" aria-label="上传照片">
+  <header class="upload-header">
+    <button id="btn-back-results" class="btn btn-icon" aria-label="返回">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2>上传穿搭照片</h2>
+  </header>
+  
+  <div class="upload-body">
+    <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="点击或拖拽上传图片">
+      <input type="file" id="upload-input" accept="image/jpeg,image/png" hidden>
+      <div class="upload-placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p>点击或拖拽上传图片</p>
+        <span class="upload-hint">支持 JPG、PNG，最大 5MB</span>
+      </div>
+      <div class="upload-preview hidden">
+        <img id="preview-image" src="" alt="预览图片">
+        <button id="btn-remove-image" class="btn btn-icon" type="button" aria-label="移除图片">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <div class="feedback-section hidden" id="feedback-section">
+      <h3>穿搭反馈</h3>
+      <textarea id="feedback-text" class="feedback-textarea" placeholder="记录今日穿搭感受..." rows="3"></textarea>
+      <button id="btn-save-feedback" class="btn btn-primary" type="button">
+        保存反馈
+      </button>
+    </div>
+  </div>
+</section>

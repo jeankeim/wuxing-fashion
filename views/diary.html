@@ -1,0 +1,158 @@
+<!-- Diary View -->
+<section id="view-diary" class="view hidden" aria-label="穿搭日记">
+  <header class="diary-header">
+    <button id="btn-back-from-diary" class="btn btn-icon" aria-label="返回">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <h2>穿搭日记</h2>
+    <div class="diary-header-actions">
+      <div class="diary-view-switch">
+        <button class="diary-view-btn active" data-view="calendar">日历</button>
+        <button class="diary-view-btn" data-view="timeline">时间线</button>
+      </div>
+      <button id="btn-add-diary" class="btn btn-primary btn-small" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        记一笔
+      </button>
+    </div>
+  </header>
+  
+  <div class="diary-body">
+    <!-- 统计卡片 -->
+    <div class="diary-stats">
+      <div class="stat-card">
+        <span class="stat-number streak-days">0</span>
+        <span class="stat-label">连续记录</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number total-records">0</span>
+        <span class="stat-label">总记录</span>
+      </div>
+    </div>
+    
+    <!-- 日历视图 -->
+    <div class="calendar-view">
+      <div class="calendar-nav">
+        <button id="btn-prev-month" class="btn btn-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <span class="current-month">2024年1月</span>
+        <button id="btn-next-month" class="btn btn-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="calendar-grid">
+        <!-- Calendar rendered by JS -->
+      </div>
+    </div>
+    
+    <!-- 时间线视图 -->
+    <div class="timeline-view hidden">
+      <div class="timeline-list">
+        <!-- Timeline rendered by JS -->
+      </div>
+    </div>
+    
+    <!-- 颜色统计 -->
+    <div class="color-stats-section">
+      <h3>颜色偏好</h3>
+      <div class="color-stats">
+        <!-- Color stats rendered by JS -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Diary Editor Modal -->
+  <div id="modal-diary-editor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-diary-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modal-diary-title">记录穿搭</h3>
+        <button class="btn btn-icon modal-close" aria-label="关闭">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </header>
+      <div class="modal-body">
+        <form id="diary-form">
+          <div class="form-group">
+            <label class="form-label">日期</label>
+            <input type="date" id="diary-date" class="form-input" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">今日心情</label>
+            <div class="mood-selector">
+              <button type="button" class="mood-btn" data-mood="happy">
+                <span class="mood-icon">😊</span>
+                <span class="mood-label">开心</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="confident">
+                <span class="mood-icon">💪</span>
+                <span class="mood-label">自信</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="calm">
+                <span class="mood-icon">😌</span>
+                <span class="mood-label">平静</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="tired">
+                <span class="mood-icon">😴</span>
+                <span class="mood-label">疲惫</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="excited">
+                <span class="mood-icon">🤩</span>
+                <span class="mood-label">兴奋</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">穿搭颜色</label>
+            <input type="text" id="diary-color" class="form-input" placeholder="例如：墨绿色、米白色">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">材质</label>
+            <input type="text" id="diary-material" class="form-input" placeholder="例如：棉麻、丝绸、羊毛">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">穿搭照片</label>
+            <div class="diary-photo-upload">
+              <input type="file" id="diary-photo" accept="image/*" hidden>
+              <button type="button" class="btn btn-ghost" id="btn-select-photo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                选择照片
+              </button>
+              <div id="diary-photo-preview" class="photo-preview hidden"></div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea id="diary-note" class="form-textarea" rows="3" placeholder="记录今日穿搭感受..."></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger hidden" id="btn-delete-diary">删除</button>
+            <div class="form-actions-right">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-diary">取消</button>
+              <button type="submit" class="btn btn-primary">保存记录</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
