@@ -55,11 +55,25 @@ const TERM_ORDER = [
 ];
 
 /**
+ * 获取基础路径（支持GitHub Pages子目录部署）
+ */
+function getBasePath() {
+  // 在GitHub Pages上，仓库名会作为路径前缀
+  const pathSegments = window.location.pathname.split('/');
+  // 如果路径包含仓库名（如 /wuxing-fashion/entry），返回 /wuxing-fashion/
+  if (pathSegments.length > 1 && pathSegments[1] && pathSegments[1] !== '') {
+    return '/' + pathSegments[1];
+  }
+  return '';
+}
+
+/**
  * 加载方案数据
  */
 async function loadSchemes() {
   if (schemesData) return schemesData;
-  const response = await safeFetch('data/schemes.json');
+  const basePath = getBasePath();
+  const response = await safeFetch(`${basePath}/data/schemes.json`);
   schemesData = await safeJsonParse(response);
   return schemesData;
 }
@@ -69,7 +83,8 @@ async function loadSchemes() {
  */
 async function loadIntentionTemplates() {
   if (intentionData) return intentionData;
-  const response = await safeFetch('data/intention-templates.json');
+  const basePath = getBasePath();
+  const response = await safeFetch(`${basePath}/data/intention-templates.json`);
   intentionData = await safeJsonParse(response);
   return intentionData;
 }
@@ -79,7 +94,8 @@ async function loadIntentionTemplates() {
  */
 async function loadBaziTemplates() {
   if (baziTemplateData) return baziTemplateData;
-  const response = await safeFetch('data/bazi-templates.json');
+  const basePath = getBasePath();
+  const response = await safeFetch(`${basePath}/data/bazi-templates.json`);
   baziTemplateData = await safeJsonParse(response);
   return baziTemplateData;
 }

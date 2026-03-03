@@ -15,12 +15,24 @@ export function getUTC8Date(date = new Date()) {
 }
 
 /**
+ * 获取基础路径（支持GitHub Pages子目录部署）
+ */
+function getBasePath() {
+  const pathSegments = window.location.pathname.split('/');
+  if (pathSegments.length > 1 && pathSegments[1] && pathSegments[1] !== '') {
+    return '/' + pathSegments[1];
+  }
+  return '';
+}
+
+/**
  * 加载节气数据
  */
 export async function loadTermsData() {
   if (termsData) return termsData;
   
-  const response = await safeFetch('data/solar-terms.json');
+  const basePath = getBasePath();
+  const response = await safeFetch(`${basePath}/data/solar-terms.json`);
   termsData = await safeJsonParse(response);
   return termsData;
 }
