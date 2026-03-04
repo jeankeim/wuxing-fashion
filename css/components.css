@@ -1595,6 +1595,75 @@
   margin-left: auto;
 }
 
+/* 简化版天气组件 */
+.simple-weather-widget {
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.simple-weather-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.simple-weather-icon {
+  font-size: 24px;
+}
+
+.simple-weather-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.simple-weather-season {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.simple-weather-temp {
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.simple-weather-term {
+  font-size: var(--text-xs);
+  opacity: 0.9;
+  background: rgba(255,255,255,0.2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.simple-weather-tags {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.simple-tag {
+  background: rgba(255,255,255,0.25);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+/* 季节影响提示 */
+.season-impact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #333;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+}
+
 /* === Diary Styles === */
 .diary-header {
   display: flex;

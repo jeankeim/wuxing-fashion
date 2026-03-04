@@ -7,7 +7,7 @@ import { navigateTo } from '../core/router.js';
 import { initYearSelect, initDaySelect, renderResultHeader, renderSchemeCards, showToast } from '../utils/render.js';
 import { baziRepo, statsRepo } from '../data/repository.js';
 import { StateKeys } from '../core/store.js';
-import { WeatherWidget } from '../components/weather-widget.js';
+import { SimpleWeatherWidget } from '../components/simple-weather-widget.js';
 import { generateRecommendation } from '../services/engine.js';
 import { analyzeBazi, analyzeBaziPrecise } from '../services/bazi.js';
 
@@ -54,7 +54,7 @@ export class EntryController extends BaseController {
   initWeatherWidget() {
     const container = document.getElementById('weather-widget-container');
     if (container) {
-      this.weatherWidget = new WeatherWidget(container);
+      this.weatherWidget = new SimpleWeatherWidget(container);
       this.weatherWidget.mount();
     }
   }
