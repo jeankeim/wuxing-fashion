@@ -3,7 +3,7 @@
  * 基于日期/节气推断季节，无需外部 API
  */
 
-import { getCurrentTerm, getUTC8Date } from './solar-terms.js';
+import { getUTC8Date } from './solar-terms.js';
 
 // 季节配置
 const SEASON_CONFIG = {
@@ -87,13 +87,14 @@ export async function getSimpleWeather() {
   const seasonKey = getCurrentSeason(date);
   const season = SEASON_CONFIG[seasonKey];
   
-  // 尝试获取当前节气（如果数据已加载）
-  let currentTerm = null;
-  try {
-    currentTerm = getCurrentTerm(date);
-  } catch (e) {
-    // 忽略节气获取失败
-  }
+  // 根据月份推断可能的节气（简化处理）
+  const month = date.getMonth();
+  const termMap = {
+    0: '小寒/大寒', 1: '立春/雨水', 2: '惊蛰/春分', 3: '清明/谷雨',
+    4: '立夏/小满', 5: '芒种/夏至', 6: '小暑/大暑', 7: '立秋/处暑',
+    8: '白露/秋分', 9: '寒露/霜降', 10: '立冬/小雪', 11: '大雪/冬至'
+  };
+  const currentTerm = termMap[month] || null;
   
   const weather = {
     season: seasonKey,
