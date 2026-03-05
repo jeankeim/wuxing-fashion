@@ -1,0 +1,14 @@
+{
+  "name": "wuxing-fashion",
+  "type": "static",
+  "build": {
+    "command": "echo 'No build needed for static site'",
+    "output": "."
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
