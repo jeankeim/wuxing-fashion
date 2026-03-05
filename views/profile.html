@@ -1,4 +1,4 @@
-<!-- Profile View - 合并画像/收藏/日记 -->
+<!-- Profile View - 画像/日记 -->
 <section id="view-profile" class="view hidden" aria-label="我的画像">
   <header class="profile-header">
     <button id="btn-back-results-from-profile" class="btn btn-icon" aria-label="返回">
@@ -14,10 +14,6 @@
     <button class="profile-tab active" data-tab="profile" type="button">
       <span class="tab-icon">👤</span>
       <span class="tab-text">画像</span>
-    </button>
-    <button class="profile-tab" data-tab="favorites" type="button">
-      <span class="tab-icon">⭐</span>
-      <span class="tab-text">收藏</span>
     </button>
     <button class="profile-tab" data-tab="diary" type="button">
       <span class="tab-icon">📓</span>
@@ -40,7 +36,25 @@
               <span class="bazi-status" id="bazi-status">未填写</span>
             </div>
             <p class="bazi-card-desc">完善八字信息，获取更精准的五行穿搭推荐</p>
-            
+                      
+            <!-- 日期类型切换 -->
+            <div class="bazi-calendar-type">
+              <label class="calendar-type-label">
+                <input type="radio" name="bazi-calendar" value="solar" checked hidden>
+                <span class="calendar-type-option active" data-type="solar">
+                  <span class="type-icon">☀️</span>
+                  <span class="type-text">公历</span>
+                </span>
+              </label>
+              <label class="calendar-type-label">
+                <input type="radio" name="bazi-calendar" value="lunar" hidden>
+                <span class="calendar-type-option" data-type="lunar">
+                  <span class="type-icon">🌙</span>
+                  <span class="type-text">农历</span>
+                </span>
+              </label>
+            </div>
+                      
             <div class="bazi-form-compact">
               <div class="bazi-row-compact">
                 <select id="profile-bazi-year" class="bazi-select-compact">
@@ -48,44 +62,32 @@
                 </select>
                 <select id="profile-bazi-month" class="bazi-select-compact">
                   <option value="">月</option>
-                  <option value="1">1月</option>
-                  <option value="2">2月</option>
-                  <option value="3">3月</option>
-                  <option value="4">4月</option>
-                  <option value="5">5月</option>
-                  <option value="6">6月</option>
-                  <option value="7">7月</option>
-                  <option value="8">8月</option>
-                  <option value="9">9月</option>
-                  <option value="10">10月</option>
-                  <option value="11">11月</option>
-                  <option value="12">12月</option>
                 </select>
                 <select id="profile-bazi-day" class="bazi-select-compact">
                   <option value="">日</option>
                 </select>
                 <select id="profile-bazi-hour" class="bazi-select-compact">
-                  <option value="">时</option>
-                  <option value="0">子</option>
-                  <option value="1">丑</option>
-                  <option value="2">寅</option>
-                  <option value="3">卯</option>
-                  <option value="4">辰</option>
-                  <option value="5">巳</option>
-                  <option value="6">午</option>
-                  <option value="7">未</option>
-                  <option value="8">申</option>
-                  <option value="9">酉</option>
-                  <option value="10">戌</option>
-                  <option value="11">亥</option>
+                  <option value="">请选择时辰</option>
+                  <option value="0">子时 - 23:00~01:00</option>
+                  <option value="1">丑时 - 01:00~03:00</option>
+                  <option value="2">寅时 - 03:00~05:00</option>
+                  <option value="3">卯时 - 05:00~07:00</option>
+                  <option value="4">辰时 - 07:00~09:00</option>
+                  <option value="5">巳时 - 09:00~11:00</option>
+                  <option value="6">午时 - 11:00~13:00</option>
+                  <option value="7">未时 - 13:00~15:00</option>
+                  <option value="8">申时 - 15:00~17:00</option>
+                  <option value="9">酉时 - 17:00~19:00</option>
+                  <option value="10">戌时 - 19:00~21:00</option>
+                  <option value="11">亥时 - 21:00~23:00</option>
                 </select>
               </div>
             </div>
-            
+                      
             <button id="btn-save-bazi" class="btn btn-primary btn-save-bazi" type="button">
               保存八字
             </button>
-            
+                      
             <!-- 八字分析结果 -->
             <div id="bazi-analysis-result" class="bazi-analysis-result hidden">
               <!-- 分析结果由 JS 渲染 -->
@@ -97,37 +99,46 @@
             <div class="radar-header">
               <span class="radar-icon">☯️</span>
               <h3>五行能量图谱</h3>
-              <span class="radar-subtitle">基于您的穿搭偏好分析</span>
+              <span class="radar-subtitle">先天八字 + 后天穿搭综合解析</span>
             </div>
             <div class="wuxing-radar-container">
-              <canvas id="wuxing-radar-canvas" width="280" height="280"></canvas>
+              <canvas id="wuxing-radar-canvas" width="300" height="300"></canvas>
               <div class="wuxing-legend">
                 <div class="legend-item wood">
                   <span class="legend-dot"></span>
                   <span class="legend-name">木</span>
                   <span class="legend-value" id="wood-value">0</span>
+                  <span class="legend-source" id="wood-source"></span>
                 </div>
                 <div class="legend-item fire">
                   <span class="legend-dot"></span>
                   <span class="legend-name">火</span>
                   <span class="legend-value" id="fire-value">0</span>
+                  <span class="legend-source" id="fire-source"></span>
                 </div>
                 <div class="legend-item earth">
                   <span class="legend-dot"></span>
                   <span class="legend-name">土</span>
                   <span class="legend-value" id="earth-value">0</span>
+                  <span class="legend-source" id="earth-source"></span>
                 </div>
                 <div class="legend-item metal">
                   <span class="legend-dot"></span>
                   <span class="legend-name">金</span>
                   <span class="legend-value" id="metal-value">0</span>
+                  <span class="legend-source" id="metal-source"></span>
                 </div>
                 <div class="legend-item water">
                   <span class="legend-dot"></span>
                   <span class="legend-name">水</span>
                   <span class="legend-value" id="water-value">0</span>
+                  <span class="legend-source" id="water-source"></span>
                 </div>
               </div>
+            </div>
+            <!-- 五行分析提示 -->
+            <div id="wuxing-analysis-tip" class="wuxing-analysis-tip hidden">
+              <!-- 由 JS 渲染分析结果 -->
             </div>
           </div>
 
@@ -154,34 +165,19 @@
               <div class="empty-preference">暂无数据，多使用采纳功能来记录您的偏好</div>
             </div>
           </div>
-
-          <div id="profile-container">
-            <!-- Profile rendered by JS -->
-          </div>
+          
+          <div class="profile-section-divider"></div>
+          
           <div id="data-manager-container">
             <!-- Data Manager rendered by JS -->
           </div>
         </div>
       </div>
       
-      <!-- Tab 2: 收藏 -->
-      <div class="profile-panel" data-panel="favorites">
-        <div class="favorites-body">
-          <div class="favorites-list" id="favorites-list">
-            <!-- Favorites rendered by JS -->
-          </div>
-          <div class="empty-state hidden" id="favorites-empty">
-            <span class="empty-icon">⭐</span>
-            <p>还没有收藏任何穿搭</p>
-            <p class="empty-hint">在推荐结果页点击收藏按钮添加</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Tab 3: 日记 -->
+      <!-- Tab 2: 日记 -->
       <div class="profile-panel" data-panel="diary">
         <div class="diary-body">
-          <!-- 统计卡片 -->
+          <!-- 统计卡片 + 打卡成就 -->
           <div class="diary-stats">
             <div class="stat-card">
               <span class="stat-number streak-days">0</span>
@@ -191,53 +187,76 @@
               <span class="stat-number total-records">0</span>
               <span class="stat-label">总记录</span>
             </div>
-            <button id="btn-add-diary" class="btn btn-primary btn-small" type="button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 5v14M5 12h14"/>
-              </svg>
-              记一笔
-            </button>
+            <div class="stat-card achievement-card" id="achievement-display">
+              <span class="achievement-icon">🎯</span>
+              <span class="stat-label">成就</span>
+            </div>
           </div>
           
-          <!-- 日记视图切换 -->
-          <div class="diary-view-switch">
-            <button class="diary-view-btn active" data-view="calendar">日历</button>
-            <button class="diary-view-btn" data-view="timeline">时间线</button>
+          <!-- 成就弹窗容器 -->
+          <div id="achievement-popup" class="achievement-popup hidden"></div>
+          
+          <!-- 筛选区域 -->
+          <div class="diary-filter-section">
+            <div class="filter-row">
+              <select id="filter-mood" class="filter-select">
+                <option value="">全部心情</option>
+                <option value="happy">😊 开心</option>
+                <option value="confident">💪 自信</option>
+                <option value="calm">😌 平静</option>
+                <option value="tired">😴 疲惫</option>
+                <option value="excited">🤩 兴奋</option>
+              </select>
+              <input type="date" id="filter-date-start" class="filter-date" placeholder="开始日期">
+              <span class="date-separator">至</span>
+              <input type="date" id="filter-date-end" class="filter-date" placeholder="结束日期">
+              <button id="btn-clear-filter" class="btn btn-ghost btn-small">清除</button>
+            </div>
           </div>
           
           <!-- 日历视图 -->
-          <div class="calendar-view" id="diary-calendar-view">
-            <div class="calendar-nav">
-              <button id="btn-prev-month" class="btn btn-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M15 18l-6-6 6-6"/>
-                </svg>
-              </button>
-              <span class="current-month">2024年1月</span>
-              <button id="btn-next-month" class="btn btn-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 18l6-6-6-6"/>
-                </svg>
-              </button>
+          <div class="diary-section">
+            <div class="diary-section-header">
+              <h3 class="diary-section-title">📅 日历</h3>
+              <span class="calendar-hint">点击日期添加记录</span>
             </div>
-            <div class="calendar-grid" id="diary-calendar-grid">
-              <!-- Calendar rendered by JS -->
+            <div class="calendar-view" id="diary-calendar-view">
+              <div class="calendar-nav">
+                <button id="btn-prev-month" class="btn btn-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                  </svg>
+                </button>
+                <span class="current-month">2024年1月</span>
+                <button id="btn-next-month" class="btn btn-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="calendar-wrapper">
+                <table class="calendar-table" id="diary-calendar-table">
+                  <!-- Calendar rendered by JS -->
+                </table>
+              </div>
             </div>
           </div>
           
           <!-- 时间线视图 -->
-          <div class="timeline-view hidden" id="diary-timeline-view">
-            <div class="timeline-list" id="diary-timeline-list">
-              <!-- Timeline rendered by JS -->
+          <div class="diary-section">
+            <h3 class="diary-section-title">📝 时间线</h3>
+            <div class="timeline-view" id="diary-timeline-view">
+              <div class="timeline-list" id="diary-timeline-list">
+                <!-- Timeline rendered by JS -->
+              </div>
             </div>
           </div>
           
-          <!-- 颜色统计 -->
-          <div class="color-stats-section">
-            <h3>颜色偏好</h3>
-            <div class="color-stats" id="diary-color-stats">
-              <!-- Color stats rendered by JS -->
-            </div>
+          <!-- 月度总结入口 -->
+          <div class="diary-section monthly-summary-section">
+            <button id="btn-monthly-summary" class="btn btn-secondary btn-block">
+              📊 查看月度总结
+            </button>
           </div>
         </div>
       </div>

@@ -4,16 +4,28 @@
 
 import { BaseController } from './base.js';
 import { goBack, navigateTo } from '../core/router.js';
-import { renderProfileView, renderFavoritesList } from '../utils/render.js';
-import { favoritesRepo } from '../data/repository.js';
+import { renderProfileView, renderDetailModal, showModal, closeModal } from '../utils/render.js';
 import { StateKeys } from '../core/store.js';
+import { inferWuxingFromColor, inferWuxingFromMaterial } from '../utils/wuxing.js';
+import {
+  getCalendarData,
+  getTimelineData,
+  getDiaryStats,
+  getMonthlyStats,
+  getStreakDays,
+  getDiaryByDate,
+  saveDiaryRecord,
+  deleteDiaryRecord,
+  MOODS
+} from '../utils/diary.js';
+import { analyzeBaziPrecise } from '../services/bazi.js';
 
 export class ProfileController extends BaseController {
   constructor() {
     super();
     this.containerId = 'view-profile';
     this.currentTab = 'profile';
-    this.tabs = ['profile', 'favorites', 'diary'];
+    this.tabs = ['profile', 'diary'];
   }
 
   onMount() {
@@ -41,13 +53,11 @@ export class ProfileController extends BaseController {
     // 初始化八字输入
     this.initBaziInput();
     
-    // 渲染收藏
-    this.renderFavorites();
-    
     // 初始化日记
     this.initDiary();
   }
   
+
   /**
    * 渲染五行雷达图
    */
@@ -56,17 +66,92 @@ export class ProfileController extends BaseController {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const prefs = JSON.parse(localStorage.getItem('wuxing_preferences') || '{}');
-    const wuxingScores = prefs.wuxingScores || { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
     
-    // 更新图例数值
-    Object.entries(wuxingScores).forEach(([wuxing, score]) => {
-      const el = this.container.querySelector(`#${wuxing}-value`);
-      if (el) el.textContent = score;
+    // 获取八字五行数据（如果有）
+    const baziData = this.getState(StateKeys.BAZI_DATA);
+    const baziWuxing = baziData?.wuxingProfile || null;
+    
+    console.log('[Profile] Bazi Wuxing:', baziWuxing);
+    console.log('[Profile] Has Bazi?', !!baziWuxing);
+    
+    // 获取穿搭偏好五行数据
+    const prefs = JSON.parse(localStorage.getItem('wuxing_preferences') || '{}');
+    const fashionWuxing = prefs.wuxingScores || { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+    
+    console.log('[Profile] Fashion Wuxing:', fashionWuxing);
+    
+    // 合并两种五行数据
+    let combinedWuxing = { ...fashionWuxing };
+    let hasBazi = false;
+    
+    if (baziWuxing) {
+      hasBazi = true;
+      console.log('[Profile] Merging Bazi and Fashion wuxing...');
+      // 八字权重更高（先天为本），穿搭为辅助
+      Object.keys(combinedWuxing).forEach(key => {
+        const baziScore = baziWuxing[key] || 0;
+        const fashionScore = fashionWuxing[key] || 0;
+        // 八字每个元素算 2 分，穿搭每个元素算 1 分，加权综合
+        combinedWuxing[key] = baziScore * 2 + fashionScore;
+        console.log(`[Profile] ${key}: Bazi=${baziScore}, Fashion=${fashionScore}, Combined=${combinedWuxing[key]}`);
+      });
+    }
+    
+    // 更新图例数值和来源标识
+    const wuxingNames = {
+      wood: '木',
+      fire: '火',
+      earth: '土',
+      metal: '金',
+      water: '水'
+    };
+    
+    Object.entries(combinedWuxing).forEach(([wuxing, score]) => {
+      const valueEl = this.container.querySelector(`#${wuxing}-value`);
+      const sourceEl = this.container.querySelector(`#${wuxing}-source`);
+      
+      console.log(`[Profile] Updating ${wuxing}: score=${score}, hasBazi=${hasBazi}`);
+      
+      if (valueEl) {
+        valueEl.textContent = score;
+      }
+      
+      if (sourceEl) {
+        if (hasBazi) {
+          const baziScore = (baziWuxing[wuxing] || 0) * 2;
+          const fashionScore = fashionWuxing[wuxing] || 0;
+          
+          console.log(`[Profile] ${wuxing} source: bazi=${baziScore}, fashion=${fashionScore}`);
+          
+          if (baziScore > 0 && fashionScore > 0) {
+            sourceEl.textContent = `八${baziScore}+穿${fashionScore}`;
+          } else if (baziScore > 0) {
+            sourceEl.textContent = `八字`;
+          } else if (fashionScore > 0) {
+            sourceEl.textContent = `穿搭`;
+          } else {
+            sourceEl.textContent = '-';
+          }
+          sourceEl.style.display = 'inline';
+        } else {
+          // 没有八字数据时，只显示穿搭
+          const fashionScore = fashionWuxing[wuxing] || 0;
+          if (fashionScore > 0) {
+            sourceEl.textContent = `穿搭`;
+            sourceEl.style.display = 'inline';
+          } else {
+            sourceEl.textContent = '-';
+            sourceEl.style.display = 'inline';
+          }
+        }
+      }
     });
     
     // 绘制雷达图
-    this.drawWuxingRadar(ctx, canvas.width, canvas.height, wuxingScores);
+    this.drawWuxingRadar(ctx, canvas.width, canvas.height, combinedWuxing);
+    
+    // 显示五行分析提示
+    this.showWuxingAnalysisTip(combinedWuxing, baziWuxing, fashionWuxing, hasBazi);
   }
   
   /**
@@ -187,12 +272,96 @@ export class ProfileController extends BaseController {
   }
   
   /**
+   * 显示五行分析提示
+   */
+  showWuxingAnalysisTip(combined, bazi, fashion, hasBazi) {
+    const tipEl = this.container.querySelector('#wuxing-analysis-tip');
+    if (!tipEl) return;
+    
+    // 找出最强和最弱的五行
+    const entries = Object.entries(combined);
+    entries.sort((a, b) => b[1] - a[1]);
+    
+    const strongest = entries[0];
+    const weakest = entries[entries.length - 1];
+    
+    let analysisHTML = '';
+    
+    if (hasBazi && bazi) {
+      // 有八字数据时的详细分析
+      analysisHTML = `
+        <p><strong>🎯 先天八字分析：</strong></p>
+        <p>您的八字五行中，${this.getWuxingName(strongest[0])}最旺，${this.getWuxingName(weakest[0])}较弱。</p>
+        <p style="margin-top: var(--space-2);"><strong>💡 穿搭建议：</strong></p>
+        <p>• 宜多穿${this.getWuxingName(weakest[0])}属性的颜色，可佩戴${this.getWuxingName(weakest[0])}属性饰品</p>
+        <p>• 避免过多${this.getWuxingName(strongest[0])}元素，以免过旺失衡</p>
+      `;
+    } else {
+      // 只有穿搭数据
+      if (fashion && Object.values(fashion).some(v => v > 0)) {
+        analysisHTML = `
+          <p><strong>🎨 穿搭偏好分析：</strong></p>
+          <p>您平时偏爱${this.getWuxingName(strongest[0])}属性的穿搭风格。</p>
+          <p style="margin-top: var(--space-2);"><strong>💡 平衡建议：</strong></p>
+          <p>可适当尝试${this.getWuxingName(weakest[0])}元素的服饰，让整体搭配更加和谐平衡。</p>
+        `;
+      } else {
+        analysisHTML = `
+          <p><strong>📝 记录您的穿搭偏好：</strong></p>
+          <p>多使用"采纳"和"不喜欢"功能记录您的穿搭偏好，系统会为您生成专属的五行能量图谱。</p>
+        `;
+      }
+    }
+    
+    tipEl.innerHTML = analysisHTML;
+    tipEl.classList.remove('hidden');
+  }
+  
+  /**
+   * 获取五行中文名称
+   */
+  getWuxingName(key) {
+    const names = {
+      wood: '木',
+      fire: '火',
+      earth: '土',
+      metal: '金',
+      water: '水'
+    };
+    return names[key] || key;
+  }
+  
+  /**
+   * 获取空偏好提示
+   */
+  getEmptyPreferenceTip(type) {
+    if (type === 'color') {
+      return `
+        <div class="empty-preference-tip">
+          <div class="empty-icon">🎨</div>
+          <p>还没有颜色偏好记录</p>
+          <p class="empty-desc">在推荐结果页多使用"采纳"功能，系统会自动记录您对颜色的喜好</p>
+        </div>
+      `;
+    } else if (type === 'material') {
+      return `
+        <div class="empty-preference-tip">
+          <div class="empty-icon">��</div>
+          <p>还没有材质偏好记录</p>
+          <p class="empty-desc">在推荐结果页多使用"采纳"功能，系统会自动记录您对材质的喜好</p>
+        </div>
+      `;
+    }
+    return '';
+  }
+  
+  /**
    * 渲染偏好条形图
    */
   renderPreferenceBars() {
     const prefs = JSON.parse(localStorage.getItem('wuxing_preferences') || '{}');
     
-    // 渲染颜色偏好
+    // 渲染颜色偏好（Top5）
     const colorContainer = this.container.querySelector('#color-bars-container');
     if (colorContainer && prefs.colorScores) {
       const colors = Object.entries(prefs.colorScores)
@@ -204,10 +373,15 @@ export class ProfileController extends BaseController {
         colorContainer.innerHTML = colors.map(([color, score]) => {
           const maxScore = Math.max(...Object.values(prefs.colorScores));
           const percentage = (score / maxScore) * 100;
-          const wuxing = this.inferWuxingFromColor(color);
+          const wuxing = inferWuxingFromColor(color);
+          const wuxingName = this.getWuxingName(wuxing);
+          
           return `
             <div class="preference-bar-item">
-              <span class="bar-label">${color}</span>
+              <span class="bar-label">
+                ${color}
+                <span class="bar-wuxing-tag ${wuxing}">${wuxingName}</span>
+              </span>
               <div class="bar-track">
                 <div class="bar-fill ${wuxing}" style="width: ${percentage}%"></div>
               </div>
@@ -215,10 +389,14 @@ export class ProfileController extends BaseController {
             </div>
           `;
         }).join('');
+      } else {
+        colorContainer.innerHTML = this.getEmptyPreferenceTip('color');
       }
+    } else if (colorContainer) {
+      colorContainer.innerHTML = this.getEmptyPreferenceTip('color');
     }
     
-    // 渲染材质偏好
+    // 渲染材质偏好（Top5）
     const materialContainer = this.container.querySelector('#material-bars-container');
     if (materialContainer && prefs.materialScores) {
       const materials = Object.entries(prefs.materialScores)
@@ -230,10 +408,15 @@ export class ProfileController extends BaseController {
         materialContainer.innerHTML = materials.map(([material, score]) => {
           const maxScore = Math.max(...Object.values(prefs.materialScores));
           const percentage = (score / maxScore) * 100;
-          const wuxing = this.inferWuxingFromMaterial(material);
+          const wuxing = inferWuxingFromMaterial(material);
+          const wuxingName = this.getWuxingName(wuxing);
+          
           return `
             <div class="preference-bar-item">
-              <span class="bar-label">${material}</span>
+              <span class="bar-label">
+                ${material}
+                <span class="bar-wuxing-tag ${wuxing}">${wuxingName}</span>
+              </span>
               <div class="bar-track">
                 <div class="bar-fill ${wuxing}" style="width: ${percentage}%"></div>
               </div>
@@ -241,66 +424,51 @@ export class ProfileController extends BaseController {
             </div>
           `;
         }).join('');
+      } else {
+        materialContainer.innerHTML = this.getEmptyPreferenceTip('material');
       }
+    } else if (materialContainer) {
+      materialContainer.innerHTML = this.getEmptyPreferenceTip('material');
     }
   }
   
   /**
-   * 从颜色推断五行
+   * 填充八字日期选项（公历/农历）
    */
-  inferWuxingFromColor(color) {
-    const colorMap = {
-      '青': 'wood', '绿': 'wood', '翠': 'wood',
-      '红': 'fire', '赤': 'fire', '朱': 'fire', '紫': 'fire',
-      '黄': 'earth', '棕': 'earth', '褐': 'earth', '咖': 'earth',
-      '白': 'metal', '银': 'metal', '灰': 'metal', '金': 'metal',
-      '黑': 'water', '蓝': 'water', '玄': 'water', '青': 'water'
-    };
-    
-    for (const [key, wuxing] of Object.entries(colorMap)) {
-      if (color.includes(key)) return wuxing;
-    }
-    return 'earth';
-  }
-  
-  /**
-   * 从材质推断五行
-   */
-  inferWuxingFromMaterial(material) {
-    const materialMap = {
-      '棉': 'wood', '麻': 'wood', '丝': 'wood',
-      '绒': 'fire', '绸': 'fire', '缎': 'fire',
-      '毛': 'earth', '呢': 'earth', '皮': 'earth',
-      '金': 'metal', '银': 'metal', '锦': 'metal',
-      '纱': 'water', '雪纺': 'water', '蕾丝': 'water'
-    };
-    
-    for (const [key, wuxing] of Object.entries(materialMap)) {
-      if (material.includes(key)) return wuxing;
-    }
-    return 'earth';
-  }
-  
-  /**
-   * 初始化八字输入
-   */
-  initBaziInput() {
-    // 填充年份选项（1900-2025）
+  fillBaziDateOptions() {
     const yearSelect = this.container.querySelector('#profile-bazi-year');
-    if (yearSelect) {
+    const monthSelect = this.container.querySelector('#profile-bazi-month');
+    const daySelect = this.container.querySelector('#profile-bazi-day');
+    
+    if (!yearSelect || !monthSelect || !daySelect) return;
+    
+    // 清空现有选项
+    yearSelect.innerHTML = '<option value="">年</option>';
+    monthSelect.innerHTML = '<option value="">月</option>';
+    daySelect.innerHTML = '<option value="">日</option>';
+    
+    if (this.baziCalendarType === 'solar') {
+      console.log('[Profile] Filling solar calendar options');
+      
+      // 填充年份
       for (let year = 2025; year >= 1900; year--) {
         const option = document.createElement('option');
         option.value = year;
         option.textContent = year + '年';
         yearSelect.appendChild(option);
       }
-    }
-    
-    // 填充日期选项（动态根据月份）
-    const monthSelect = this.container.querySelector('#profile-bazi-month');
-    const daySelect = this.container.querySelector('#profile-bazi-day');
-    
-    if (monthSelect && daySelect) {
+      
+      // 填充月份（固定 1-12 月）
+      console.log('[Profile] Filling months...');
+      for (let month = 1; month <= 12; month++) {
+        const option = document.createElement('option');
+        option.value = month;
+        option.textContent = month + '月';
+        monthSelect.appendChild(option);
+      }
+      console.log('[Profile] Month select has', monthSelect.options.length, 'options');
+      
+      // 动态更新日期
       const updateDays = () => {
         const year = parseInt(yearSelect?.value) || 2024;
         const month = parseInt(monthSelect.value) || 1;
@@ -315,9 +483,143 @@ export class ProfileController extends BaseController {
         }
       };
       
+      // 立即执行一次
+      updateDays();
+      
       monthSelect.addEventListener('change', updateDays);
       if (yearSelect) yearSelect.addEventListener('change', updateDays);
+    } else {
+      // 农历模式 - 使用 lunar-javascript
+      if (typeof Lunar !== 'undefined') {
+        // 农历年份（近 100 年）
+        for (let lunarYear = 2025; lunarYear >= 1900; lunarYear--) {
+          const option = document.createElement('option');
+          option.value = lunarYear;
+          option.textContent = `农历${lunarYear}年`;
+          yearSelect.appendChild(option);
+        }
+        
+        // 农历月份（包括闰月）
+        try {
+          const sampleLunar = Lunar.fromYmd(2024, 1, 1);
+          const months = sampleLunar.getMonthsInYear();
+          
+          months.forEach((month, index) => {
+            const option = document.createElement('option');
+            option.value = index + 1;
+            option.textContent = month;
+            monthSelect.appendChild(option);
+          });
+        } catch (e) {
+          console.error('[Profile] Failed to get lunar months:', e);
+        }
+        
+        // 动态更新日期
+        const updateLunarDays = () => {
+          const year = parseInt(yearSelect?.value) || 2024;
+          const monthIndex = parseInt(monthSelect.value) || 1;
+          
+          try {
+            const lunar = Lunar.fromYmd(year, monthIndex, 1);
+            const daysInMonth = lunar.getDaysInMonth();
+            
+            daySelect.innerHTML = '<option value="">日</option>';
+            for (let day = 1; day <= daysInMonth; day++) {
+              const option = document.createElement('option');
+              option.value = day;
+              option.textContent = day + '日';
+              daySelect.appendChild(option);
+            }
+          } catch (e) {
+            console.error('[Profile] Failed to get lunar days:', e);
+          }
+        };
+        
+        monthSelect.addEventListener('change', updateLunarDays);
+        if (yearSelect) yearSelect.addEventListener('change', updateLunarDays);
+      } else {
+        console.warn('[Profile] Lunar library not loaded, using solar mode');
+        this.baziCalendarType = 'solar';
+        
+        // 切换到公历选项
+        const calendarRadios = this.container.querySelectorAll('input[name="bazi-calendar"]');
+        calendarRadios.forEach(radio => {
+          radio.checked = (radio.value === 'solar');
+        });
+        const options = this.container.querySelectorAll('.calendar-type-option');
+        options.forEach(opt => {
+          opt.classList.toggle('active', opt.dataset.type === 'solar');
+        });
+        
+        this.fillBaziDateOptions();
+      }
     }
+  }
+  
+  /**
+   * 计算八字（支持公历/农历）
+   */
+  calculateBazi(year, month, day, hourIndex) {
+    try {
+      // 将时辰序号转换为实际小时数（取时辰的中间时刻）
+      // 子时 (0): 23:00-01:00 → 0 点，丑时 (1): 01:00-03:00 → 2 点，以此类推
+      const actualHour = hourIndex === 0 ? 0 : hourIndex * 2;
+
+      if (this.baziCalendarType === 'solar') {
+        // 公历直接计算
+        return analyzeBaziPrecise(year, month, day, actualHour);
+      } else {
+        // 农历转换为公历后计算
+        if (typeof Lunar === 'undefined') {
+          console.error('[Profile] Lunar library not loaded');
+          return null;
+        }
+        
+        const lunarDate = Lunar.fromYmd(year, month, day);
+        const solarDate = lunarDate.getSolar();
+        
+        return analyzeBaziPrecise(
+          solarDate.getYear(),
+          solarDate.getMonth(),
+          solarDate.getDay(),
+          actualHour
+        );
+      }
+    } catch (error) {
+      console.error('[Profile] Bazi calculation failed:', error);
+      return null;
+    }
+  }
+  
+  /**
+   * 初始化八字输入
+   */
+  initBaziInput() {
+    // 当前选择的日历类型
+    this.baziCalendarType = 'solar'; // 'solar' | 'lunar'
+    
+    // 日期类型切换（使用 radio）
+    const calendarRadios = this.container.querySelectorAll('input[name="bazi-calendar"]');
+    calendarRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const type = e.target.value;
+        
+        // 更新激活状态
+        const options = this.container.querySelectorAll('.calendar-type-option');
+        options.forEach(opt => {
+          opt.classList.toggle('active', opt.dataset.type === type);
+        });
+        
+        // 切换日历类型
+        this.baziCalendarType = type;
+        
+        // 重新填充年月日选项
+        this.fillBaziDateOptions();
+      });
+    });
+    
+    // 填充年月日选项
+    this.fillBaziDateOptions();
     
     // 加载已保存的八字
     this.loadSavedBazi();
@@ -362,6 +664,10 @@ export class ProfileController extends BaseController {
       this.updateBaziStatus(true);
       // 显示分析结果
       this.renderBaziAnalysis(bazi);
+      
+      // 重新渲染五行雷达图和偏好条形图（显示八字五行数据）
+      this.renderWuxingRadar();
+      this.renderPreferenceBars();
     }
   }
   
@@ -379,11 +685,29 @@ export class ProfileController extends BaseController {
       return;
     }
     
+    // 计算八字（支持公历/农历）
+    const baziResult = this.calculateBazi(
+      parseInt(year),
+      parseInt(month),
+      parseInt(day),
+      parseInt(hour)
+    );
+    
+    if (!baziResult) {
+      this.showToast('八字计算失败，请检查输入');
+      return;
+    }
+    
+    // 保存原始输入和计算结果
     const baziData = {
       year: parseInt(year),
       month: parseInt(month),
       day: parseInt(day),
-      hour: parseInt(hour)
+      hour: parseInt(hour),
+      calendarType: this.baziCalendarType, // 记录使用的日历类型
+      baziResult: baziResult.bazi, // 完整的八字四柱
+      wuxingProfile: baziResult.profile, // 五行分布
+      recommend: baziResult.recommend // 推荐五行
     };
     
     // 保存到 state
@@ -395,6 +719,10 @@ export class ProfileController extends BaseController {
     // 更新 UI
     this.updateBaziStatus(true);
     this.renderBaziAnalysis(baziData);
+    
+    // 重新渲染五行雷达图和偏好条形图（显示八字五行数据）
+    this.renderWuxingRadar();
+    this.renderPreferenceBars();
     
     this.showToast('八字信息已保存');
   }
@@ -417,30 +745,30 @@ export class ProfileController extends BaseController {
     const resultEl = this.container.querySelector('#bazi-analysis-result');
     if (!resultEl) return;
     
-    // 简单的八字分析展示
-    const ganZhi = this.calculateGanZhi(baziData);
+    // 使用精确计算的八字结果
+    const bazi = baziData.baziResult;
     
     resultEl.innerHTML = `
       <div class="bazi-pillars">
         <div class="pillar">
           <span class="pillar-label">年柱</span>
-          <span class="pillar-gan">${ganZhi.yearGan}</span>
-          <span class="pillar-zhi">${ganZhi.yearZhi}</span>
+          <span class="pillar-gan">${bazi.year.gan}</span>
+          <span class="pillar-zhi">${bazi.year.zhi}</span>
         </div>
         <div class="pillar">
           <span class="pillar-label">月柱</span>
-          <span class="pillar-gan">${ganZhi.monthGan}</span>
-          <span class="pillar-zhi">${ganZhi.monthZhi}</span>
+          <span class="pillar-gan">${bazi.month.gan}</span>
+          <span class="pillar-zhi">${bazi.month.zhi}</span>
         </div>
         <div class="pillar">
           <span class="pillar-label">日柱</span>
-          <span class="pillar-gan">${ganZhi.dayGan}</span>
-          <span class="pillar-zhi">${ganZhi.dayZhi}</span>
+          <span class="pillar-gan">${bazi.day.gan}</span>
+          <span class="pillar-zhi">${bazi.day.zhi}</span>
         </div>
         <div class="pillar">
           <span class="pillar-label">时柱</span>
-          <span class="pillar-gan">${ganZhi.hourGan}</span>
-          <span class="pillar-zhi">${ganZhi.hourZhi}</span>
+          <span class="pillar-gan">${bazi.hour.gan}</span>
+          <span class="pillar-zhi">${bazi.hour.zhi}</span>
         </div>
       </div>
     `;
@@ -498,36 +826,12 @@ export class ProfileController extends BaseController {
   }
   
   /**
-   * 渲染收藏列表
-   */
-  renderFavorites() {
-    const listEl = this.container.querySelector('#favorites-list');
-    const emptyEl = this.container.querySelector('#favorites-empty');
-    if (!listEl) return;
-    
-    const favorites = favoritesRepo.getAll();
-    
-    if (favorites.length === 0) {
-      listEl.innerHTML = '';
-      emptyEl?.classList.remove('hidden');
-    } else {
-      emptyEl?.classList.add('hidden');
-      renderFavoritesList(favorites, listEl);
-    }
-  }
-  
-  /**
    * 初始化日记功能
    */
   initDiary() {
-    // 日记视图切换
-    const viewBtns = this.container.querySelectorAll('.diary-view-btn');
-    viewBtns.forEach(btn => {
-      this.addEventListener(btn, 'click', () => {
-        const view = btn.dataset.view;
-        this.switchDiaryView(view);
-      });
-    });
+    // 日记相关状态
+    this.diaryCurrentDate = new Date();
+    this.diaryCurrentEditingDate = null;
     
     // 添加日记按钮
     const addBtn = this.container.querySelector('#btn-add-diary');
@@ -537,20 +841,20 @@ export class ProfileController extends BaseController {
       });
     }
     
-    // 关闭日记弹窗
-    const closeBtn = this.container.querySelector('#btn-close-diary-modal');
-    if (closeBtn) {
-      this.addEventListener(closeBtn, 'click', () => {
-        this.closeDiaryEditor();
-      });
-    }
-    
-    // 取消按钮
+    // 弹窗关闭
+    const modal = this.container.querySelector('#modal-diary-editor');
+    const backdrop = modal?.querySelector('.modal-backdrop');
+    const closeBtn = modal?.querySelector('.modal-close');
     const cancelBtn = this.container.querySelector('#btn-cancel-diary');
+    
+    if (backdrop) {
+      this.addEventListener(backdrop, 'click', () => this.closeDiaryEditor());
+    }
+    if (closeBtn) {
+      this.addEventListener(closeBtn, 'click', () => this.closeDiaryEditor());
+    }
     if (cancelBtn) {
-      this.addEventListener(cancelBtn, 'click', () => {
-        this.closeDiaryEditor();
-      });
+      this.addEventListener(cancelBtn, 'click', () => this.closeDiaryEditor());
     }
     
     // 表单提交
@@ -571,73 +875,735 @@ export class ProfileController extends BaseController {
       });
     });
     
-    // 初始化日历
-    this.initCalendar();
+    // 照片选择
+    const photoInput = this.container.querySelector('#diary-photo');
+    const selectPhotoBtn = this.container.querySelector('#btn-select-photo');
+    
+    if (selectPhotoBtn && photoInput) {
+      this.addEventListener(selectPhotoBtn, 'click', () => photoInput.click());
+      this.addEventListener(photoInput, 'change', (e) => {
+        if (e.target.files?.[0]) {
+          this.handlePhotoSelect(e.target.files[0]);
+        }
+      });
+    }
+    
+    // 删除按钮
+    const deleteBtn = this.container.querySelector('#btn-delete-diary');
+    if (deleteBtn) {
+      this.addEventListener(deleteBtn, 'click', () => this.deleteDiary());
+    }
+    
+    // 月份导航
+    const prevMonthBtn = this.container.querySelector('#btn-prev-month');
+    const nextMonthBtn = this.container.querySelector('#btn-next-month');
+    
+    if (prevMonthBtn) {
+      this.addEventListener(prevMonthBtn, 'click', () => {
+        this.diaryCurrentDate.setMonth(this.diaryCurrentDate.getMonth() - 1);
+        this.renderDiaryCalendar();
+      });
+    }
+    
+    if (nextMonthBtn) {
+      this.addEventListener(nextMonthBtn, 'click', () => {
+        this.diaryCurrentDate.setMonth(this.diaryCurrentDate.getMonth() + 1);
+        this.renderDiaryCalendar();
+      });
+    }
+    
+    // 日历点击（委托）
+    const calendarTable = this.container.querySelector('#diary-calendar-table');
+    if (calendarTable) {
+      this.addEventListener(calendarTable, 'click', (e) => {
+        const dayCell = e.target.closest('.calendar-cell');
+        if (dayCell) {
+          const date = dayCell.dataset.date;
+          this.openDiaryEditor(date);
+        }
+      });
+    }
+    
+    // 时间线点击（委托）
+    const timelineList = this.container.querySelector('#diary-timeline-list');
+    if (timelineList) {
+      this.addEventListener(timelineList, 'click', (e) => {
+        const timelineItem = e.target.closest('.timeline-item');
+        if (timelineItem) {
+          const date = timelineItem.dataset.date;
+          this.openDiaryEditor(date);
+        }
+      });
+    }
+    
+    // 初始化渲染
+    this.renderDiaryCalendar();
+    this.renderDiaryTimeline();
+    this.renderDiaryStats();
+    this.checkAchievement();
+    
+    // 筛选状态
+    this.filterState = { mood: '', dateStart: '', dateEnd: '' };
+    
+    // 筛选控件
+    const filterMood = this.container.querySelector('#filter-mood');
+    const filterDateStart = this.container.querySelector('#filter-date-start');
+    const filterDateEnd = this.container.querySelector('#filter-date-end');
+    const clearFilterBtn = this.container.querySelector('#btn-clear-filter');
+    const monthlySummaryBtn = this.container.querySelector('#btn-monthly-summary');
+    const achievementDisplay = this.container.querySelector('#achievement-display');
+    
+    if (filterMood) {
+      this.addEventListener(filterMood, 'change', (e) => {
+        this.filterState.mood = e.target.value;
+        this.applyFilter();
+      });
+    }
+    
+    if (filterDateStart) {
+      this.addEventListener(filterDateStart, 'change', (e) => {
+        this.filterState.dateStart = e.target.value;
+        this.applyFilter();
+      });
+    }
+    
+    if (filterDateEnd) {
+      this.addEventListener(filterDateEnd, 'change', (e) => {
+        this.filterState.dateEnd = e.target.value;
+        this.applyFilter();
+      });
+    }
+    
+    if (clearFilterBtn) {
+      this.addEventListener(clearFilterBtn, 'click', () => this.clearFilter());
+    }
+    
+    if (monthlySummaryBtn) {
+      this.addEventListener(monthlySummaryBtn, 'click', () => this.showMonthlySummary());
+    }
+    
+    if (achievementDisplay) {
+      this.addEventListener(achievementDisplay, 'click', () => this.showAchievementPopup());
+    }
   }
   
-  switchDiaryView(view) {
-    const calendarView = this.container.querySelector('#diary-calendar-view');
-    const timelineView = this.container.querySelector('#diary-timeline-view');
+  /**
+   * 应用筛选
+   */
+  applyFilter() {
+    const { mood, dateStart, dateEnd } = this.filterState;
+    this.renderDiaryTimelineFiltered(mood, dateStart, dateEnd);
+    this.highlightFilteredDays(mood, dateStart, dateEnd);
+  }
+  
+  /**
+   * 清除筛选
+   */
+  clearFilter() {
+    this.filterState = { mood: '', dateStart: '', dateEnd: '' };
     
-    this.container.querySelectorAll('.diary-view-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.view === view);
+    const filterMood = this.container.querySelector('#filter-mood');
+    const filterDateStart = this.container.querySelector('#filter-date-start');
+    const filterDateEnd = this.container.querySelector('#filter-date-end');
+    
+    if (filterMood) filterMood.value = '';
+    if (filterDateStart) filterDateStart.value = '';
+    if (filterDateEnd) filterDateEnd.value = '';
+    
+    this.renderDiaryTimeline();
+    this.renderDiaryCalendar();
+  }
+  
+  /**
+   * 高亮筛选日期
+   */
+  highlightFilteredDays(mood, dateStart, dateEnd) {
+    const allDays = this.container.querySelectorAll('.calendar-cell');
+    
+    allDays.forEach(day => {
+      const date = day.dataset.date;
+      if (!date) return;
+      
+      const record = getDiaryByDate(date);
+      let match = true;
+      
+      if (mood && record?.mood !== mood) match = false;
+      if (dateStart && date < dateStart) match = false;
+      if (dateEnd && date > dateEnd) match = false;
+      
+      day.style.opacity = match ? '1' : '0.3';
     });
-    
-    if (view === 'calendar') {
-      calendarView?.classList.remove('hidden');
-      timelineView?.classList.add('hidden');
-    } else {
-      calendarView?.classList.add('hidden');
-      timelineView?.classList.remove('hidden');
-    }
   }
   
-  initCalendar() {
-    const prevBtn = this.container.querySelector('#btn-prev-month');
-    const nextBtn = this.container.querySelector('#btn-next-month');
+  /**
+   * 检查成就
+   */
+  checkAchievement() {
+    const streak = getStreakDays();
+    const achievementDisplay = this.container.querySelector('#achievement-display');
+    const achievementIcon = achievementDisplay?.querySelector('.achievement-icon');
     
-    if (prevBtn) {
-      this.addEventListener(prevBtn, 'click', () => {
-        this.showToast('上月功能开发中...');
-      });
-    }
+    if (!achievementDisplay) return;
     
-    if (nextBtn) {
-      this.addEventListener(nextBtn, 'click', () => {
-        this.showToast('下月功能开发中...');
-      });
-    }
+    let icon = '🎯', label = '开始打卡';
+    
+    if (streak >= 30) { icon = '🏆'; label = '月度冠军'; }
+    else if (streak >= 14) { icon = '💎'; label = '两周达人'; }
+    else if (streak >= 7) { icon = '⭐'; label = '一周之星'; }
+    else if (streak >= 3) { icon = '🔥'; label = '起步中'; }
+    
+    if (achievementIcon) achievementIcon.textContent = icon;
+    achievementDisplay.querySelector('.stat-label').textContent = label;
+    
+    this.checkNewAchievement(streak);
   }
   
-  openDiaryEditor() {
-    const modal = this.container.querySelector('#modal-diary-editor');
-    if (modal) {
-      modal.classList.remove('hidden');
-      // 设置今天日期
-      const dateInput = this.container.querySelector('#diary-date');
-      if (dateInput) {
-        dateInput.value = new Date().toISOString().split('T')[0];
+  /**
+   * 检查新成就
+   */
+  checkNewAchievement(streak) {
+    const lastAchievement = localStorage.getItem('wuxing_last_achievement');
+    const milestones = [7, 14, 30];
+    
+    for (const milestone of milestones) {
+      if (streak >= milestone && parseInt(lastAchievement || '0') < milestone) {
+        localStorage.setItem('wuxing_last_achievement', milestone.toString());
+        this.showAchievementAnimation(milestone);
+        break;
       }
     }
   }
   
+  /**
+   * 显示成就动画
+   */
+  showAchievementAnimation(milestone) {
+    const achievements = {
+      7: { icon: '⭐', title: '一周之星', desc: '连续打卡7天，养成好习惯！' },
+      14: { icon: '💎', title: '两周达人', desc: '坚持14天，你真棒！' },
+      30: { icon: '🏆', title: '月度冠军', desc: '连续30天，穿搭达人诞生！' }
+    };
+    
+    const achievement = achievements[milestone];
+    if (!achievement) return;
+    
+    this.createConfetti();
+    
+    const popup = this.container.querySelector('#achievement-popup');
+    if (popup) {
+      popup.innerHTML = `
+        <div class="achievement-badge">${achievement.icon}</div>
+        <div class="achievement-title">${achievement.title}</div>
+        <div class="achievement-desc">${achievement.desc}</div>
+        <button class="btn btn-primary" onclick="this.closest('.achievement-popup').classList.add('hidden')">太棒了！</button>
+      `;
+      popup.classList.remove('hidden');
+      setTimeout(() => popup.classList.add('hidden'), 5000);
+    }
+  }
+  
+  /**
+   * 创建彩纸动画
+   */
+  createConfetti() {
+    const container = document.createElement('div');
+    container.className = 'achievement-animation';
+    document.body.appendChild(container);
+    
+    const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96e6a1'];
+    
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      container.appendChild(confetti);
+    }
+    
+    setTimeout(() => container.remove(), 3000);
+  }
+  
+  /**
+   * 显示成就弹窗
+   */
+  showAchievementPopup() {
+    const streak = getStreakDays();
+    const popup = this.container.querySelector('#achievement-popup');
+    if (!popup) return;
+    
+    const achievements = [];
+    if (streak >= 7) achievements.push({ icon: '⭐', title: '一周之星' });
+    if (streak >= 14) achievements.push({ icon: '💎', title: '两周达人' });
+    if (streak >= 30) achievements.push({ icon: '🏆', title: '月度冠军' });
+    
+    if (achievements.length === 0) {
+      achievements.push({ icon: '🎯', title: '开始打卡', desc: `还需${7 - streak}天解锁第一个成就` });
+    }
+    
+    popup.innerHTML = `
+      <div class="achievement-badge">${achievements[achievements.length - 1].icon}</div>
+      <div class="achievement-title">我的成就</div>
+      <div class="achievement-desc" style="margin-bottom: var(--space-3);">
+        ${achievements.map(a => `<div style="margin: var(--space-2) 0;">${a.icon} ${a.title}</div>`).join('')}
+      </div>
+      <button class="btn btn-secondary" onclick="this.closest('.achievement-popup').classList.add('hidden')">关闭</button>
+    `;
+    popup.classList.remove('hidden');
+  }
+  
+  /**
+   * 显示月度总结
+   */
+  showMonthlySummary() {
+    const popup = this.container.querySelector('#achievement-popup');
+    if (!popup) {
+      console.error('[ProfileController] Achievement popup not found');
+      return;
+    }
+    
+    // 使用日历当前显示的月份
+    const year = this.diaryCurrentDate.getFullYear();
+    const month = this.diaryCurrentDate.getMonth() + 1;
+    const stats = getMonthlyStats(year, month);
+    const streak = getStreakDays();
+    
+    const moodLabels = {
+      happy: '😊 开心', confident: '💪 自信', calm: '😌 平静',
+      tired: '😴 疲惫', excited: '🤩 兴奋'
+    };
+    
+    // 心情分布（排序取前5）
+    const moodStats = Object.entries(stats.moodCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    // 颜色分布（排序取前3）
+    const colorStats = Object.entries(stats.colorCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+    
+    // 材质分布（排序取前3）
+    const materialStats = Object.entries(stats.materialCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+    
+    // 如果没有记录，显示空状态提示
+    if (stats.totalDays === 0) {
+      popup.innerHTML = `
+        <div class="achievement-badge">📊</div>
+        <div class="achievement-title">${year}年${month}月穿搭总结</div>
+        <div class="achievement-desc" style="text-align: center; padding: var(--space-5);">
+          <div style="font-size: 64px; margin-bottom: var(--space-3);">📝</div>
+          <p style="color: var(--color-text-secondary); margin-bottom: var(--space-2);">
+            本月还没有穿搭记录哦～
+          </p>
+          <p style="font-size: var(--text-sm); color: var(--color-text-muted);">
+            点击日历上的日期，开始记录你的第一套穿搭吧！
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="this.closest('.achievement-popup').classList.add('hidden')" style="margin-top: var(--space-4);">去记录</button>
+      `;
+    } else {
+      // 有记录时显示详细统计
+      popup.innerHTML = `
+        <div class="achievement-badge">📊</div>
+        <div class="achievement-title">${year}年${month}月穿搭总结</div>
+        <div class="achievement-desc" style="text-align: left; max-height: 60vh; overflow-y: auto;">
+          <div style="margin: var(--space-3) 0; padding: var(--space-3); background: var(--color-surface); border-radius: var(--radius-md);">
+            <div style="font-size: var(--text-2xl); font-weight: 700; color: var(--color-primary); text-align: center;">
+              ${stats.totalDays}<span style="font-size: var(--text-sm); font-weight: normal;">天</span>
+            </div>
+            <div style="text-align: center; color: var(--color-text-secondary); font-size: var(--text-sm);">本月记录</div>
+          </div>
+          
+          <div style="margin: var(--space-3) 0;">🔥 连续打卡：<strong>${streak}</strong> 天</div>
+          
+          ${moodStats.length > 0 ? `
+          <div style="margin: var(--space-3) 0;">
+            <div style="font-weight: 600; margin-bottom: var(--space-2);">🌈 心情分布</div>
+            ${moodStats.map(([mood, count]) => `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin: var(--space-2) 0; padding: var(--space-2); background: var(--color-surface); border-radius: var(--radius-sm);">
+                <span>${moodLabels[mood] || mood}</span>
+                <span style="font-weight: 600;">${count}次</span>
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+          
+          ${colorStats.length > 0 ? `
+          <div style="margin: var(--space-3) 0;">
+            <div style="font-weight: 600; margin-bottom: var(--space-2);">🎨 颜色偏好</div>
+            ${colorStats.map(([color, count]) => `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin: var(--space-2) 0; padding: var(--space-2); background: var(--color-surface); border-radius: var(--radius-sm);">
+                <span>${color}</span>
+                <span style="font-weight: 600;">${count}次</span>
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+          
+          ${materialStats.length > 0 ? `
+          <div style="margin: var(--space-3) 0;">
+            <div style="font-weight: 600; margin-bottom: var(--space-2);">🧵 材质偏好</div>
+            ${materialStats.map(([material, count]) => `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin: var(--space-2) 0; padding: var(--space-2); background: var(--color-surface); border-radius: var(--radius-sm);">
+                <span>${material}</span>
+                <span style="font-weight: 600;">${count}次</span>
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+        </div>
+        <button class="btn btn-primary" onclick="this.closest('.achievement-popup').classList.add('hidden')" style="margin-top: var(--space-4);">继续加油！</button>
+      `;
+    }
+    popup.classList.remove('hidden');
+  }
+  
+  /**
+   * 渲染筛选后的时间线
+   */
+  renderDiaryTimelineFiltered(filterMood, filterDateStart, filterDateEnd) {
+    const timeline = this.container.querySelector('#diary-timeline-list');
+    if (!timeline) return;
+    
+    let records = getTimelineData(30);
+    
+    if (filterMood) records = records.filter(r => r.mood === filterMood);
+    if (filterDateStart) records = records.filter(r => r.date >= filterDateStart);
+    if (filterDateEnd) records = records.filter(r => r.date <= filterDateEnd);
+    
+    if (records.length === 0) {
+      timeline.innerHTML = `
+        <div class="empty-state">
+          <p>暂无匹配的记录</p>
+          <p class="text-muted">尝试调整筛选条件</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    records.forEach(record => {
+      const moodHtml = record.mood && MOODS[record.mood] 
+        ? `<span class="timeline-mood" style="background: ${MOODS[record.mood].color}">${MOODS[record.mood].icon} ${MOODS[record.mood].label}</span>`
+        : '';
+      
+      html += `
+        <div class="timeline-item" data-date="${record.date}">
+          <div class="timeline-date">
+            <span class="date-day">${record.date.slice(8)}</span>
+            <span class="date-month">${record.date.slice(5, 7)}月</span>
+          </div>
+          <div class="timeline-content">
+            ${record.image ? `<img src="${record.image}" class="timeline-image" alt="穿搭照片">` : ''}
+            <div class="timeline-info">
+              ${moodHtml}
+              ${record.color ? `<span class="timeline-color">${record.color}</span>` : ''}
+              ${record.material ? `<span class="timeline-material">${record.material}</span>` : ''}
+              ${record.note ? `<p class="timeline-note">${record.note}</p>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    timeline.innerHTML = html;
+  }
+  
+  /**
+   * 渲染日记日历
+   */
+  renderDiaryCalendar() {
+    const year = this.diaryCurrentDate.getFullYear();
+    const month = this.diaryCurrentDate.getMonth() + 1;
+    
+    // 更新月份标题
+    const monthTitle = this.container.querySelector('.current-month');
+    if (monthTitle) {
+      monthTitle.textContent = `${year}年${month}月`;
+    }
+    
+    // 获取日历数据
+    const calendar = getCalendarData(year, month);
+    
+    // 渲染日历表格
+    const table = this.container.querySelector('#diary-calendar-table');
+    if (!table) return;
+    
+    const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+    
+    // 表头
+    let html = '<thead><tr>';
+    weekDays.forEach(day => {
+      html += `<th>${day}</th>`;
+    });
+    html += '</tr></thead>';
+    
+    // 表体
+    html += '<tbody>';
+    calendar.forEach(week => {
+      html += '<tr>';
+      week.forEach(day => {
+        const hasRecordClass = day.hasRecord ? 'has-record' : '';
+        const isTodayClass = day.isToday ? 'is-today' : '';
+        const isCurrentMonthClass = day.isCurrentMonth ? '' : 'other-month';
+        
+        // 日历心情显示
+        let moodDot = '';
+        if (day.hasRecord && day.record?.mood && MOODS[day.record.mood]) {
+          moodDot = `<span class="mood-dot">${MOODS[day.record.mood].icon}</span>`;
+        }
+        
+        html += `
+          <td>
+            <div class="calendar-cell ${hasRecordClass} ${isTodayClass} ${isCurrentMonthClass}" 
+                 data-date="${day.date}">
+              <span class="day-number">${day.day}</span>
+              ${moodDot}
+            </div>
+          </td>
+        `;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    
+    table.innerHTML = html;
+  }
+  
+  /**
+   * 渲染时间线
+   */
+  renderDiaryTimeline() {
+    const timeline = this.container.querySelector('#diary-timeline-list');
+    if (!timeline) return;
+    
+    const records = getTimelineData(30);
+    
+    if (records.length === 0) {
+      timeline.innerHTML = `
+        <div class="empty-state">
+          <p>暂无穿搭记录</p>
+          <p class="text-muted">点击右上角"记一笔"开始记录</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    records.forEach(record => {
+      const moodHtml = record.mood && MOODS[record.mood] 
+        ? `<span class="timeline-mood" style="background: ${MOODS[record.mood].color}">${MOODS[record.mood].icon} ${MOODS[record.mood].label}</span>`
+        : '';
+      
+      html += `
+        <div class="timeline-item" data-date="${record.date}">
+          <div class="timeline-date">
+            <span class="date-day">${record.date.slice(8)}</span>
+            <span class="date-month">${record.date.slice(5, 7)}月</span>
+          </div>
+          <div class="timeline-content">
+            ${record.image ? `<img src="${record.image}" class="timeline-image" alt="穿搭照片">` : ''}
+            <div class="timeline-info">
+              ${moodHtml}
+              ${record.color ? `<span class="timeline-color">${record.color}</span>` : ''}
+              ${record.material ? `<span class="timeline-material">${record.material}</span>` : ''}
+              ${record.note ? `<p class="timeline-note">${record.note}</p>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    timeline.innerHTML = html;
+  }
+  
+  /**
+   * 渲染日记统计
+   */
+  renderDiaryStats() {
+    const stats = getDiaryStats();
+    const streak = getStreakDays();
+    
+    // 连续天数
+    const streakEl = this.container.querySelector('.streak-days');
+    if (streakEl) {
+      streakEl.textContent = streak;
+    }
+    
+    // 总记录数
+    const totalEl = this.container.querySelector('.total-records');
+    if (totalEl) {
+      totalEl.textContent = stats.totalDays;
+    }
+    
+  }
+  
+  /**
+   * 打开日记编辑器
+   */
+  openDiaryEditor(date) {
+    const modal = this.container.querySelector('#modal-diary-editor');
+    const dateInput = this.container.querySelector('#diary-date');
+    const deleteBtn = this.container.querySelector('#btn-delete-diary');
+    
+    // 设置日期
+    const selectedDate = date || new Date().toISOString().split('T')[0];
+    dateInput.value = selectedDate;
+    this.diaryCurrentEditingDate = selectedDate;
+    
+    // 加载已有记录
+    const existingRecord = getDiaryByDate(selectedDate);
+    if (existingRecord) {
+      this.loadDiaryRecord(existingRecord);
+      if (deleteBtn) deleteBtn.classList.remove('hidden');
+    } else {
+      this.resetDiaryForm();
+      if (deleteBtn) deleteBtn.classList.add('hidden');
+    }
+    
+    // 显示弹窗
+    modal.classList.remove('hidden');
+  }
+  
+  /**
+   * 关闭日记编辑器
+   */
   closeDiaryEditor() {
     const modal = this.container.querySelector('#modal-diary-editor');
     if (modal) {
       modal.classList.add('hidden');
     }
-    // 重置表单
+    this.resetDiaryForm();
+    this.diaryCurrentEditingDate = null;
+  }
+  
+  /**
+   * 加载日记记录到表单
+   */
+  loadDiaryRecord(record) {
+    const colorInput = this.container.querySelector('#diary-color');
+    const materialInput = this.container.querySelector('#diary-material');
+    const noteInput = this.container.querySelector('#diary-note');
+    
+    if (colorInput) colorInput.value = record.color || '';
+    if (materialInput) materialInput.value = record.material || '';
+    if (noteInput) noteInput.value = record.note || '';
+    
+    // 设置心情
+    this.container.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mood === record.mood);
+    });
+    
+    // 设置照片预览
+    if (record.image) {
+      this.showPhotoPreview(record.image);
+    } else {
+      this.hidePhotoPreview();
+    }
+  }
+  
+  /**
+   * 重置日记表单
+   */
+  resetDiaryForm() {
     const form = this.container.querySelector('#diary-form');
     if (form) form.reset();
-    // 重置心情选择
+    
     this.container.querySelectorAll('.mood-btn').forEach(btn => {
       btn.classList.remove('active');
     });
+    
+    this.hidePhotoPreview();
   }
   
+  /**
+   * 处理照片选择
+   */
+  handlePhotoSelect(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.showPhotoPreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  /**
+   * 显示照片预览
+   */
+  showPhotoPreview(imageSrc) {
+    const preview = this.container.querySelector('#diary-photo-preview');
+    if (preview) {
+      preview.innerHTML = `<img src="${imageSrc}" alt="预览">`;
+      preview.classList.remove('hidden');
+    }
+  }
+  
+  /**
+   * 隐藏照片预览
+   */
+  hidePhotoPreview() {
+    const preview = this.container.querySelector('#diary-photo-preview');
+    if (preview) {
+      preview.innerHTML = '';
+      preview.classList.add('hidden');
+    }
+  }
+  
+  /**
+   * 保存日记
+   */
   saveDiary() {
-    this.showToast('日记保存成功');
+    const date = this.container.querySelector('#diary-date')?.value;
+    const color = this.container.querySelector('#diary-color')?.value;
+    const material = this.container.querySelector('#diary-material')?.value;
+    const note = this.container.querySelector('#diary-note')?.value;
+    
+    const selectedMood = this.container.querySelector('.mood-btn.active');
+    const mood = selectedMood ? selectedMood.dataset.mood : null;
+    
+    const previewImg = this.container.querySelector('#diary-photo-preview img');
+    const image = previewImg ? previewImg.src : null;
+    
+    if (!date) {
+      this.showToast('请选择日期');
+      return;
+    }
+    
+    const record = {
+      color,
+      material,
+      note,
+      mood,
+      image
+    };
+    
+    saveDiaryRecord(date, record);
+    this.showToast('记录已保存');
     this.closeDiaryEditor();
+    this.renderDiaryCalendar();
+    this.renderDiaryTimeline();
+    this.renderDiaryStats();
+  }
+  
+  /**
+   * 删除日记
+   */
+  deleteDiary() {
+    if (!this.diaryCurrentEditingDate) return;
+    
+    if (confirm('确定要删除这条记录吗？')) {
+      deleteDiaryRecord(this.diaryCurrentEditingDate);
+      this.showToast('记录已删除');
+      this.closeDiaryEditor();
+      this.renderDiaryCalendar();
+      this.renderDiaryTimeline();
+      this.renderDiaryStats();
+    }
   }
 
   bindEvents() {
@@ -682,6 +1648,22 @@ export class ProfileController extends BaseController {
     if (fileInput) {
       this.addEventListener(fileInput, 'change', (e) => {
         this.handleFileSelect(e);
+      });
+    }
+    
+    // 详情模态框关闭按钮（全局）
+    const modalCloseBtn = document.querySelector('#modal-detail .modal-close');
+    if (modalCloseBtn) {
+      this.addEventListener(modalCloseBtn, 'click', () => {
+        closeModal('modal-detail');
+      });
+    }
+    
+    // 详情模态框背景点击关闭
+    const modalBackdrop = document.querySelector('#modal-detail .modal-backdrop');
+    if (modalBackdrop) {
+      this.addEventListener(modalBackdrop, 'click', () => {
+        closeModal('modal-detail');
       });
     }
   }
@@ -763,7 +1745,7 @@ export class ProfileController extends BaseController {
       this.showToast('数据已清除');
     }
   }
-
+  
   onUnmount() {
     this.eventsBound = false;
   }
