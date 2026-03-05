@@ -2,10 +2,11 @@
  * Render Module - DOM渲染
  */
 
-import { isFavorite } from '../data/storage.js';
 import { renderExplanationCard } from '../services/explanation.js';
 import { renderUserProfilePanel } from './profile.js';
 import { renderDataManagerPanel } from '../data/data-manager.js';
+import { getWuxingName } from './wuxing.js';
+import { store, StateKeys } from '../core/store.js';
 
 /**
  * 显示指定视图
@@ -130,8 +131,8 @@ export function renderSchemeCards(schemes, options = {}) {
     container.appendChild(card);
   });
   
-  // 保存到全局供详情模态框使用
-  window.__currentSchemes = schemes;
+  // 保存到 Store 供详情模态框使用（替代全局变量）
+  store.set(StateKeys.CURRENT_SCHEMES, schemes);
 }
 
 /**
@@ -141,8 +142,6 @@ function createSchemeCard(scheme, index, hasBazi = false) {
   const card = document.createElement('div');
   card.className = 'scheme-card';
   card.style.animationDelay = `${index * 100}ms`;
-  
-  const favorited = isFavorite(scheme.id);
   
   // 获取推荐理由（如果有评分数据）
   const explanationHtml = generateSchemeExplanation(scheme, index, hasBazi);
@@ -162,11 +161,6 @@ function createSchemeCard(scheme, index, hasBazi = false) {
     <p class="scheme-source">${scheme.source}</p>
     ${explanationHtml}
     <div class="scheme-actions">
-      <button class="scheme-favorite-btn ${favorited ? 'active' : ''}" data-index="${index}" type="button" aria-label="${favorited ? '取消收藏' : '收藏'}">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="${favorited ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-      </button>
       <button class="scheme-share-btn" data-index="${index}" type="button" aria-label="分享">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="18" cy="5" r="3"/>
@@ -427,11 +421,6 @@ function generateReasonText(scheme, context) {
   `;
 }
 
-function getWuxingName(wuxing) {
-  const names = { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' };
-  return names[wuxing] || wuxing;
-}
-
 function getMaterialWuxingDesc(material, wuxing) {
   const descs = {
     wood: '温润自然，助长木气生发',
@@ -447,12 +436,7 @@ function getMaterialWuxingDesc(material, wuxing) {
  * 渲染用户画像视图
  */
 export function renderProfileView() {
-  const container = document.getElementById('profile-container');
-  if (!container) return;
-  
-  container.innerHTML = renderUserProfilePanel();
-  
-  // 同时渲染数据管理面板
+  // 渲染数据管理面板
   const dataContainer = document.getElementById('data-manager-container');
   if (dataContainer) {
     dataContainer.innerHTML = renderDataManagerPanel();
@@ -501,33 +485,6 @@ export function updateUploadPreview(imageData) {
     if (previewImg) previewImg.src = '';
     feedbackSection?.classList.add('hidden');
   }
-}
-
-/**
- * 渲染收藏列表
- */
-export function renderFavoritesList(favorites) {
-  const container = document.getElementById('favorites-list');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  if (favorites.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <p>暂无收藏的搭配</p>
-        <p class="text-muted">在推荐结果中点击心形图标收藏喜欢的方案</p>
-      </div>
-    `;
-    return;
-  }
-  
-  favorites.forEach((scheme, index) => {
-    const card = createSchemeCard(scheme, index);
-    container.appendChild(card);
-  });
-  
-  window.__currentFavorites = favorites;
 }
 
 /**

@@ -3,6 +3,8 @@
  * 支持简版和精确模式
  */
 
+import { getWuxingName } from '../utils/wuxing.js';
+
 // 天干
 const TIAN_GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 
@@ -228,11 +230,6 @@ export function getRecommendElement(profile) {
     recommend: weakest,
     analysis: `五行中${getWuxingName(weakest)}较弱，宜补${getWuxingName(weakest)}；${getWuxingName(strongest)}较旺，可适当泄之。`
   };
-}
-
-function getWuxingName(wuxing) {
-  const names = { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' };
-  return names[wuxing] || wuxing;
 }
 
 /**

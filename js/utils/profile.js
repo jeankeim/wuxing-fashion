@@ -4,7 +4,6 @@
  */
 
 import { getUserPreferences, getFeedbackData, getDailyLuckFactors } from '../services/recommendation.js';
-import { getFavorites } from '../data/storage.js';
 
 // 五行名称映射
 const WUXING_NAMES = {
@@ -24,7 +23,6 @@ const WUXING_COLORS = {
 export function getUserProfile() {
   const prefs = getUserPreferences();
   const feedback = getFeedbackData();
-  const favorites = getFavorites();
   
   // 计算五行偏好分数（归一化到0-100）
   const wuxingScores = normalizeScores(prefs.wuxingScores);
@@ -42,9 +40,6 @@ export function getUserProfile() {
   // 统计场景使用
   const sceneStats = calculateSceneStats(feedback);
   
-  // 收藏趋势
-  const favoriteTrend = calculateFavoriteTrend(favorites);
-  
   // 互动统计
   const interactionStats = calculateInteractionStats(feedback);
   
@@ -53,9 +48,7 @@ export function getUserProfile() {
     colorScores,
     materialScores,
     sceneStats,
-    favoriteTrend,
     interactionStats,
-    totalFavorites: favorites.length,
     lastUpdated: new Date().toISOString()
   };
 }
@@ -103,56 +96,20 @@ function calculateSceneStats(feedback) {
 }
 
 /**
- * 计算收藏趋势
- * @param {Array} favorites - 收藏列表
- * @returns {Array} 趋势数据
- */
-function calculateFavoriteTrend(favorites) {
-  // 按月份统计
-  const monthly = {};
-  const now = new Date();
-  
-  // 初始化最近6个月
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    monthly[key] = 0;
-  }
-  
-  // 统计收藏
-  favorites.forEach(f => {
-    if (f.addedAt) {
-      const date = new Date(f.addedAt);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      if (monthly[key] !== undefined) {
-        monthly[key]++;
-      }
-    }
-  });
-  
-  return Object.entries(monthly).map(([month, count]) => ({
-    month: month.slice(5), // 只显示月份
-    count
-  }));
-}
-
-/**
  * 计算互动统计
  * @param {Object} feedback - 反馈数据
  * @returns {Object} 互动统计
  */
 function calculateInteractionStats(feedback) {
   let views = 0;
-  let favorites = 0;
   let selects = 0;
   
   Object.values(feedback).forEach(f => {
     views += f.views || 0;
-    favorites += f.favorites || 0;
     selects += f.selects || 0;
   });
   
-  return { views, favorites, selects };
+  return { views, selects };
 }
 
 /**
@@ -318,58 +275,6 @@ export function renderScenePieChart(profile) {
 }
 
 /**
- * 渲染收藏趋势折线图
- * @param {Object} profile - 用户画像
- * @returns {string} SVG HTML
- */
-export function renderTrendLineChart(profile) {
-  const trend = profile.favoriteTrend;
-  if (trend.length === 0) {
-    return '<p class="chart-empty">暂无趋势数据</p>';
-  }
-  
-  const maxCount = Math.max(...trend.map(t => t.count), 1);
-  const width = 300;
-  const height = 150;
-  const padding = 30;
-  
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
-  
-  // 计算点坐标
-  const points = trend.map((t, i) => {
-    const x = padding + (i / (trend.length - 1)) * chartWidth;
-    const y = padding + chartHeight - (t.count / maxCount) * chartHeight;
-    return `${x},${y}`;
-  }).join(' ');
-  
-  // 绘制点
-  let circles = '';
-  trend.forEach((t, i) => {
-    const x = padding + (i / (trend.length - 1)) * chartWidth;
-    const y = padding + chartHeight - (t.count / maxCount) * chartHeight;
-    circles += `<circle cx="${x}" cy="${y}" r="4" class="trend-point" />`;
-  });
-  
-  // X轴标签
-  let labels = '';
-  trend.forEach((t, i) => {
-    const x = padding + (i / (trend.length - 1)) * chartWidth;
-    labels += `<text x="${x}" y="${height - 5}" class="trend-label" text-anchor="middle">${t.month}</text>`;
-  });
-  
-  return `
-    <svg viewBox="0 0 ${width} ${height}" class="trend-chart">
-      <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" class="trend-axis" />
-      <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" class="trend-axis" />
-      <polyline points="${points}" class="trend-line" fill="none" />
-      ${circles}
-      ${labels}
-    </svg>
-  `;
-}
-
-/**
  * 渲染用户画像面板
  * @returns {string} HTML
  */
@@ -382,16 +287,12 @@ export function renderUserProfilePanel() {
       
       <div class="profile-stats">
         <div class="stat-item">
-          <span class="stat-value">${profile.totalFavorites}</span>
-          <span class="stat-label">收藏方案</span>
-        </div>
-        <div class="stat-item">
           <span class="stat-value">${profile.interactionStats.views}</span>
           <span class="stat-label">浏览次数</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">${profile.interactionStats.favorites}</span>
-          <span class="stat-label">收藏次数</span>
+          <span class="stat-value">${profile.interactionStats.selects}</span>
+          <span class="stat-label">采纳次数</span>
         </div>
       </div>
       
@@ -408,11 +309,6 @@ export function renderUserProfilePanel() {
       <div class="profile-section">
         <h4>场景分布</h4>
         ${renderScenePieChart(profile)}
-      </div>
-      
-      <div class="profile-section">
-        <h4>收藏趋势</h4>
-        ${renderTrendLineChart(profile)}
       </div>
     </div>
   `;

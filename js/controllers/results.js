@@ -5,10 +5,10 @@
 import { BaseController } from './base.js';
 import { navigateTo, goBack } from '../core/router.js';
 import { renderSchemeCards, renderResultHeader, renderDetailModal, showModal, closeModal } from '../utils/render.js';
-import { favoritesRepo } from '../data/repository.js';
 import { StateKeys } from '../core/store.js';
 import { WeatherImpact } from '../components/weather-widget.js';
 import { calculateWeatherBoost } from '../services/weather.js';
+import { getWuxingName } from '../utils/wuxing.js';
 
 export class ResultsController extends BaseController {
   constructor() {
@@ -164,7 +164,7 @@ export class ResultsController extends BaseController {
     // 八字分析
     if (bazi?.recommend) {
       const usefulGod = bazi.recommend.recommend;
-      const usefulGodName = this.getWuxingName(usefulGod);
+      const usefulGodName = getWuxingName(usefulGod);
       analysis += `而你的八字喜${usefulGodName}。`;
     }
     
@@ -186,7 +186,7 @@ export class ResultsController extends BaseController {
     }
     
     const strongest = bazi.recommend.strongest;
-    const strongestName = this.getWuxingName(strongest);
+    const strongestName = getWuxingName(strongest);
     const mainWuxing = schemes[0]?.color?.wuxing;
     
     // 如果推荐方案的五行与忌神相同，给出提醒
@@ -196,7 +196,7 @@ export class ResultsController extends BaseController {
     
     // 避免的颜色
     const avoidWuxing = strongest;
-    const avoidName = this.getWuxingName(avoidWuxing);
+    const avoidName = getWuxingName(avoidWuxing);
     
     const tips = [
       `避免全身${avoidName}色，以免加重你的${avoidName}能量，影响运势发挥。`,
@@ -205,17 +205,6 @@ export class ResultsController extends BaseController {
     ];
     
     return tips[Math.floor(Math.random() * tips.length)];
-  }
-  
-  getWuxingName(wuxing) {
-    const names = {
-      wood: '木',
-      fire: '火',
-      earth: '土',
-      metal: '金',
-      water: '水'
-    };
-    return names[wuxing] || wuxing;
   }
 
   renderWeatherImpact(result) {
@@ -397,15 +386,9 @@ export class ResultsController extends BaseController {
   }
 
   handleCardClick(e) {
-    const favoriteBtn = e.target.closest('.scheme-favorite-btn');
     const shareBtn = e.target.closest('.scheme-share-btn');
     const detailBtn = e.target.closest('.scheme-detail-btn');
     const feedbackBtn = e.target.closest('.feedback-btn');
-
-    if (favoriteBtn) {
-      const index = parseInt(favoriteBtn.dataset.index, 10);
-      this.toggleFavorite(index);
-    }
 
     if (shareBtn) {
       const index = parseInt(shareBtn.dataset.index, 10);
@@ -425,7 +408,7 @@ export class ResultsController extends BaseController {
   }
   
   handleFeedback(index, action, btnElement) {
-    const schemes = window.__currentSchemes;
+    const schemes = this.getState(StateKeys.CURRENT_SCHEMES);
     if (!schemes || !schemes[index]) return;
     
     const scheme = schemes[index];
@@ -557,49 +540,8 @@ export class ResultsController extends BaseController {
     localStorage.setItem(prefsKey, JSON.stringify(prefs));
   }
 
-  toggleFavorite(index) {
-    try {
-      const schemes = window.__currentSchemes;
-      if (!schemes || !schemes[index]) return;
-
-      const scheme = schemes[index];
-      const isFav = favoritesRepo.exists(scheme.id);
-      
-      if (isFav) {
-        favoritesRepo.remove(scheme.id);
-        this.showToast('已取消收藏');
-      } else {
-        favoritesRepo.add(scheme);
-        this.showToast('已收藏');
-      }
-      
-      // 更新按钮状态
-      this.updateFavoriteButton(index, !isFav);
-    } catch (error) {
-      this.showToast('操作失败，请重试');
-    }
-  }
-
-  updateFavoriteButton(index, isFav) {
-    const cards = this.container.querySelectorAll('.scheme-card');
-    const card = cards[index];
-    if (!card) return;
-    
-    const btn = card.querySelector('.scheme-favorite-btn');
-    if (!btn) return;
-    
-    btn.classList.toggle('active', isFav);
-    btn.setAttribute('aria-label', isFav ? '取消收藏' : '收藏');
-    
-    // 更新 SVG 填充
-    const svg = btn.querySelector('svg');
-    if (svg) {
-      svg.setAttribute('fill', isFav ? 'currentColor' : 'none');
-    }
-  }
-
   shareScheme(index) {
-    const schemes = window.__currentSchemes;
+    const schemes = this.getState(StateKeys.CURRENT_SCHEMES);
     if (!schemes || !schemes[index]) return;
 
     const scheme = schemes[index];
@@ -627,7 +569,7 @@ export class ResultsController extends BaseController {
   }
 
   showDetail(index) {
-    const schemes = window.__currentSchemes;
+    const schemes = this.getState(StateKeys.CURRENT_SCHEMES);
     if (!schemes || !schemes[index]) return;
 
     const scheme = schemes[index];

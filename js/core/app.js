@@ -15,7 +15,6 @@ import { WelcomeController } from '../controllers/welcome.js';
 import { EntryController } from '../controllers/entry.js';
 import { LoadingController } from '../controllers/loading.js';
 import { ResultsController } from '../controllers/results.js';
-import { FavoritesController } from '../controllers/favorites.js';
 import { ProfileController } from '../controllers/profile.js';
 import { DiaryController } from '../controllers/diary.js';
 import { UploadController } from '../controllers/upload.js';
@@ -26,7 +25,6 @@ const VIEW_CONFIG = {
   'view-entry': { controller: EntryController, html: 'views/entry.html' },
   'view-loading': { controller: LoadingController, html: 'views/loading.html' },
   'view-results': { controller: ResultsController, html: 'views/results.html' },
-  'view-favorites': { controller: FavoritesController, html: 'views/favorites.html' },
   'view-profile': { controller: ProfileController, html: 'views/profile.html' },
   'view-diary': { controller: DiaryController, html: 'views/diary.html' },
   'view-upload': { controller: UploadController, html: 'views/upload.html' }

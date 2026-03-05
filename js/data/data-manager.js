@@ -239,8 +239,11 @@ export function getDataOverview() {
     items: {}
   };
   
-  DATA_KEYS.forEach(key => {
-    const value = storage.getItem(key);
+  // 遍历 localStorage 中的所有 key
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key);
+    
     if (value !== null) {
       const jsonStr = JSON.stringify(value);
       const size = new Blob([jsonStr]).size;
@@ -250,11 +253,17 @@ export function getDataOverview() {
       
       // 简化显示
       let displayValue = '';
-      if (Array.isArray(value)) {
-        displayValue = `${value.length} 项`;
-      } else if (typeof value === 'object') {
-        displayValue = `${Object.keys(value).length} 个字段`;
-      } else {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          displayValue = `${parsed.length} 项`;
+        } else if (typeof parsed === 'object') {
+          displayValue = `${Object.keys(parsed).length} 个字段`;
+        } else {
+          displayValue = String(parsed).substring(0, 50);
+        }
+      } catch (e) {
+        // 非 JSON 格式
         displayValue = String(value).substring(0, 50);
       }
       
@@ -263,7 +272,7 @@ export function getDataOverview() {
         display: displayValue
       };
     }
-  });
+  }
   
   overview.totalSize = formatBytes(overview.dataSize);
   

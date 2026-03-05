@@ -41,9 +41,6 @@ class Store {
       // 推荐结果
       currentResult: null,
       
-      // 收藏列表
-      favorites: [],
-      
       // UI 状态
       currentView: 'view-welcome',
       isLoading: false,
@@ -150,7 +147,6 @@ class Store {
       currentWishId: null,
       currentBaziResult: null,
       currentResult: null,
-      favorites: [],
       currentView: 'view-welcome',
       isLoading: false,
       error: null
@@ -195,7 +191,7 @@ export const StateKeys = {
   CURRENT_WISH_ID: 'currentWishId',
   CURRENT_BAZI_RESULT: 'currentBaziResult',
   CURRENT_RESULT: 'currentResult',
-  FAVORITES: 'favorites',
+  CURRENT_SCHEMES: 'currentSchemes',  // 当前推荐方案列表（替代 window.__currentSchemes）
   CURRENT_VIEW: 'currentView',
   IS_LOADING: 'isLoading',
   ERROR: 'error'
@@ -206,6 +202,5 @@ export const ViewNames = {
   WELCOME: 'view-welcome',
   ENTRY: 'view-entry',
   RESULTS: 'view-results',
-  UPLOAD: 'view-upload',
-  FAVORITES: 'view-favorites'
+  UPLOAD: 'view-upload'
 };

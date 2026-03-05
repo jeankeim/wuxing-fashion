@@ -12,7 +12,6 @@ const ROUTES = {
   '/entry': { view: 'view-entry', title: '选择心愿' },
   '/loading': { view: 'view-loading', title: '正在计算' },
   '/results': { view: 'view-results', title: '推荐结果' },
-  '/favorites': { view: 'view-favorites', title: '我的收藏' },
   '/profile': { view: 'view-profile', title: '我的画像' },
   '/diary': { view: 'view-diary', title: '穿搭日记' },
   '/upload': { view: 'view-upload', title: '上传照片' }

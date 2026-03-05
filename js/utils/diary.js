@@ -182,6 +182,50 @@ export function getDiaryStats() {
 }
 
 /**
+ * 获取指定月份的统计数据
+ * @param {number} year - 年份
+ * @param {number} month - 月份 (1-12)
+ * @returns {Object} 月度统计数据
+ */
+export function getMonthlyStats(year, month) {
+  const records = getDiaryRecords();
+  const monthPrefix = `${year}-${String(month).padStart(2, '0')}`;
+  
+  const monthRecords = Object.values(records).filter(record => 
+    record.date && record.date.startsWith(monthPrefix)
+  );
+  
+  const stats = {
+    year,
+    month,
+    totalDays: monthRecords.length,
+    colorCount: {},
+    materialCount: {},
+    moodCount: {},
+    records: monthRecords
+  };
+  
+  monthRecords.forEach(record => {
+    // 颜色统计
+    if (record.color) {
+      stats.colorCount[record.color] = (stats.colorCount[record.color] || 0) + 1;
+    }
+    
+    // 材质统计
+    if (record.material) {
+      stats.materialCount[record.material] = (stats.materialCount[record.material] || 0) + 1;
+    }
+    
+    // 心情统计
+    if (record.mood) {
+      stats.moodCount[record.mood] = (stats.moodCount[record.mood] || 0) + 1;
+    }
+  });
+  
+  return stats;
+}
+
+/**
  * 格式化日期
  * @param {Date} date - 日期对象
  * @returns {string} YYYY-MM-DD

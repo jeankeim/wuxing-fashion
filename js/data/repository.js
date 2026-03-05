@@ -9,7 +9,6 @@ import { safeStorage } from '../core/error-handler.js';
 export const StorageKeys = {
   FEEDBACK: 'recommendation_feedback',
   PREFERENCES: 'user_preferences',
-  FAVORITES: 'wuxing_favorites',
   LAST_BAZI: 'wuxing_last_bazi',
   LAST_WISH: 'wuxing_last_wish',
   LAST_RESULT: 'wuxing_last_result',
@@ -77,71 +76,6 @@ class BaseRepository {
    */
   exists() {
     return this.get() !== null;
-  }
-}
-
-/**
- * 收藏 Repository
- */
-class FavoritesRepository extends BaseRepository {
-  constructor() {
-    super(StorageKeys.FAVORITES);
-  }
-
-  /**
-   * 获取所有收藏
-   * @returns {Array} 收藏列表
-   */
-  getAll() {
-    return this.get() || [];
-  }
-
-  /**
-   * 添加收藏
-   * @param {Object} scheme - 方案
-   */
-  add(scheme) {
-    const favorites = this.getAll();
-    if (!this.exists(scheme.id)) {
-      favorites.push({
-        ...scheme,
-        addedAt: new Date().toISOString()
-      });
-      this.set(favorites);
-    }
-  }
-
-  /**
-   * 移除收藏
-   * @param {string} schemeId - 方案ID
-   */
-  remove(schemeId) {
-    const favorites = this.getAll().filter(f => f.id !== schemeId);
-    this.set(favorites);
-  }
-
-  /**
-   * 检查是否已收藏
-   * @param {string} schemeId - 方案ID
-   * @returns {boolean}
-   */
-  exists(schemeId) {
-    return this.getAll().some(f => f.id === schemeId);
-  }
-
-  /**
-   * 获取收藏数量
-   * @returns {number}
-   */
-  count() {
-    return this.getAll().length;
-  }
-
-  /**
-   * 清空收藏
-   */
-  clear() {
-    this.set([]);
   }
 }
 
@@ -228,7 +162,6 @@ class FeedbackRepository extends BaseRepository {
     if (!feedback[schemeId]) {
       feedback[schemeId] = {
         views: 0,
-        favorites: 0,
         selects: 0,
         dismisses: 0,
         lastInteraction: null,
@@ -241,9 +174,6 @@ class FeedbackRepository extends BaseRepository {
     switch (action) {
       case 'view':
         record.views++;
-        break;
-      case 'favorite':
-        record.favorites++;
         break;
       case 'select':
         record.selects++;
@@ -377,7 +307,6 @@ class OutfitRepository extends BaseRepository {
 }
 
 // 导出 Repository 实例
-export const favoritesRepo = new FavoritesRepository();
 export const preferencesRepo = new PreferencesRepository();
 export const feedbackRepo = new FeedbackRepository();
 export const baziRepo = new BaziRepository();

@@ -4,8 +4,9 @@
 
 import { BaseController } from './base.js';
 import { navigateTo, goBack } from '../core/router.js';
-import { renderFavoritesList } from '../utils/render.js';
+import { renderFavoritesList, renderDetailModal, showModal, closeModal } from '../utils/render.js';
 import { favoritesRepo } from '../data/repository.js';
+import { StateKeys } from '../core/store.js';
 
 export class FavoritesController extends BaseController {
   constructor() {
@@ -49,6 +50,22 @@ export class FavoritesController extends BaseController {
         this.handleListClick(e);
       });
     }
+    
+    // 详情模态框关闭按钮（全局）
+    const modalCloseBtn = document.querySelector('#modal-detail .modal-close');
+    if (modalCloseBtn) {
+      this.addEventListener(modalCloseBtn, 'click', () => {
+        closeModal('modal-detail');
+      });
+    }
+    
+    // 详情模态框背景点击关闭
+    const modalBackdrop = document.querySelector('#modal-detail .modal-backdrop');
+    if (modalBackdrop) {
+      this.addEventListener(modalBackdrop, 'click', () => {
+        closeModal('modal-detail');
+      });
+    }
   }
 
   handleListClick(e) {
@@ -67,7 +84,7 @@ export class FavoritesController extends BaseController {
   }
 
   removeFavorite(index) {
-    const favorites = window.__currentFavorites || favoritesRepo.getAll();
+    const favorites = this.getState(StateKeys.CURRENT_SCHEMES) || favoritesRepo.getAll();
     if (!favorites[index]) return;
 
     const scheme = favorites[index];
@@ -79,7 +96,14 @@ export class FavoritesController extends BaseController {
   }
 
   showDetail(index) {
-    this.showToast('详情功能开发中...');
+    const favorites = this.getState(StateKeys.CURRENT_SCHEMES) || favoritesRepo.getAll();
+    if (!favorites[index]) return;
+
+    const scheme = favorites[index];
+    
+    // 渲染详情模态框（复用结果页的逻辑）
+    renderDetailModal(scheme, null);
+    showModal('modal-detail');
   }
 
   onUnmount() {

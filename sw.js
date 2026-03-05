@@ -2,7 +2,7 @@
  * Service Worker - 离线缓存
  * 版本号用于缓存更新
  */
-const CACHE_NAME = 'wuxing-fashion-v4';
+const CACHE_NAME = 'wuxing-fashion-v5';
 
 // 预缓存资源列表（只缓存核心静态资源，不缓存数据文件）
 const PRECACHE_ASSETS = [
@@ -34,7 +34,6 @@ const PRECACHE_ASSETS = [
   '/js/controllers/welcome.js',
   '/js/controllers/entry.js',
   '/js/controllers/results.js',
-  '/js/controllers/favorites.js',
   '/js/controllers/profile.js',
   '/js/controllers/diary.js',
   '/js/controllers/upload.js',
