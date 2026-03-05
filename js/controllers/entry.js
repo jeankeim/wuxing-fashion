@@ -4,12 +4,12 @@
 
 import { BaseController } from './base.js';
 import { navigateTo } from '../core/router.js';
-import { initYearSelect, initDaySelect, renderResultHeader, renderSchemeCards, showToast } from '../utils/render.js';
-import { baziRepo, statsRepo } from '../data/repository.js';
+import { showToast } from '../utils/render.js';
+import { statsRepo } from '../data/repository.js';
 import { StateKeys } from '../core/store.js';
 import { SimpleWeatherWidget } from '../components/simple-weather-widget.js';
 import { generateRecommendation } from '../services/engine.js';
-import { analyzeBazi, analyzeBaziPrecise } from '../services/bazi.js';
+import { analyzeBazi } from '../services/bazi.js';
 
 export class EntryController extends BaseController {
   constructor() {
@@ -30,13 +30,6 @@ export class EntryController extends BaseController {
     
     // 绑定事件
     this.bindEvents();
-    
-    // 初始化表单
-    initYearSelect();
-    initDaySelect();
-    
-    // 恢复上次选择
-    this.restoreLastSelection();
     
     // 初始化天气组件
     this.initWeatherWidget();
@@ -86,13 +79,6 @@ export class EntryController extends BaseController {
       });
     });
 
-    // 精度切换
-    this.container.querySelectorAll('.precision-btn').forEach(btn => {
-      this.addEventListener(btn, 'click', () => {
-        this.switchPrecision(btn.dataset.precision);
-      });
-    });
-
     // 生成按钮
     const generateBtn = this.container.querySelector('#btn-generate');
     if (generateBtn) {
@@ -116,51 +102,23 @@ export class EntryController extends BaseController {
     this.setState(StateKeys.CURRENT_WISH_ID, wishId);
   }
 
-  switchPrecision(precision) {
-    this.currentPrecision = precision;
-    this.container.querySelectorAll('.precision-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.precision === precision);
-    });
-    
-    const preciseFields = this.container.querySelector('.precise-fields');
-    if (preciseFields) {
-      preciseFields.classList.toggle('hidden', precision !== 'precise');
-    }
-  }
-
   async handleGenerate() {
-    // 获取八字数据
-    const baziForm = this.getBaziFormData();
+    // 从 State 获取八字数据（用户在画像页输入的）
+    const baziData = this.getState(StateKeys.BAZI_DATA);
     let baziResult = null;
     
-    if (baziForm) {
-      // 保存八字
-      baziRepo.save(baziForm);
-      
-      // 根据精度模式计算八字
-      if (baziForm.precision === 'precise') {
-        const realHour = baziForm.hour * 2;
-        baziResult = analyzeBaziPrecise(
-          baziForm.year,
-          baziForm.month,
-          baziForm.day,
-          realHour,
-          baziForm.minute,
-          baziForm.timezone
-        );
-      } else {
-        baziResult = analyzeBazi(
-          baziForm.year,
-          baziForm.month,
-          baziForm.day,
-          baziForm.hour
-        );
-      }
-      
-      this.setState(StateKeys.CURRENT_BAZI_RESULT, baziResult);
-    } else {
-      this.setState(StateKeys.CURRENT_BAZI_RESULT, null);
+    if (baziData && baziData.year && baziData.month && baziData.day && baziData.hour !== undefined) {
+      // 用户填写了八字，计算分析结果
+      baziResult = analyzeBazi(
+        baziData.year,
+        baziData.month,
+        baziData.day,
+        baziData.hour
+      );
     }
+    
+    // 保存八字分析结果（有则保存，无则为 null）
+    this.setState(StateKeys.CURRENT_BAZI_RESULT, baziResult);
     
     // 生成推荐
     try {
@@ -178,8 +136,8 @@ export class EntryController extends BaseController {
         // 更新统计
         statsRepo.increment('generates');
         
-        // 导航到结果页
-        navigateTo('/results');
+        // 导航到加载页（再自动跳转到结果页）
+        navigateTo('/loading');
       } else {
         showToast('生成失败，请重试');
       }
@@ -188,53 +146,4 @@ export class EntryController extends BaseController {
     }
   }
 
-  /**
-   * 获取八字表单数据
-   */
-  getBaziFormData() {
-    const year = this.container.querySelector('#bazi-year')?.value;
-    const month = this.container.querySelector('#bazi-month')?.value;
-    const day = this.container.querySelector('#bazi-day')?.value;
-    const hour = this.container.querySelector('#bazi-hour')?.value;
-    
-    if (year && month && day && hour !== '') {
-      const data = {
-        year: parseInt(year, 10),
-        month: parseInt(month, 10),
-        day: parseInt(day, 10),
-        hour: parseInt(hour, 10),
-        precision: this.currentPrecision
-      };
-      
-      // 精确模式额外数据
-      if (data.precision === 'precise') {
-        const minute = this.container.querySelector('#bazi-minute')?.value || '0';
-        const timezone = this.container.querySelector('#bazi-timezone')?.value || '8';
-        data.minute = parseInt(minute, 10);
-        data.timezone = parseInt(timezone, 10);
-      }
-      
-      return data;
-    }
-    
-    return null;
-  }
-
-  /**
-   * 恢复上次选择
-   */
-  restoreLastSelection() {
-    const lastBazi = baziRepo.get();
-    if (lastBazi) {
-      const yearSelect = this.container.querySelector('#bazi-year');
-      const monthSelect = this.container.querySelector('#bazi-month');
-      const daySelect = this.container.querySelector('#bazi-day');
-      const hourSelect = this.container.querySelector('#bazi-hour');
-      
-      if (yearSelect) yearSelect.value = lastBazi.year || '';
-      if (monthSelect) monthSelect.value = lastBazi.month || '';
-      if (daySelect) daySelect.value = lastBazi.day || '';
-      if (hourSelect) hourSelect.value = lastBazi.hour !== undefined ? lastBazi.hour : '';
-    }
-  }
 }

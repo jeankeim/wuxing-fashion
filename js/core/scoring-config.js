@@ -3,18 +3,23 @@
  * 采用加权系数法，总分归一化为 1.0 (100%)
  */
 
-// 基础权重配置
+// 基础权重配置 (总分100分)
 export const SCORING_WEIGHTS = {
   base: {
-    solarTerm: 0.25,   // 节气匹配 (25%)
-    bazi: 0.20,        // 八字喜用 (20%) - 若无八字则平分给其他
-    scene: 0.20,       // 场景匹配 (20%)
-    weather: 0.15,     // 天气联动 (15%)
-    wish: 0.15         // 心愿匹配 (15%)
+    bazi: 0.35,        // 八字五行 (35%) - 核心差异化
+    scene: 0.25,       // 场景适配 (25%) - 社会属性，一票否决
+    solarTerm: 0.20,   // 节气能量 (20%) - 顺应天时
+    weather: 0.20      // 天气实况 (20%) - 物理门槛，一票否决
   },
   bonus: {
-    history: 0.10,     // 历史偏好 (额外加成，可突破 100% 上限)
+    wish: 0.10,        // 心愿/偏好 (Bonus，最多+10分)
+    history: 0.05,     // 历史偏好 (额外加成)
     dailyLuck: 0.05    // 今日运势 (随机种子)
+  },
+  // 门槛阈值
+  threshold: {
+    weather: 30,       // 天气匹配度低于30分直接淘汰
+    scene: 40          // 场景匹配度低于40分直接淘汰
   }
 };
 
@@ -74,19 +79,13 @@ export const SCORE_LEVELS = {
 export function getDynamicWeights(userProfile = {}) {
   const weights = { ...SCORING_WEIGHTS.base };
   
-  // 如果没有八字，将八字权重平分给节气和场景
+  // 如果没有八字，八字权重设为0，其他权重保持不变
   if (!userProfile.bazi) {
-    const redistribute = weights.bazi / 2;
-    weights.solarTerm += redistribute;
-    weights.scene += redistribute;
     weights.bazi = 0;
   }
   
-  // 如果是新用户，降低历史偏好权重
-  if (userProfile.isNewUser) {
-    weights.solarTerm += 0.05;
-    weights.scene += 0.05;
-  }
+  // 新用户和老用户权重保持一致，不再额外调整
+  // 历史偏好权重由调用方控制
   
   return weights;
 }

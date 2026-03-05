@@ -9,9 +9,9 @@ import { safeFetch, withErrorHandler, ErrorTypes } from '../core/error-handler.j
 const WEATHER_CODES = {
   // 晴天
   0: { name: '晴', icon: '☀️', type: 'sunny' },
-  1: { name: ' mainly clear', icon: '🌤️', type: 'clear' },
-  2: { name: ' partly cloudy', icon: '⛅', type: 'cloudy' },
-  3: { name: ' overcast', icon: '☁️', type: 'cloudy' },
+  1: { name: '晴间多云', icon: '🌤️', type: 'clear' },
+  2: { name: '多云', icon: '⛅', type: 'cloudy' },
+  3: { name: '阴', icon: '☁️', type: 'cloudy' },
   // 雾
   45: { name: '雾', icon: '🌫️', type: 'fog' },
   48: { name: '雾凇', icon: '🌫️', type: 'fog' },

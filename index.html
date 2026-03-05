@@ -9,9 +9,12 @@
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
   
-  <!-- Fonts from jsDelivr CDN -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+  <!-- Fonts - 使用系统字体，避免 CDN 延迟 -->
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    }
+  </style>
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="./css/main.css">
@@ -74,13 +77,16 @@
   <!-- App Script (MVC Architecture) -->
   <script type="module">
     import { bootstrap } from './js/core/app.js';
+    console.log('[Index] Starting bootstrap...');
     bootstrap();
+    console.log('[Index] Bootstrap called');
   </script>
   
-  <!-- Service Worker Registration -->
+  <!-- Service Worker Registration - 延迟注册避免阻塞 -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
+      // 延迟5秒注册，避免阻塞首屏加载
+      setTimeout(() => {
         navigator.serviceWorker.register('./sw.js')
           .then((registration) => {
             console.log('[SW] Registered:', registration.scope);
@@ -88,7 +94,7 @@
           .catch((error) => {
             console.error('[SW] Registration failed:', error);
           });
-      });
+      }, 5000);
     }
   </script>
 </body>

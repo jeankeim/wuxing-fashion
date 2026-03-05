@@ -1,9 +1,10 @@
 /**
  * Simple Weather Module - 轻量级天气服务
- * 基于日期/节气推断季节，无需外部 API
+ * 优先使用 Open-Meteo API 获取真实天气，失败时回退到季节推断
  */
 
 import { getUTC8Date } from './solar-terms.js';
+import { getCurrentWeather, getWeatherRecommendation } from './weather.js';
 
 // 季节配置
 const SEASON_CONFIG = {
@@ -72,7 +73,7 @@ function getCurrentSeason(date = new Date()) {
 }
 
 /**
- * 获取简化版天气数据（无需外部 API）
+ * 获取天气数据（优先使用真实天气 API）
  * @returns {Promise<Object>} 天气数据
  */
 export async function getSimpleWeather() {
@@ -83,37 +84,77 @@ export async function getSimpleWeather() {
     return cachedWeather;
   }
   
-  const date = getUTC8Date();
-  const seasonKey = getCurrentSeason(date);
-  const season = SEASON_CONFIG[seasonKey];
-  
-  // 根据月份推断可能的节气（简化处理）
-  const month = date.getMonth();
-  const termMap = {
-    0: '小寒/大寒', 1: '立春/雨水', 2: '惊蛰/春分', 3: '清明/谷雨',
-    4: '立夏/小满', 5: '芒种/夏至', 6: '小暑/大暑', 7: '立秋/处暑',
-    8: '白露/秋分', 9: '寒露/霜降', 10: '立冬/小雪', 11: '大雪/冬至'
-  };
-  const currentTerm = termMap[month] || null;
-  
-  const weather = {
-    season: seasonKey,
-    seasonName: season.name,
-    icon: season.icon,
-    tempRange: season.tempRange,
-    materials: season.materials,
-    colors: season.colors,
-    tips: season.tips,
-    currentTerm: currentTerm?.name || null,
-    date: date.toISOString().split('T')[0],
-    source: 'simple' // 标记为简化版
-  };
-  
-  // 更新缓存
-  cachedWeather = weather;
-  cacheTime = now;
-  
-  return weather;
+  try {
+    // 尝试获取真实天气数据
+    const realWeather = await getCurrentWeather();
+    const recommendation = getWeatherRecommendation(realWeather.current);
+    
+    // 根据温度推断季节
+    const temp = realWeather.current.temperature;
+    let seasonKey = 'spring';
+    if (temp >= 25) seasonKey = 'summer';
+    else if (temp >= 15) seasonKey = 'spring';
+    else if (temp >= 10) seasonKey = 'autumn';
+    else seasonKey = 'winter';
+    
+    const season = SEASON_CONFIG[seasonKey];
+    
+    const weather = {
+      season: seasonKey,
+      seasonName: realWeather.current.name,  // 真实天气名称（晴、雨等）
+      icon: realWeather.current.icon,        // 真实天气图标
+      temperature: temp,                     // 真实温度数值
+      humidity: realWeather.current.humidity, // 真实湿度
+      tempRange: `${temp}°C`,                // 显示实际温度
+      materials: recommendation.materials || season.materials,
+      colors: recommendation.colors || season.colors,
+      tips: recommendation.tips || season.tips,
+      currentTerm: null,
+      date: new Date().toISOString().split('T')[0],
+      source: 'real',                        // 标记为真实天气
+      raw: realWeather                       // 保留原始数据
+    };
+    
+    // 更新缓存
+    cachedWeather = weather;
+    cacheTime = now;
+    
+    return weather;
+  } catch (error) {
+    console.warn('获取真实天气失败，使用季节推断:', error);
+    
+    // 回退到季节推断
+    const date = getUTC8Date();
+    const seasonKey = getCurrentSeason(date);
+    const season = SEASON_CONFIG[seasonKey];
+    
+    const month = date.getMonth();
+    const termMap = {
+      0: '小寒/大寒', 1: '立春/雨水', 2: '惊蛰/春分', 3: '清明/谷雨',
+      4: '立夏/小满', 5: '芒种/夏至', 6: '小暑/大暑', 7: '立秋/处暑',
+      8: '白露/秋分', 9: '寒露/霜降', 10: '立冬/小雪', 11: '大雪/冬至'
+    };
+    const currentTerm = termMap[month] || null;
+    
+    const weather = {
+      season: seasonKey,
+      seasonName: season.name,
+      icon: season.icon,
+      tempRange: season.tempRange,
+      materials: season.materials,
+      colors: season.colors,
+      tips: season.tips,
+      currentTerm: currentTerm,
+      date: date.toISOString().split('T')[0],
+      source: 'simple'
+    };
+    
+    // 更新缓存
+    cachedWeather = weather;
+    cacheTime = now;
+    
+    return weather;
+  }
 }
 
 /**

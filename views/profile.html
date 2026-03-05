@@ -1,4 +1,4 @@
-<!-- Profile View -->
+<!-- Profile View - 合并画像/收藏/日记 -->
 <section id="view-profile" class="view hidden" aria-label="我的画像">
   <header class="profile-header">
     <button id="btn-back-results-from-profile" class="btn btn-icon" aria-label="返回">
@@ -9,12 +9,325 @@
     <h2>我的画像</h2>
   </header>
   
-  <div class="profile-body">
-    <div id="profile-container">
-      <!-- Profile rendered by JS -->
+  <!-- Tab 导航 -->
+  <div class="profile-tabs">
+    <button class="profile-tab active" data-tab="profile" type="button">
+      <span class="tab-icon">👤</span>
+      <span class="tab-text">画像</span>
+    </button>
+    <button class="profile-tab" data-tab="favorites" type="button">
+      <span class="tab-icon">⭐</span>
+      <span class="tab-text">收藏</span>
+    </button>
+    <button class="profile-tab" data-tab="diary" type="button">
+      <span class="tab-icon">📓</span>
+      <span class="tab-text">日记</span>
+    </button>
+  </div>
+  
+  <!-- 可滑动内容区 -->
+  <div class="profile-content-wrapper" id="profile-swipe-container">
+    <div class="profile-content-slider" id="profile-slider">
+      
+      <!-- Tab 1: 画像 -->
+      <div class="profile-panel active" data-panel="profile">
+        <div class="profile-body">
+          <!-- 八字输入卡片 -->
+          <div class="profile-bazi-card">
+            <div class="bazi-card-header">
+              <span class="bazi-card-icon">📿</span>
+              <h3>生辰八字</h3>
+              <span class="bazi-status" id="bazi-status">未填写</span>
+            </div>
+            <p class="bazi-card-desc">完善八字信息，获取更精准的五行穿搭推荐</p>
+            
+            <div class="bazi-form-compact">
+              <div class="bazi-row-compact">
+                <select id="profile-bazi-year" class="bazi-select-compact">
+                  <option value="">年</option>
+                </select>
+                <select id="profile-bazi-month" class="bazi-select-compact">
+                  <option value="">月</option>
+                  <option value="1">1月</option>
+                  <option value="2">2月</option>
+                  <option value="3">3月</option>
+                  <option value="4">4月</option>
+                  <option value="5">5月</option>
+                  <option value="6">6月</option>
+                  <option value="7">7月</option>
+                  <option value="8">8月</option>
+                  <option value="9">9月</option>
+                  <option value="10">10月</option>
+                  <option value="11">11月</option>
+                  <option value="12">12月</option>
+                </select>
+                <select id="profile-bazi-day" class="bazi-select-compact">
+                  <option value="">日</option>
+                </select>
+                <select id="profile-bazi-hour" class="bazi-select-compact">
+                  <option value="">时</option>
+                  <option value="0">子</option>
+                  <option value="1">丑</option>
+                  <option value="2">寅</option>
+                  <option value="3">卯</option>
+                  <option value="4">辰</option>
+                  <option value="5">巳</option>
+                  <option value="6">午</option>
+                  <option value="7">未</option>
+                  <option value="8">申</option>
+                  <option value="9">酉</option>
+                  <option value="10">戌</option>
+                  <option value="11">亥</option>
+                </select>
+              </div>
+            </div>
+            
+            <button id="btn-save-bazi" class="btn btn-primary btn-save-bazi" type="button">
+              保存八字
+            </button>
+            
+            <!-- 八字分析结果 -->
+            <div id="bazi-analysis-result" class="bazi-analysis-result hidden">
+              <!-- 分析结果由 JS 渲染 -->
+            </div>
+          </div>
+          
+          <!-- 五行能量雷达图 -->
+          <div class="wuxing-radar-section">
+            <div class="radar-header">
+              <span class="radar-icon">☯️</span>
+              <h3>五行能量图谱</h3>
+              <span class="radar-subtitle">基于您的穿搭偏好分析</span>
+            </div>
+            <div class="wuxing-radar-container">
+              <canvas id="wuxing-radar-canvas" width="280" height="280"></canvas>
+              <div class="wuxing-legend">
+                <div class="legend-item wood">
+                  <span class="legend-dot"></span>
+                  <span class="legend-name">木</span>
+                  <span class="legend-value" id="wood-value">0</span>
+                </div>
+                <div class="legend-item fire">
+                  <span class="legend-dot"></span>
+                  <span class="legend-name">火</span>
+                  <span class="legend-value" id="fire-value">0</span>
+                </div>
+                <div class="legend-item earth">
+                  <span class="legend-dot"></span>
+                  <span class="legend-name">土</span>
+                  <span class="legend-value" id="earth-value">0</span>
+                </div>
+                <div class="legend-item metal">
+                  <span class="legend-dot"></span>
+                  <span class="legend-name">金</span>
+                  <span class="legend-value" id="metal-value">0</span>
+                </div>
+                <div class="legend-item water">
+                  <span class="legend-dot"></span>
+                  <span class="legend-name">水</span>
+                  <span class="legend-value" id="water-value">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 颜色偏好条形图 -->
+          <div class="preference-bars-section">
+            <div class="bars-header">
+              <span class="bars-icon">🎨</span>
+              <h3>颜色偏好</h3>
+            </div>
+            <div class="color-bars-container" id="color-bars-container">
+              <!-- 颜色条形由 JS 渲染 -->
+              <div class="empty-preference">暂无数据，多使用采纳功能来记录您的偏好</div>
+            </div>
+          </div>
+
+          <!-- 材质偏好条形图 -->
+          <div class="preference-bars-section">
+            <div class="bars-header">
+              <span class="bars-icon">🧵</span>
+              <h3>材质偏好</h3>
+            </div>
+            <div class="material-bars-container" id="material-bars-container">
+              <!-- 材质条形由 JS 渲染 -->
+              <div class="empty-preference">暂无数据，多使用采纳功能来记录您的偏好</div>
+            </div>
+          </div>
+
+          <div id="profile-container">
+            <!-- Profile rendered by JS -->
+          </div>
+          <div id="data-manager-container">
+            <!-- Data Manager rendered by JS -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tab 2: 收藏 -->
+      <div class="profile-panel" data-panel="favorites">
+        <div class="favorites-body">
+          <div class="favorites-list" id="favorites-list">
+            <!-- Favorites rendered by JS -->
+          </div>
+          <div class="empty-state hidden" id="favorites-empty">
+            <span class="empty-icon">⭐</span>
+            <p>还没有收藏任何穿搭</p>
+            <p class="empty-hint">在推荐结果页点击收藏按钮添加</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tab 3: 日记 -->
+      <div class="profile-panel" data-panel="diary">
+        <div class="diary-body">
+          <!-- 统计卡片 -->
+          <div class="diary-stats">
+            <div class="stat-card">
+              <span class="stat-number streak-days">0</span>
+              <span class="stat-label">连续记录</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number total-records">0</span>
+              <span class="stat-label">总记录</span>
+            </div>
+            <button id="btn-add-diary" class="btn btn-primary btn-small" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              记一笔
+            </button>
+          </div>
+          
+          <!-- 日记视图切换 -->
+          <div class="diary-view-switch">
+            <button class="diary-view-btn active" data-view="calendar">日历</button>
+            <button class="diary-view-btn" data-view="timeline">时间线</button>
+          </div>
+          
+          <!-- 日历视图 -->
+          <div class="calendar-view" id="diary-calendar-view">
+            <div class="calendar-nav">
+              <button id="btn-prev-month" class="btn btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <span class="current-month">2024年1月</span>
+              <button id="btn-next-month" class="btn btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            </div>
+            <div class="calendar-grid" id="diary-calendar-grid">
+              <!-- Calendar rendered by JS -->
+            </div>
+          </div>
+          
+          <!-- 时间线视图 -->
+          <div class="timeline-view hidden" id="diary-timeline-view">
+            <div class="timeline-list" id="diary-timeline-list">
+              <!-- Timeline rendered by JS -->
+            </div>
+          </div>
+          
+          <!-- 颜色统计 -->
+          <div class="color-stats-section">
+            <h3>颜色偏好</h3>
+            <div class="color-stats" id="diary-color-stats">
+              <!-- Color stats rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </div>
-    <div id="data-manager-container">
-      <!-- Data Manager rendered by JS -->
+  </div>
+  
+  <!-- 日记编辑器 Modal -->
+  <div id="modal-diary-editor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-diary-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modal-diary-title">记录穿搭</h3>
+        <button class="btn btn-icon modal-close" id="btn-close-diary-modal" aria-label="关闭">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </header>
+      <div class="modal-body">
+        <form id="diary-form">
+          <div class="form-group">
+            <label class="form-label">日期</label>
+            <input type="date" id="diary-date" class="form-input" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">今日心情</label>
+            <div class="mood-selector">
+              <button type="button" class="mood-btn" data-mood="happy">
+                <span class="mood-icon">😊</span>
+                <span class="mood-label">开心</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="confident">
+                <span class="mood-icon">💪</span>
+                <span class="mood-label">自信</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="calm">
+                <span class="mood-icon">😌</span>
+                <span class="mood-label">平静</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="tired">
+                <span class="mood-icon">😴</span>
+                <span class="mood-label">疲惫</span>
+              </button>
+              <button type="button" class="mood-btn" data-mood="excited">
+                <span class="mood-icon">🤩</span>
+                <span class="mood-label">兴奋</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">穿搭颜色</label>
+            <input type="text" id="diary-color" class="form-input" placeholder="例如：墨绿色、米白色">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">材质</label>
+            <input type="text" id="diary-material" class="form-input" placeholder="例如：棉麻、丝绸、羊毛">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">穿搭照片</label>
+            <div class="diary-photo-upload">
+              <input type="file" id="diary-photo" accept="image/*" hidden>
+              <button type="button" class="btn btn-ghost" id="btn-select-photo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                选择照片
+              </button>
+              <div id="diary-photo-preview" class="photo-preview hidden"></div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea id="diary-note" class="form-textarea" rows="3" placeholder="记录今日穿搭感受..."></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-danger hidden" id="btn-delete-diary">删除</button>
+            <div class="form-actions-right">
+              <button type="button" class="btn btn-secondary" id="btn-cancel-diary">取消</button>
+              <button type="submit" class="btn btn-primary">保存记录</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </section>

@@ -68,16 +68,16 @@ export const SCENE_PREFERENCES = {
   
   // 工作/事业场景
   interview: { wuxing: ['earth', 'metal'], materials: ['精纺羊毛', '羊绒', '真丝', '棉麻', '西装料'] },
-  negotiation: { wuxing: ['metal', 'fire'], materials: ['精纺', '丝绒', '真丝', '高支棉', '羊绒'] },
+  negotiation: { wuxing: ['metal', 'earth'], materials: ['精纺', '丝绒', '真丝', '高支棉', '羊绒'] },
   commute: { wuxing: ['wood', 'earth'], materials: ['棉', '针织', '混纺', '牛仔', '休闲面料'] },
   
   // 情感/社交场景
   blind_date: { wuxing: ['fire', 'earth'], materials: ['雪纺', '针织', '棉麻', '天丝', '莫代尔'] },
-  romantic_date: { wuxing: ['fire', 'water'], materials: ['丝绸', '蕾丝', '丝绒', '雪纺', '真丝'] },
+  romantic_date: { wuxing: ['fire', 'wood'], materials: ['丝绸', '蕾丝', '丝绒', '雪纺', '真丝'] },
   friend_gathering: { wuxing: ['fire'], materials: ['棉', '牛仔', '休闲面料', '亮面', '印花'] },
   
   // 自我/成长场景
-  study: { wuxing: ['wood', 'fire'], materials: ['棉', '针织', '麻', '舒适面料', '透气'] },
+  study: { wuxing: ['wood', 'metal'], materials: ['棉', '针织', '麻', '舒适面料', '透气'] },
   home: { wuxing: ['earth'], materials: ['棉', '麻', '针织', '绒布', '家居服面料'] },
   travel: { wuxing: ['wood', 'water'], materials: ['速干', '弹力', '尼龙', '透气', '轻便面料'] },
   
@@ -236,198 +236,6 @@ export function getUserPreferences() {
  */
 export function getFeedbackData() {
   return storage.getItem(STORAGE_KEY) || {};
-}
-
-/**
- * 计算方案个性化得分
- * @param {Object} scheme - 方案
- * @param {Object} context - 上下文
- * @returns {number} 个性化得分
- */
-function calculatePersonalizedScore(scheme, context) {
-  const prefs = getUserPreferences();
-  const feedback = getFeedbackData();
-  let score = 0;
-  
-  // 1. 基于用户五行偏好 (0-30分)
-  const wuxingScore = prefs.wuxingScores[scheme.color.wuxing] || 0;
-  const maxWuxingScore = Math.max(...Object.values(prefs.wuxingScores), 1);
-  score += (wuxingScore / maxWuxingScore) * 30;
-  
-  // 2. 基于历史反馈 (0-25分)
-  const fb = feedback[scheme.id];
-  if (fb) {
-    const feedbackScore = (fb.favorites * 3 + fb.selects * 2 - fb.dismisses) / 
-                          Math.max(fb.views, 1);
-    score += Math.max(0, feedbackScore * 25);
-  }
-  
-  // 3. 基于颜色偏好 (0-20分)
-  const colorScore = prefs.colorScores[scheme.color.name] || 0;
-  const maxColorScore = Math.max(...Object.values(prefs.colorScores), 1);
-  score += (colorScore / maxColorScore) * 20;
-  
-  // 4. 基于材质偏好 (0-15分)
-  const materialScore = prefs.materialScores[scheme.material] || 0;
-  const maxMaterialScore = Math.max(...Object.values(prefs.materialScores), 1);
-  score += (materialScore / maxMaterialScore) * 15;
-  
-  // 5. 今日运势加成 (0-10分)
-  const luck = getDailyLuckFactors();
-  if (scheme.color.wuxing === luck.luckyWuxing) {
-    score += 10;
-  } else if (scheme.color.wuxing === luck.boostWuxing) {
-    score += 5;
-  }
-  
-  return score;
-}
-
-/**
- * 计算场景匹配得分
- * @param {Object} scheme - 方案
- * @param {string} sceneId - 场景ID
- * @returns {number} 场景匹配得分
- */
-function calculateSceneScore(scheme, sceneId) {
-  if (!sceneId || sceneId === 'daily') return 0;
-  
-  const scenePref = SCENE_PREFERENCES[sceneId];
-  if (!scenePref) return 0;
-  
-  let score = 0;
-  
-  // 五行匹配
-  if (scenePref.wuxing.includes(scheme.color.wuxing)) {
-    score += 15;
-  }
-  
-  // 材质匹配
-  const materialMatch = scenePref.materials.some(m => 
-    scheme.material.includes(m)
-  );
-  if (materialMatch) {
-    score += 10;
-  }
-  
-  return score;
-}
-
-/**
- * 智能选择方案
- * @param {Array} schemes - 所有方案
- * @param {Object} context - 上下文
- * @param {Object} options - 选项
- * @returns {Array} 选中的方案
- */
-export function smartSelectSchemes(schemes, context, options = {}) {
-  const { count = 3, sceneId = 'daily', enablePersonalization = true } = options;
-  
-  // 计算每个方案的综合得分
-  const scoredSchemes = schemes.map(scheme => {
-    let score = 0;
-    
-    // 基础得分（节气、八字匹配）
-    score += calculateBaseScore(scheme, context);
-    
-    // 个性化得分
-    if (enablePersonalization) {
-      score += calculatePersonalizedScore(scheme, context);
-    }
-    
-    // 场景匹配得分
-    score += calculateSceneScore(scheme, sceneId);
-    
-    // 今日运势随机因子（增加变化）
-    const luck = getDailyLuckFactors();
-    const randomBoost = seededRandom(luck.seed + scheme.id.charCodeAt(0)) * 10;
-    score += randomBoost;
-    
-    return { scheme, score };
-  });
-  
-  // 按得分排序
-  scoredSchemes.sort((a, b) => b.score - a.score);
-  
-  // 选择方案，确保多样性
-  const selected = [];
-  const usedWuxing = new Set();
-  
-  for (const item of scoredSchemes) {
-    if (selected.length >= count) break;
-    
-    const wuxing = item.scheme.color.wuxing;
-    
-    // 前两个可以重复五行，后面的必须不同
-    if (selected.length < 2 || !usedWuxing.has(wuxing)) {
-      selected.push(item.scheme);
-      usedWuxing.add(wuxing);
-    }
-  }
-  
-  // 如果不够，补充高分方案
-  if (selected.length < count) {
-    for (const item of scoredSchemes) {
-      if (selected.length >= count) break;
-      if (!selected.includes(item.scheme)) {
-        selected.push(item.scheme);
-      }
-    }
-  }
-  
-  return selected;
-}
-
-/**
- * 计算基础得分
- * @param {Object} scheme - 方案
- * @param {Object} context - 上下文
- * @returns {number} 基础得分
- */
-function calculateBaseScore(scheme, context) {
-  let score = 0;
-  const wuxing = scheme.color.wuxing;
-  
-  // 节气匹配 (0-50分)
-  if (wuxing === context.termWuxing) {
-    score += 50;
-  } else if (isGenerating(context.termWuxing, wuxing)) {
-    score += 30;
-  }
-  
-  // 八字匹配 (0-30分)
-  if (context.baziWuxing) {
-    if (wuxing === context.baziWuxing) {
-      score += 30;
-    } else if (isGenerating(wuxing, context.baziWuxing)) {
-      score += 18;
-    }
-  }
-  
-  // 心愿匹配 (0-20分)
-  if (context.wishWuxing) {
-    if (wuxing === context.wishWuxing) {
-      score += 20;
-    } else if (isGenerating(context.wishWuxing, wuxing)) {
-      score += 12;
-    }
-  }
-  
-  return score;
-}
-
-/**
- * 五行相生关系
- */
-function isGenerating(from, to) {
-  const generating = {
-    wood: 'fire',
-    fire: 'earth',
-    earth: 'metal',
-    metal: 'water',
-    water: 'wood'
-  };
-  return generating[from] === to;
 }
 
 /**

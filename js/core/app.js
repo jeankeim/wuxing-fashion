@@ -13,6 +13,7 @@ import { showToast } from '../utils/render.js';
 // 视图控制器
 import { WelcomeController } from '../controllers/welcome.js';
 import { EntryController } from '../controllers/entry.js';
+import { LoadingController } from '../controllers/loading.js';
 import { ResultsController } from '../controllers/results.js';
 import { FavoritesController } from '../controllers/favorites.js';
 import { ProfileController } from '../controllers/profile.js';
@@ -23,6 +24,7 @@ import { UploadController } from '../controllers/upload.js';
 const VIEW_CONFIG = {
   'view-welcome': { controller: WelcomeController, html: 'views/welcome.html' },
   'view-entry': { controller: EntryController, html: 'views/entry.html' },
+  'view-loading': { controller: LoadingController, html: 'views/loading.html' },
   'view-results': { controller: ResultsController, html: 'views/results.html' },
   'view-favorites': { controller: FavoritesController, html: 'views/favorites.html' },
   'view-profile': { controller: ProfileController, html: 'views/profile.html' },
@@ -45,19 +47,26 @@ class App {
    * 初始化应用
    */
   async init() {
+    console.log('[App] Initializing...');
+    
     // 初始化错误处理
     initGlobalErrorHandler();
     
     // 获取应用容器
     this.appContainer = document.querySelector('.app-container');
+    console.log('[App] Container:', this.appContainer);
     
     // 预加载首屏视图
+    console.log('[App] Loading views...');
     await this.loadView('view-welcome');
     await this.loadView('view-entry');
+    console.log('[App] Views loaded, loadedViews:', this.loadedViews);
     
     // 注册首屏控制器
+    console.log('[App] Registering controllers...');
     this.registerController('view-welcome');
     this.registerController('view-entry');
+    console.log('[App] Controllers registered:', this.controllers);
     
     // 监听路由变化
     window.addEventListener('routechange', (e) => this.handleRouteChange(e));
@@ -66,10 +75,13 @@ class App {
     await this.loadBaseData();
     
     // 初始化路由
+    console.log('[App] Initializing router...');
     initRouter();
     
     // 初始化统计
     this.initStats();
+    
+    console.log('[App] Initialization complete');
   }
 
   /**
@@ -77,26 +89,39 @@ class App {
    * @param {string} viewId - 视图 ID
    */
   async loadView(viewId) {
-    if (this.loadedViews.has(viewId)) return;
+    console.log(`[App] Loading view: ${viewId}`);
+    if (this.loadedViews.has(viewId)) {
+      console.log(`[App] View ${viewId} already loaded`);
+      return;
+    }
     
     const config = VIEW_CONFIG[viewId];
-    if (!config) return;
+    if (!config) {
+      console.error(`[App] No config for view: ${viewId}`);
+      return;
+    }
     
     try {
+      console.log(`[App] Fetching: ${config.html}`);
       const response = await fetch(config.html);
-      if (!response.ok) throw new Error(`Failed to load ${config.html}`);
+      if (!response.ok) throw new Error(`Failed to load ${config.html}: ${response.status}`);
       
       const html = await response.text();
+      console.log(`[App] Received HTML for ${viewId}, length:`, html.length);
       
       // 创建临时容器解析 HTML
       const temp = document.createElement('div');
       temp.innerHTML = html;
       const viewElement = temp.firstElementChild;
+      console.log(`[App] Parsed element:`, viewElement?.id);
       
       // 插入到应用容器
       if (this.appContainer) {
         this.appContainer.appendChild(viewElement);
         this.loadedViews.add(viewId);
+        console.log(`[App] View ${viewId} appended to container`);
+      } else {
+        console.error('[App] No appContainer found!');
       }
     } catch (error) {
       console.error(`[App] Failed to load view ${viewId}:`, error);
@@ -108,10 +133,16 @@ class App {
    * @param {string} viewId - 视图 ID
    */
   registerController(viewId) {
-    if (this.controllers.has(viewId)) return;
+    // loading 页面每次都要重新创建，不缓存
+    if (viewId !== 'view-loading' && this.controllers.has(viewId)) return;
     
     const config = VIEW_CONFIG[viewId];
     if (config) {
+      // 如果是 loading 页面，先卸载旧的
+      if (viewId === 'view-loading' && this.controllers.has(viewId)) {
+        const oldController = this.controllers.get(viewId);
+        oldController.unmount();
+      }
       this.controllers.set(viewId, new config.controller());
     }
   }

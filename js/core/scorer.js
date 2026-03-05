@@ -24,7 +24,7 @@ export class RecommendationScorer {
   /**
    * 计算单个方案的总得分
    * @param {Object} scheme - 穿搭方案
-   * @returns {Object} { total: 总分, breakdown: 分项得分 }
+   * @returns {Object} { total: 总分, breakdown: 分项得分, rejected: 是否被淘汰 }
    */
   score(scheme) {
     const cacheKey = scheme.id;
@@ -42,32 +42,64 @@ export class RecommendationScorer {
       dailyLuck: 0
     };
 
-    // 1. 基础分 (客观环境)
-    breakdown.solarTerm = this.scoreSolarTerm(scheme) * this.weights.solarTerm;
-    breakdown.weather = this.scoreWeather(scheme) * this.weights.weather;
-    breakdown.scene = this.scoreScene(scheme) * this.weights.scene;
+    // 1. 计算原始分数 (0-100)
+    const rawWeather = this.scoreWeather(scheme);
+    const rawScene = this.scoreScene(scheme);
+    const rawSolarTerm = this.scoreSolarTerm(scheme);
+    const rawBazi = this.user.bazi ? this.scoreBazi(scheme) : 0;
     
-    // 2. 核心分 (个人命理)
-    if (this.weights.bazi > 0 && this.user.bazi) {
-      breakdown.bazi = this.scoreBazi(scheme) * this.weights.bazi;
+    // 2. 一票否决权：天气和场景必须达到及格线
+    if (rawWeather < SCORING_WEIGHTS.threshold.weather) {
+      // 天气不匹配，直接淘汰
+      const result = {
+        total: -100,
+        breakdown: { ...breakdown, weather: rawWeather },
+        weights: { ...this.weights },
+        rejected: true,
+        rejectReason: '天气不匹配'
+      };
+      this._cache.set(cacheKey, result);
+      return result;
     }
     
-    // 3. 心愿分
-    breakdown.wish = this.scoreWish(scheme) * this.weights.wish;
-
-    // 4. 个性化加成 (历史行为)
-    breakdown.history = this.scoreHistory(scheme) * SCORING_WEIGHTS.bonus.history;
+    if (rawScene < SCORING_WEIGHTS.threshold.scene) {
+      // 场景不匹配，直接淘汰
+      const result = {
+        total: -100,
+        breakdown: { ...breakdown, scene: rawScene },
+        weights: { ...this.weights },
+        rejected: true,
+        rejectReason: '场景不匹配'
+      };
+      this._cache.set(cacheKey, result);
+      return result;
+    }
     
-    // 5. 今日运势
+    // 3. 通过门槛，计算加权分数
+    breakdown.weather = rawWeather * this.weights.weather;
+    breakdown.scene = rawScene * this.weights.scene;
+    breakdown.solarTerm = rawSolarTerm * this.weights.solarTerm;
+    breakdown.bazi = rawBazi * this.weights.bazi;
+    
+    // 4. Bonus 分数
+    breakdown.wish = this.scoreWish(scheme) * SCORING_WEIGHTS.bonus.wish;
+    breakdown.history = this.scoreHistory(scheme) * SCORING_WEIGHTS.bonus.history;
     breakdown.dailyLuck = this.scoreDailyLuck(scheme) * SCORING_WEIGHTS.bonus.dailyLuck;
 
-    // 计算总分
-    const total = Object.values(breakdown).reduce((sum, score) => sum + score, 0);
+    // 5. 计算总分
+    const baseTotal = breakdown.solarTerm + breakdown.scene + breakdown.weather;
+    const baziScore = breakdown.bazi; // 八字可以有负分
+    const bonusTotal = breakdown.wish + breakdown.history + breakdown.dailyLuck;
+    
+    // 总分 = 基础分 + 八字分 + bonus
+    let total = baseTotal + baziScore + bonusTotal;
+    total = Math.max(0, Math.min(100, total));
 
     const result = {
       total: Math.round(total),
       breakdown,
-      weights: { ...this.weights }
+      weights: { ...this.weights },
+      rejected: false
     };
 
     this._cache.set(cacheKey, result);
@@ -86,7 +118,8 @@ export class RecommendationScorer {
   }
 
   /**
-   * 八字评分（带喜用神和忌神机制）
+   * 八字评分（按新策略：喜用神+100，相生+57，其他+0，忌神-57）
+   * 加权后：喜用神+35，相生+20，忌神-20
    */
   scoreBazi(scheme) {
     const bazi = this.user.bazi;
@@ -96,23 +129,23 @@ export class RecommendationScorer {
     const usefulGod = bazi.recommend.recommend; // 喜用神
     const strongest = bazi.recommend.strongest; // 最旺五行（可能是忌神）
     
-    // 喜用神匹配 = 满分
+    // 喜用神匹配 = 100分（加权后+35）
     if (schemeElement === usefulGod) {
       return 100;
     }
     
-    // 忌神匹配 = 负分（惩罚机制）
+    // 忌神匹配 = -57分（加权后-20）
     if (schemeElement === strongest && strongest !== usefulGod) {
-      return -20;
+      return -57;
     }
     
-    // 相生关系
+    // 相生关系 = 57分（加权后+20）
     if (getElementRelationScore(usefulGod, schemeElement) >= 80) {
-      return 70;
+      return 57;
     }
     
-    // 其他情况
-    return 30;
+    // 其他情况 = 0分（不加不减）
+    return 0;
   }
 
   /**
@@ -197,16 +230,113 @@ export class RecommendationScorer {
    */
   scoreWish(scheme) {
     const wishId = this.context.wishId;
-    if (!wishId) return 50;
+    if (!wishId) return 0;
 
-    // 如果有心愿模板，使用模板中的五行
+    // 根据心愿类型获取对应五行
     const intentionTemplate = this.context.intentionTemplate;
-    if (intentionTemplate) {
-      // 这里简化处理，实际应该根据模板内容评分
+    const wishIntention = intentionTemplate?.intention || this.getIntentionFromWishId(wishId);
+    
+    if (!wishIntention) return 30;
+    
+    // 获取心愿对应的五行
+    const wishWuxing = this.getWuxingForIntention(wishIntention);
+    if (!wishWuxing) return 30;
+    
+    const schemeWuxing = scheme.color.wuxing;
+    
+    // 心愿五行与方案五行匹配
+    if (wishWuxing === schemeWuxing) {
+      return 100; // 完全匹配
+    }
+    
+    // 相生关系
+    if (getElementRelationScore(wishWuxing, schemeWuxing) >= 80) {
       return 70;
     }
-
-    return 50;
+    
+    // 其他情况
+    return 40;
+  }
+  
+  /**
+   * 从心愿ID推断心愿类型
+   */
+  getIntentionFromWishId(wishId) {
+    // 心愿ID到类型的映射（支持直接匹配完整ID）
+    const wishIdMap = {
+      // 事业财运
+      'job': '求职',
+      'promotion': '升职加薪',
+      'deal': '签单顺利',
+      'gui_ren': '贵人运',
+      'avoid': '防小人避坑',
+      // 情感人际
+      'taohua': '桃花朵朵',
+      'family': '家庭和睦',
+      'reconcile': '挽回缓和',
+      '新朋友缘': '新朋友缘',
+      // 身心状态
+      'energy': '精力充沛',
+      'sleep': '安神助眠',
+      'confidence': '增强自信',
+      'calm': '静心专注',
+      // 健康平安
+      'health': '健康舒畅',
+      'recovery': '身体康复',
+      'safety': '出行平安',
+      'travel': '远行顺利'
+    };
+    
+    // 直接匹配
+    if (wishIdMap[wishId]) return wishIdMap[wishId];
+    
+    // 尝试匹配前缀
+    for (const [prefix, intention] of Object.entries(wishIdMap)) {
+      if (wishId.startsWith(prefix)) return intention;
+    }
+    
+    return null;
+  }
+  
+  /**
+   * 获取心愿对应的五行
+   */
+  getWuxingForIntention(intention) {
+    // 心愿到五行的映射（基于五行生克和象征意义）
+    const intentionWuxingMap = {
+      // 木 - 生长、发展、求职、健康、人缘
+      '求职': 'wood',
+      '求职顺利': 'wood',
+      '身体康复': 'wood',
+      '精力充沛': 'wood',
+      '新朋友缘': 'wood',
+      
+      // 火 - 热情、名声、桃花、自信、活力
+      '桃花朵朵': 'fire',
+      '增强自信': 'fire',
+      '升职加薪': 'fire',
+      '贵人运': 'fire',
+      '元气满满': 'fire',
+      
+      // 土 - 稳定、家庭、信任、和睦、情绪
+      '家庭和睦': 'earth',
+      '签单顺利': 'earth',
+      '挽回缓和': 'earth',
+      '健康舒畅': 'earth',
+      '出行平安': 'earth',
+      '远行顺利': 'earth',
+      '情绪稳定': 'earth',
+      
+      // 金 - 决断、肃杀、避坑、专注
+      '防小人避坑': 'metal',
+      '静心专注': 'metal',
+      
+      // 水 - 智慧、流动、安眠、沟通
+      '安神助眠': 'water',
+      '深度沟通': 'water'
+    };
+    
+    return intentionWuxingMap[intention] || null;
   }
 
   /**
@@ -237,25 +367,52 @@ export class RecommendationScorer {
   }
 
   /**
-   * 今日运势评分
+   * 今日运势评分 - 基于八字喜用神计算
    */
   scoreDailyLuck(scheme) {
-    const luck = this.context.dailyLuck;
-    if (!luck) return 50;
-
+    const bazi = this.user.bazi;
     const schemeElement = scheme.color.wuxing;
     
-    // 幸运五行
-    if (schemeElement === luck.luckyWuxing) {
-      return 100;
+    // 如果有八字，基于喜用神计算运势
+    if (bazi && bazi.recommend) {
+      const usefulGod = bazi.recommend.recommend; // 喜用神
+      const strongest = bazi.recommend.strongest; // 最旺五行
+      
+      // 喜用神 = 运势最佳
+      if (schemeElement === usefulGod) {
+        return 100;
+      }
+      
+      // 相生关系 = 运势增益
+      if (getElementRelationScore(usefulGod, schemeElement) >= 80) {
+        return 70;
+      }
+      
+      // 忌神 = 运势不佳
+      if (schemeElement === strongest && strongest !== usefulGod) {
+        return 30;
+      }
+      
+      return 50;
     }
     
-    // 增益五行
-    if (schemeElement === luck.boostWuxing) {
-      return 70;
+    // 无八字时，基于节气五行计算
+    const termWuxing = this.context.termWuxing;
+    if (termWuxing) {
+      // 与节气同五行 = 顺应天时
+      if (schemeElement === termWuxing) {
+        return 80;
+      }
+      
+      // 相生关系
+      if (getElementRelationScore(termWuxing, schemeElement) >= 80) {
+        return 60;
+      }
+      
+      return 40;
     }
 
-    return 40;
+    return 50;
   }
 
   /**

@@ -29,13 +29,19 @@ export class SimpleWeatherWidget extends Component {
 
     const style = getSeasonStyle(weather.season);
 
+    // 根据数据来源调整显示
+    const isRealWeather = weather.source === 'real';
+    const tempDisplay = isRealWeather 
+      ? `${weather.temperature}°C ${weather.humidity ? `· 湿度${weather.humidity}%` : ''}`
+      : weather.tempRange;
+    
     this.container.innerHTML = `
       <div class="simple-weather-widget" style="background: ${style.bg}; color: ${style.color}">
         <div class="simple-weather-main">
           <span class="simple-weather-icon">${weather.icon}</span>
           <div class="simple-weather-info">
             <span class="simple-weather-season">${weather.seasonName}</span>
-            <span class="simple-weather-temp">${weather.tempRange}</span>
+            <span class="simple-weather-temp">${tempDisplay}</span>
           </div>
         </div>
         ${weather.currentTerm ? `<span class="simple-weather-term">${weather.currentTerm}</span>` : ''}

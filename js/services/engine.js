@@ -24,6 +24,7 @@ const INTENTION_MAP = {
   '桃花朵朵': '桃花朵朵',
   '家庭和睦': '家庭和睦',
   '挽回缓和': '挽回缓和',
+  '新朋友缘': '新朋友缘',
   // 身心状态
   '精力充沛': '精力充沛',
   '安神助眠': '安神助眠',
@@ -198,7 +199,7 @@ function buildUserProfile(baziResult, preferences = null) {
  */
 function getDefaultPreferences() {
   return {
-    wuxingScores: { wood: 10, fire: 10, earth: 10, metal: 10, water: 10 },
+    wuxingScores: { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 },
     colorScores: {},
     materialScores: {},
     style: 'casual'
@@ -238,13 +239,24 @@ function buildContext(termInfo, wishId, baziProfile, weatherData = null, intenti
 /**
  * 选择方案（使用新的评分器类）
  * 采用梯度推荐策略：最佳匹配 + 保守替代 + 平衡方案
+ * 一票否决：天气和场景不达标的方案直接淘汰
  */
 function selectSchemes(schemes, userProfile, context, count = 3) {
   // 创建评分器
   const scorer = new RecommendationScorer(userProfile, context);
   
   // 批量评分
-  const scoredSchemes = scorer.scoreAll(schemes);
+  const allScored = scorer.scoreAll(schemes);
+  
+  // 过滤被淘汰的方案（一票否决）
+  const scoredSchemes = allScored.filter(item => !item.rejected);
+  
+  // 如果全部被淘汰，放宽条件（降级模式）
+  if (scoredSchemes.length === 0) {
+    console.warn('[Engine] 所有方案被一票否决，启用降级模式');
+    // 按原始分数排序，选择相对最好的
+    scoredSchemes.push(...allScored.sort((a, b) => b.total - a.total).slice(0, count));
+  }
   
   // 梯度推荐策略
   const selected = [];

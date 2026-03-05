@@ -10,27 +10,9 @@
       <span class="brand-mini-icon">🌿</span>
       <span class="brand-mini-name">顺时裳</span>
     </div>
-    <div class="results-actions-header">
-      <button id="btn-favorites" class="btn btn-icon" aria-label="我的收藏">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-      </button>
-      <button id="btn-diary" class="btn btn-icon" aria-label="穿搭日记">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-          <line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/>
-          <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-      </button>
-      <button id="btn-profile" class="btn btn-icon" aria-label="我的画像">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </button>
-    </div>
+    <button id="btn-profile" class="btn-profile-corner" aria-label="我的画像" title="我的画像">
+      <span class="profile-icon">👤</span>
+    </button>
   </header>
   
   <!-- Page Title Section -->
@@ -40,12 +22,18 @@
   </div>
   
   <div class="results-body">
-    <!-- Bazi Hint (shown when no bazi) -->
-    <div id="bazi-hint-container" class="hidden">
-      <div class="bazi-hint">
-        <span class="hint-icon">📿</span>
-        <span class="hint-text">填写八字后，推荐精准度可提升 30%</span>
-        <button class="hint-btn" id="btn-add-bazi" type="button">去填写</button>
+    <!-- 八字使用状态提示 -->
+    <div id="bazi-usage-hint" class="bazi-usage-hint hidden">
+      <div class="usage-hint-content">
+        <span class="usage-icon">📿</span>
+        <span class="usage-text">已基于您的八字喜用进行个性化推荐</span>
+      </div>
+    </div>
+    <div id="bazi-missing-hint" class="bazi-missing-hint hidden">
+      <div class="usage-hint-content">
+        <span class="usage-icon">💡</span>
+        <span class="usage-text">完善八字信息，推荐精准度可提升 30%</span>
+        <button class="usage-btn" id="btn-go-profile" type="button">去填写</button>
       </div>
     </div>
     

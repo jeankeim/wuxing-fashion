@@ -43,21 +43,22 @@ export function generateReasons(scheme, context) {
     });
   }
   
-  // 2. 八字匹配
-  if (context.baziWuxing) {
-    if (wuxing === context.baziWuxing) {
+  // 2. 八字匹配（从 context.bazi 或 context.baziResult 读取）
+  const baziWuxing = context.bazi?.recommend?.recommend || context.baziResult?.recommend?.recommend;
+  if (baziWuxing) {
+    if (wuxing === baziWuxing) {
       reasons.push({
         type: 'bazi',
         icon: '📿',
         title: '八字补益',
-        desc: `您的八字喜${WUXING_NAMES[context.baziWuxing]}，${scheme.color.name}可助运势`
+        desc: `您的八字喜${WUXING_NAMES[baziWuxing]}，${scheme.color.name}可助运势`
       });
-    } else if (isGenerating(wuxing, context.baziWuxing)) {
+    } else if (isGenerating(wuxing, baziWuxing)) {
       reasons.push({
         type: 'bazi',
         icon: '✨',
         title: '八字相生',
-        desc: `${WUXING_NAMES[wuxing]}生${WUXING_NAMES[context.baziWuxing]}，${scheme.color.name}间接补益`
+        desc: `${WUXING_NAMES[wuxing]}生${WUXING_NAMES[baziWuxing]}，${scheme.color.name}间接补益`
       });
     }
   }
@@ -131,10 +132,11 @@ export function generateWuxingAnalysis(context) {
     };
   }
   
-  if (context.baziWuxing) {
+  const baziWuxing = context.bazi?.recommend?.recommend || context.baziResult?.recommend?.recommend;
+  if (baziWuxing) {
     analysis.current.bazi = {
-      name: WUXING_NAMES[context.baziWuxing],
-      color: WUXING_COLORS[context.baziWuxing],
+      name: WUXING_NAMES[baziWuxing],
+      color: WUXING_COLORS[baziWuxing],
       desc: '八字喜用'
     };
   }

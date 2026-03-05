@@ -30,9 +30,13 @@ export class ResultsController extends BaseController {
     // 渲染结果
     const result = this.getState(StateKeys.CURRENT_RESULT);
     if (result) {
+      // 检查是否有八字数据
+      const baziData = this.getState(StateKeys.BAZI_DATA);
+      const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
+      
       this.renderPageSubtitle(result);
       renderResultHeader(result.termInfo);
-      renderSchemeCards(result.schemes);
+      renderSchemeCards(result.schemes, { hasBazi });
       
       // 渲染今日运势卡片
       this.renderDailyFortune(result);
@@ -40,8 +44,8 @@ export class ResultsController extends BaseController {
       // 渲染天气影响提示
       this.renderWeatherImpact(result);
       
-      // 渲染八字提示（如果没有八字）
-      this.renderBaziHint(result);
+      // 渲染八字使用状态提示
+      this.renderBaziUsageHint(result);
     }
   }
 
@@ -232,23 +236,68 @@ export class ResultsController extends BaseController {
     }
   }
 
-  renderBaziHint(result) {
-    const container = document.getElementById('bazi-hint-container');
-    if (!container) return;
+  /**
+   * 渲染八字使用状态提示
+   */
+  renderBaziUsageHint(result) {
+    const usageHint = document.getElementById('bazi-usage-hint');
+    const missingHint = document.getElementById('bazi-missing-hint');
     
-    // 如果没有八字，显示提示
-    if (!result.baziResult) {
-      container.classList.remove('hidden');
+    if (!usageHint || !missingHint) return;
+    
+    // 检查是否有八字数据（从 state 读取）
+    const baziData = this.getState(StateKeys.BAZI_DATA);
+    const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
+    
+    // 检查是否刚刚更新了八字
+    const baziJustUpdated = this.getState('BAZI_JUST_UPDATED');
+    
+    if (baziJustUpdated) {
+      // 刚更新八字 - 提示重新计算
+      usageHint.classList.add('hidden');
+      missingHint.classList.remove('hidden');
+      missingHint.innerHTML = `
+        <div class="usage-hint-content">
+          <span class="usage-icon">✨</span>
+          <span class="usage-text">已输入八字，点击重新计算获取个性化推荐</span>
+          <button class="usage-btn" id="btn-recalculate" type="button">重新计算</button>
+        </div>
+      `;
       
-      // 绑定去填写按钮
-      const addBaziBtn = container.querySelector('#btn-add-bazi');
-      if (addBaziBtn) {
-        this.addEventListener(addBaziBtn, 'click', () => {
+      // 绑定重新计算按钮
+      const recalcBtn = missingHint.querySelector('#btn-recalculate');
+      if (recalcBtn) {
+        this.addEventListener(recalcBtn, 'click', () => {
+          // 清除标记
+          this.setState('BAZI_JUST_UPDATED', false);
+          // 跳转到输入页重新生成
           navigateTo('/entry');
         });
       }
+    } else if (hasBazi) {
+      // 有八字且已用于当前推荐 - 显示已使用提示
+      usageHint.classList.remove('hidden');
+      missingHint.classList.add('hidden');
     } else {
-      container.classList.add('hidden');
+      // 无八字 - 显示提示去填写
+      usageHint.classList.add('hidden');
+      missingHint.classList.remove('hidden');
+      // 恢复原始内容
+      missingHint.innerHTML = `
+        <div class="usage-hint-content">
+          <span class="usage-icon">💡</span>
+          <span class="usage-text">完善八字信息，推荐精准度可提升 30%</span>
+          <button class="usage-btn" id="btn-go-profile" type="button">去填写</button>
+        </div>
+      `;
+      
+      // 绑定去填写按钮
+      const goProfileBtn = missingHint.querySelector('#btn-go-profile');
+      if (goProfileBtn) {
+        this.addEventListener(goProfileBtn, 'click', () => {
+          navigateTo('/profile');
+        });
+      }
     }
   }
 
@@ -265,27 +314,11 @@ export class ResultsController extends BaseController {
       });
     }
 
-    // 收藏按钮
-    const favBtn = this.container.querySelector('#btn-favorites');
-    if (favBtn) {
-      this.addEventListener(favBtn, 'click', () => {
-        navigateTo('/favorites');
-      });
-    }
-
-    // 画像按钮
+    // 画像按钮（右上角）
     const profileBtn = this.container.querySelector('#btn-profile');
     if (profileBtn) {
       this.addEventListener(profileBtn, 'click', () => {
         navigateTo('/profile');
-      });
-    }
-
-    // 日记按钮
-    const diaryBtn = this.container.querySelector('#btn-diary');
-    if (diaryBtn) {
-      this.addEventListener(diaryBtn, 'click', () => {
-        navigateTo('/diary');
       });
     }
 
@@ -600,8 +633,17 @@ export class ResultsController extends BaseController {
     const scheme = schemes[index];
     const result = this.getState(StateKeys.CURRENT_RESULT);
     
+    // 构建 context 对象传递给 renderDetailModal
+    const context = result ? {
+      termInfo: result.termInfo,
+      baziResult: result.baziResult,
+      sceneId: result.sceneId,
+      wishId: result.wishId,
+      weather: result.weather
+    } : null;
+    
     // 渲染详情模态框
-    renderDetailModal(scheme, result?.context);
+    renderDetailModal(scheme, context);
     
     // 显示模态框
     showModal('modal-detail');

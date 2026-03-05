@@ -116,14 +116,17 @@ export function renderResultHeader(termInfo) {
 /**
  * 渲染方案卡片
  */
-export function renderSchemeCards(schemes) {
+export function renderSchemeCards(schemes, options = {}) {
   const container = document.getElementById('scheme-cards');
   if (!container) return;
   
   container.innerHTML = '';
   
+  // 检查是否有八字数据（从 options 或全局状态）
+  const hasBazi = options.hasBazi || window.__currentBaziData || false;
+  
   schemes.forEach((scheme, index) => {
-    const card = createSchemeCard(scheme, index);
+    const card = createSchemeCard(scheme, index, hasBazi);
     container.appendChild(card);
   });
   
@@ -134,7 +137,7 @@ export function renderSchemeCards(schemes) {
 /**
  * 创建方案卡片
  */
-function createSchemeCard(scheme, index) {
+function createSchemeCard(scheme, index, hasBazi = false) {
   const card = document.createElement('div');
   card.className = 'scheme-card';
   card.style.animationDelay = `${index * 100}ms`;
@@ -142,7 +145,7 @@ function createSchemeCard(scheme, index) {
   const favorited = isFavorite(scheme.id);
   
   // 获取推荐理由（如果有评分数据）
-  const explanationHtml = generateSchemeExplanation(scheme, index);
+  const explanationHtml = generateSchemeExplanation(scheme, index, hasBazi);
   
   // 推荐类型标签
   const typeLabel = getSchemeTypeLabel(scheme._type);
@@ -219,8 +222,11 @@ function getSchemeTypeLabel(type) {
 
 /**
  * 生成方案推荐理由HTML
+ * @param {Object} scheme - 方案
+ * @param {number} index - 索引
+ * @param {boolean} hasBazi - 是否有八字数据
  */
-function generateSchemeExplanation(scheme, index) {
+function generateSchemeExplanation(scheme, index, hasBazi = false) {
   // 如果没有评分数据，不显示推荐理由
   if (!scheme._score && !scheme._breakdown) {
     return '';
@@ -230,20 +236,25 @@ function generateSchemeExplanation(scheme, index) {
   const explanations = [];
   const formulaParts = [];
   
-  // 维度配置（包含权重信息）
+  // 维度配置（包含权重信息）- 与新评分逻辑保持一致
   const dimensionConfig = {
-    solarTerm: { name: '节气', icon: '🌿', weight: 0.25 },
-    bazi: { name: '八字', icon: '📿', weight: 0.20 },
-    scene: { name: '场景', icon: '🎯', weight: 0.20 },
-    weather: { name: '天气', icon: '🌤️', weight: 0.15 },
-    wish: { name: '心愿', icon: '💫', weight: 0.15 },
-    history: { name: '偏好', icon: '💝', weight: 0.10, isBonus: true },
-    dailyLuck: { name: '运势', icon: '🍀', weight: 0.05, isBonus: true }
+    bazi: { name: '八字', icon: '📿', weight: 0.35 },      // 35% 核心差异化
+    scene: { name: '场景', icon: '🎯', weight: 0.25 },    // 25% 一票否决
+    solarTerm: { name: '节气', icon: '🌿', weight: 0.20 }, // 20% 顺应天时
+    weather: { name: '天气', icon: '🌤️', weight: 0.20 },  // 20% 一票否决
+    wish: { name: '心愿', icon: '💫', weight: 0.10, isBonus: true },    // Bonus +10
+    history: { name: '偏好', icon: '💝', weight: 0.05, isBonus: true },  // Bonus +5
+    dailyLuck: { name: '运势', icon: '🍀', weight: 0.05, isBonus: true } // Bonus +5
   };
   
-  // 找出所有维度（不过滤，显示所有维度）
-  const sortedEntries = Object.entries(breakdown)
+  // 找出所有维度，过滤掉八字（如果没有八字数据）
+  let sortedEntries = Object.entries(breakdown)
     .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+  
+  // 如果没有八字，过滤掉八字维度
+  if (!hasBazi) {
+    sortedEntries = sortedEntries.filter(([key]) => key !== 'bazi');
+  }
   
   for (const [key, score] of sortedEntries) {
     const config = dimensionConfig[key];
@@ -326,8 +337,12 @@ export function renderDetailModal(scheme, context = null) {
   if (!body || !scheme) return;
   
   let explanationHtml = '';
+  let reasonTextHtml = '';
+  
   if (context) {
     explanationHtml = renderExplanationCard(scheme, context);
+    // 生成推荐理由文字描述
+    reasonTextHtml = generateReasonText(scheme, context);
   }
   
   body.innerHTML = `
@@ -361,7 +376,71 @@ export function renderDetailModal(scheme, context = null) {
     </div>
     
     ${explanationHtml}
+    
+    ${reasonTextHtml}
   `;
+}
+
+/**
+ * 生成推荐理由文字描述
+ */
+function generateReasonText(scheme, context) {
+  const { termInfo, baziResult, sceneId, wishId } = context;
+  const parts = [];
+  
+  // 节气因素
+  if (termInfo?.current) {
+    parts.push(`今日${termInfo.current.name}，${termInfo.current.wuxingName}气当令`);
+    parts.push(`${scheme.color.name}属${getWuxingName(scheme.color.wuxing)}，与节气${termInfo.current.wuxingName}相生相合`);
+  }
+  
+  // 八字因素
+  if (baziResult?.recommend) {
+    const usefulGod = baziResult.recommend.recommend;
+    const usefulGodName = getWuxingName(usefulGod);
+    if (scheme.color.wuxing === usefulGod) {
+      parts.push(`您的八字喜${usefulGodName}，${scheme.color.name}正是您的喜用色，有助提升运势`);
+    }
+  }
+  
+  // 场景因素
+  if (sceneId) {
+    const sceneNames = {
+      work: '职场', date: '约会', party: '聚会', 
+      sport: '运动', interview: '面试', daily: '日常'
+    };
+    if (sceneNames[sceneId]) {
+      parts.push(`${scheme.feeling}的风格非常适合${sceneNames[sceneId]}场景`);
+    }
+  }
+  
+  // 材质因素
+  parts.push(`${scheme.material}材质${getMaterialWuxingDesc(scheme.material, scheme.color.wuxing)}`);
+  
+  return `
+    <div class="detail-section reason-text-section">
+      <p class="detail-label">💡 推荐理由</p>
+      <div class="reason-text-content">
+        ${parts.map(p => `<p class="reason-paragraph">${p}。</p>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function getWuxingName(wuxing) {
+  const names = { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' };
+  return names[wuxing] || wuxing;
+}
+
+function getMaterialWuxingDesc(material, wuxing) {
+  const descs = {
+    wood: '温润自然，助长木气生发',
+    fire: '温暖热烈，增强火性活力',
+    earth: '厚重踏实，稳固土行根基',
+    metal: '清凉坚韧，收敛金气精华',
+    water: '柔顺流动，滋养水性智慧'
+  };
+  return descs[wuxing] || '质地舒适，贴合肌肤';
 }
 
 /**

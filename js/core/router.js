@@ -10,6 +10,7 @@ import { store, StateKeys } from './store.js';
 const ROUTES = {
   '/': { view: 'view-welcome', title: '欢迎' },
   '/entry': { view: 'view-entry', title: '选择心愿' },
+  '/loading': { view: 'view-loading', title: '正在计算' },
   '/results': { view: 'view-results', title: '推荐结果' },
   '/favorites': { view: 'view-favorites', title: '我的收藏' },
   '/profile': { view: 'view-profile', title: '我的画像' },
