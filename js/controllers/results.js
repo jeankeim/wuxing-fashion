@@ -12,6 +12,60 @@ export class ResultsController extends BaseController {
   constructor() {
     super();
     this.containerId = 'view-results';
+    // 从 localStorage 加载反馈状态
+    this.feedbackStates = this.loadFeedbackStates();
+  }
+  
+  // 生成方案唯一标识（颜色+材质+感受）
+  getSchemeId(scheme) {
+    return `${scheme.color.name}-${scheme.material}-${scheme.feeling}`;
+  }
+  
+  // 从 localStorage 加载反馈状态
+  loadFeedbackStates() {
+    try {
+      const data = localStorage.getItem('wuxing_feedback_states');
+      return data ? new Map(JSON.parse(data)) : new Map();
+    } catch (e) {
+      return new Map();
+    }
+  }
+  
+  // 保存反馈状态到 localStorage
+  saveFeedbackStates() {
+    try {
+      localStorage.setItem('wuxing_feedback_states', JSON.stringify([...this.feedbackStates]));
+    } catch (e) {
+      console.warn('保存反馈状态失败:', e);
+    }
+  }
+  
+  // 恢复反馈状态到UI
+  restoreFeedbackStates(schemes) {
+    const cards = this.container.querySelectorAll('.scheme-card');
+    schemes.forEach((scheme, index) => {
+      const schemeId = this.getSchemeId(scheme);
+      const state = this.feedbackStates.get(schemeId);
+      const card = cards[index];
+      if (!card || !state) return;
+      
+      if (state === 'adopt') {
+        const adoptBtn = card.querySelector('.feedback-adopt');
+        if (adoptBtn) this.setAdoptedButton(adoptBtn);
+      } else if (state === 'dislike') {
+        const dislikeBtn = card.querySelector('.feedback-dislike');
+        if (dislikeBtn) {
+          dislikeBtn.classList.add('disliked');
+          dislikeBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            已反馈
+          `;
+        }
+      }
+    });
   }
 
 
@@ -42,6 +96,9 @@ export class ResultsController extends BaseController {
         this.renderPageSubtitle(result);
         renderResultHeader(result.termInfo);
         renderSchemeCards(result.schemes, { hasBazi });
+        
+        // 恢复之前保存的反馈状态
+        this.restoreFeedbackStates(result.schemes);
         
         // 渲染今日运势卡片
         this.renderDailyFortune(result);
@@ -532,24 +589,87 @@ export class ResultsController extends BaseController {
     if (!schemes || !schemes[index]) return;
     
     const scheme = schemes[index];
+    const schemeId = this.getSchemeId(scheme);
+    const currentState = this.feedbackStates.get(schemeId);
+    const cards = this.container.querySelectorAll('.scheme-card');
+    const card = cards[index];
     
     if (action === 'adopt') {
-      // 采纳：标记为已采纳，记录正向反馈
-      btnElement.classList.add('adopted');
-      btnElement.disabled = true;
-      btnElement.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-        已采纳
-      `;
-      this.recordFeedback(scheme, 'adopt');
-      this.showToast('已记录您的采纳，将优化后续推荐');
+      if (currentState === 'adopt') {
+        // 已采纳，再次点击取消
+        this.feedbackStates.delete(schemeId);
+        this.saveFeedbackStates();
+        this.resetAdoptButton(btnElement);
+        this.recordFeedback(scheme, 'cancel_adopt');
+        this.showToast('已取消采纳');
+      } else {
+        // 采纳：如果之前是不喜欢，先取消不喜欢
+        if (currentState === 'dislike') {
+          this.resetDislikeButton(card);
+        }
+        // 设置采纳状态
+        this.feedbackStates.set(schemeId, 'adopt');
+        this.saveFeedbackStates();
+        this.setAdoptedButton(btnElement);
+        this.recordFeedback(scheme, 'adopt');
+        this.showToast('已记录您的采纳，将优化后续推荐');
+      }
     } else if (action === 'dislike') {
-      // 不喜欢：显示反馈弹窗
-      this.currentFeedbackScheme = scheme;
-      this.currentFeedbackIndex = index;
-      this.showFeedbackModal();
+      if (currentState === 'dislike') {
+        // 已不喜欢，再次点击取消
+        this.feedbackStates.delete(schemeId);
+        this.saveFeedbackStates();
+        this.resetDislikeButton(card);
+        this.recordFeedback(scheme, 'cancel_dislike');
+        this.showToast('已取消反馈');
+      } else {
+        // 不喜欢：如果之前是采纳，先取消采纳
+        if (currentState === 'adopt') {
+          const adoptBtn = card.querySelector('.feedback-adopt');
+          if (adoptBtn) this.resetAdoptButton(adoptBtn);
+        }
+        // 显示反馈弹窗
+        this.currentFeedbackScheme = scheme;
+        this.currentFeedbackIndex = index;
+        this.showFeedbackModal();
+      }
+    }
+  }
+  
+  // 设置采纳按钮状态
+  setAdoptedButton(btn) {
+    btn.classList.add('adopted');
+    btn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      已采纳
+    `;
+  }
+  
+  // 重置采纳按钮状态
+  resetAdoptButton(btn) {
+    btn.classList.remove('adopted');
+    btn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      采纳
+    `;
+  }
+  
+  // 重置不喜欢按钮状态
+  resetDislikeButton(card) {
+    const btn = card.querySelector('.feedback-dislike');
+    if (btn) {
+      btn.classList.remove('disliked');
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        不喜欢
+      `;
     }
   }
   
@@ -572,17 +692,23 @@ export class ResultsController extends BaseController {
   handleFeedbackReason(reason) {
     if (!this.currentFeedbackScheme) return;
     
+    const schemeId = this.getSchemeId(this.currentFeedbackScheme);
+    const index = this.currentFeedbackIndex;
+    
+    // 设置不喜欢状态并保存
+    this.feedbackStates.set(schemeId, 'dislike');
+    this.saveFeedbackStates();
+    
     // 记录负向反馈
     this.recordFeedback(this.currentFeedbackScheme, 'dislike', reason);
     
     // 更新按钮状态
     const cards = this.container.querySelectorAll('.scheme-card');
-    const card = cards[this.currentFeedbackIndex];
+    const card = cards[index];
     if (card) {
       const dislikeBtn = card.querySelector('.feedback-dislike');
       if (dislikeBtn) {
         dislikeBtn.classList.add('disliked');
-        dislikeBtn.disabled = true;
         dislikeBtn.innerHTML = `
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
