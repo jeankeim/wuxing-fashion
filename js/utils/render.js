@@ -273,6 +273,10 @@ function generateSchemeExplanation(scheme, index, hasBazi = false) {
         </svg>
       </button>
       <div class="explanation-content hidden" id="explanation-${index}">
+        <div class="explanation-score-total">
+          <span class="score-label">综合得分</span>
+          <span class="score-value">${Math.round(scheme._score)}</span>
+        </div>
         <div class="explanation-list">
           ${explanations.join('')}
         </div>
