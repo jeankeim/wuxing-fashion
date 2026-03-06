@@ -308,7 +308,18 @@ export function renderDetailModal(scheme, context = null) {
   const body = document.getElementById('modal-detail-body');
   if (!body || !scheme) return;
   
+  // 生成推荐理由文字
+  let reasonTextHtml = '';
+  if (context) {
+    reasonTextHtml = generateReasonText(scheme, context);
+  }
+  
   body.innerHTML = `
+    <div class="detail-section">
+      <p class="detail-label">今日幸运色</p>
+      <p class="detail-text" style="color: ${scheme.color.hex}; font-weight: 600;">${scheme.color.name}</p>
+    </div>
+    
     <div class="detail-section">
       <p class="detail-label">五行解读</p>
       <p class="detail-text">${scheme.annotation}</p>
@@ -318,6 +329,8 @@ export function renderDetailModal(scheme, context = null) {
       <p class="detail-label">典籍出处</p>
       <div class="detail-quote">${scheme.source}</div>
     </div>
+    
+    ${reasonTextHtml}
   `;
 }
 
