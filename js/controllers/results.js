@@ -180,10 +180,12 @@ export class ResultsController extends BaseController {
       '精力充沛': { name: '精力充沛', icon: '⚡' },
       '安神助眠': { name: '安神助眠', icon: '🌙' },
       '增强自信': { name: '增强自信', icon: '💪' },
+      '静心专注': { name: '静心专注', icon: '🧘‍♀️' },
       // 健康平安
-      '身体健康': { name: '身体健康', icon: '🍀' },
-      '出入平安': { name: '出入平安', icon: '🧧' },
-      '远离疾厄': { name: '远离疾厄', icon: '✨' }
+      '健康舒畅': { name: '健康舒畅', icon: '🌿' },
+      '身体康复': { name: '身体康复', icon: '💊' },
+      '出行平安': { name: '出行平安', icon: '🚗' },
+      '远行顺利': { name: '远行顺利', icon: '✈️' }
     };
     return wishes[wishId];
   }
