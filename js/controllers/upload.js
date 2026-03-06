@@ -121,14 +121,6 @@ export class UploadController extends BaseController {
       });
     }
 
-    // 关闭应用按钮
-    const closeBtn = this.container.querySelector('#btn-close-app');
-    if (closeBtn) {
-      this.addEventListener(closeBtn, 'click', () => {
-        this.closeApp();
-      });
-    }
-
     // 心情选择
     const moodSelector = this.container.querySelector('#mood-selector');
     if (moodSelector) {
@@ -274,17 +266,6 @@ export class UploadController extends BaseController {
       sessionStorage.setItem('profile_auto_switch_tab', 'diary');
       navigateTo('/profile');
     }, 800);
-  }
-
-  closeApp() {
-    // 尝试关闭窗口
-    if (window.close) {
-      window.close();
-    } else {
-      // 返回首页
-      navigateTo('/');
-      this.showToast('已返回首页');
-    }
   }
 
   onUnmount() {
