@@ -197,12 +197,80 @@ export class UploadController extends BaseController {
       return;
     }
 
+    // 读取并压缩图片
     const reader = new FileReader();
     reader.onload = (event) => {
-      this.imageData = event.target.result;
-      this.showPhotoPreview();
+      const img = new Image();
+      img.onload = () => {
+        this.compressImage(img).then(compressedData => {
+          this.imageData = compressedData;
+          this.showPhotoPreview();
+        });
+      };
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  /**
+   * 压缩图片，确保小于1MB
+   * @param {HTMLImageElement} img - 图片元素
+   * @returns {Promise<string>} - 压缩后的 base64 数据
+   */
+  compressImage(img) {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // 计算压缩后的尺寸（最大宽度/高度 1200px）
+      let width = img.width;
+      let height = img.height;
+      const maxDimension = 1200;
+      
+      if (width > maxDimension || height > maxDimension) {
+        if (width > height) {
+          height = Math.round((height * maxDimension) / width);
+          width = maxDimension;
+        } else {
+          width = Math.round((width * maxDimension) / height);
+          height = maxDimension;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // 绘制图片
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // 逐步降低质量直到小于1MB
+      let quality = 0.9;
+      let result = canvas.toDataURL('image/jpeg', quality);
+      
+      // 1MB = 1024 * 1024 bytes，base64 约增加 33% 体积
+      const maxBase64Length = (1024 * 1024 * 4) / 3;
+      
+      while (result.length > maxBase64Length && quality > 0.1) {
+        quality -= 0.1;
+        result = canvas.toDataURL('image/jpeg', quality);
+      }
+      
+      // 如果仍然超过1MB，进一步缩小尺寸
+      if (result.length > maxBase64Length) {
+        width = Math.round(width * 0.8);
+        height = Math.round(height * 0.8);
+        canvas.width = width;
+        canvas.height = height;
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        result = canvas.toDataURL('image/jpeg', 0.7);
+      }
+      
+      resolve(result);
+    });
   }
 
   showPhotoPreview() {
