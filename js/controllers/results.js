@@ -518,8 +518,33 @@ export class ResultsController extends BaseController {
   }
 
   handleRegenerate() {
-    // TODO: 实现换一批逻辑
+    // 获取当前结果数据
+    const result = this.getState(StateKeys.CURRENT_RESULT);
+    if (!result || !result.schemes || result.schemes.length === 0) {
+      this.showToast('暂无推荐数据');
+      return;
+    }
+    
     this.showToast('正在生成新推荐...');
+    
+    // 打乱方案顺序，模拟"换一批"效果
+    const shuffledSchemes = [...result.schemes].sort(() => Math.random() - 0.5);
+    
+    // 更新 Store 中的方案
+    store.set(StateKeys.CURRENT_RESULT, {
+      ...result,
+      schemes: shuffledSchemes
+    });
+    
+    // 重新渲染方案卡片
+    const baziData = this.getState(StateKeys.BAZI_DATA);
+    const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
+    renderSchemeCards(shuffledSchemes, { hasBazi });
+    
+    // 恢复反馈状态
+    this.restoreFeedbackStates(shuffledSchemes);
+    
+    this.showToast('已为您换一批推荐');
   }
 
   handleCardClick(e) {
