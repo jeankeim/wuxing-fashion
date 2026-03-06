@@ -81,66 +81,23 @@ export class ResultsController extends BaseController {
     const result = this.getState(StateKeys.CURRENT_RESULT);
     
     if (result) {
-      // 有数据：先显示骨架屏，然后渲染内容
-      this.showSkeleton();
+      // 有数据：直接渲染内容
+      // 检查是否有八字数据
+      const baziData = this.getState(StateKeys.BAZI_DATA);
+      const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
       
-      // 使用 requestAnimationFrame 确保骨架屏先渲染
-      requestAnimationFrame(() => {
-        // 检查是否有八字数据
-        const baziData = this.getState(StateKeys.BAZI_DATA);
-        const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
-        
-        this.renderPageSubtitle(result);
-        renderResultHeader(result.termInfo);
-        renderSchemeCards(result.schemes, { hasBazi });
-        
-        // 恢复之前保存的反馈状态
-        this.restoreFeedbackStates(result.schemes);
-        
-        // 渲染今日运势卡片
-        this.renderDailyFortune(result);
-        
-        // 渲染八字使用状态提示
-        this.renderBaziUsageHint(result);
-        
-        // 延迟隐藏骨架屏，确保内容渲染完成
-        setTimeout(() => {
-          this.hideSkeleton();
-        }, 300);
-      });
-    } else {
-      // 无数据：直接隐藏骨架屏，显示空状态
-      this.hideSkeleton();
-    }
-  }
-  
-  /**
-   * 显示骨架屏
-   */
-  showSkeleton() {
-    const skeleton = document.getElementById('results-skeleton');
-    const content = document.getElementById('results-content');
-    
-    if (skeleton) {
-      skeleton.classList.remove('hidden');
-    }
-    if (content) {
-      content.classList.add('hidden');
-    }
-  }
-  
-  /**
-   * 隐藏骨架屏，显示内容
-   */
-  hideSkeleton() {
-    const skeleton = document.getElementById('results-skeleton');
-    const content = document.getElementById('results-content');
-    
-    if (skeleton) {
-      skeleton.classList.add('hidden');
-    }
-    if (content) {
-      content.classList.remove('hidden');
+      this.renderPageSubtitle(result);
+      renderResultHeader(result.termInfo);
+      renderSchemeCards(result.schemes, { hasBazi });
+      
+      // 恢复之前保存的反馈状态
+      this.restoreFeedbackStates(result.schemes);
+      
+      // 渲染今日运势卡片
+      this.renderDailyFortune(result);
+      
+      // 渲染八字使用状态提示
+      this.renderBaziUsageHint(result);
     }
   }
 
