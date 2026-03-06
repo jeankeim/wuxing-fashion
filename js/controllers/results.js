@@ -5,8 +5,9 @@
 import { BaseController } from './base.js';
 import { navigateTo, goBack } from '../core/router.js';
 import { renderSchemeCards, renderResultHeader, renderDetailModal, showModal, closeModal } from '../utils/render.js';
-import { StateKeys } from '../core/store.js';
+import { StateKeys, store } from '../core/store.js';
 import { getWuxingName } from '../utils/wuxing.js';
+import { regenerateRecommendation } from '../services/engine.js';
 
 export class ResultsController extends BaseController {
   constructor() {
@@ -517,7 +518,7 @@ export class ResultsController extends BaseController {
     }
   }
 
-  handleRegenerate() {
+  async handleRegenerate() {
     // 获取当前结果数据
     const result = this.getState(StateKeys.CURRENT_RESULT);
     if (!result || !result.schemes || result.schemes.length === 0) {
@@ -527,24 +528,44 @@ export class ResultsController extends BaseController {
     
     this.showToast('正在生成新推荐...');
     
-    // 打乱方案顺序，模拟"换一批"效果
-    const shuffledSchemes = [...result.schemes].sort(() => Math.random() - 0.5);
+    // 获取当前已显示方案的ID，用于排除
+    const excludeIds = result.schemes.map(s => s.id).filter(Boolean);
     
-    // 更新 Store 中的方案
-    store.set(StateKeys.CURRENT_RESULT, {
-      ...result,
-      schemes: shuffledSchemes
-    });
-    
-    // 重新渲染方案卡片
-    const baziData = this.getState(StateKeys.BAZI_DATA);
-    const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
-    renderSchemeCards(shuffledSchemes, { hasBazi });
-    
-    // 恢复反馈状态
-    this.restoreFeedbackStates(shuffledSchemes);
-    
-    this.showToast('已为您换一批推荐');
+    try {
+      // 调用引擎重新生成推荐（排除已显示的方案）
+      const newResult = await regenerateRecommendation(
+        result.termInfo,
+        result.wishId,
+        result.baziResult,
+        excludeIds,
+        { sceneId: result.sceneId || 'daily' }
+      );
+      
+      if (!newResult || !newResult.schemes || newResult.schemes.length === 0) {
+        this.showToast('暂无更多推荐方案');
+        return;
+      }
+      
+      // 更新 Store 中的结果
+      store.set(StateKeys.CURRENT_RESULT, {
+        ...result,
+        schemes: newResult.schemes,
+        regeneratedAt: new Date().toISOString()
+      });
+      
+      // 重新渲染方案卡片
+      const baziData = this.getState(StateKeys.BAZI_DATA);
+      const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
+      renderSchemeCards(newResult.schemes, { hasBazi });
+      
+      // 恢复反馈状态（新方案没有之前的反馈）
+      this.restoreFeedbackStates(newResult.schemes);
+      
+      this.showToast('已为您换一批推荐');
+    } catch (error) {
+      console.error('[ResultsController] 换一批失败:', error);
+      this.showToast('生成推荐失败，请重试');
+    }
   }
 
   handleCardClick(e) {
