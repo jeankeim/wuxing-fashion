@@ -3797,3 +3797,195 @@
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
 }
+
+/* ============================================
+   Upload Page Styles - 记录今日穿搭
+   ============================================ */
+
+/* === Upload Quote Section === */
+.upload-quote {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  margin-bottom: var(--space-4);
+  background: linear-gradient(135deg, rgba(124, 179, 66, 0.08), rgba(255, 255, 255, 0.9));
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(124, 179, 66, 0.15);
+}
+
+.quote-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-3);
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.quote-text {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.05em;
+}
+
+.quote-subtext {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* === Upload Form === */
+.upload-form {
+  padding: 0 var(--space-4) var(--space-6);
+}
+
+.upload-form .form-group {
+  margin-bottom: var(--space-5);
+}
+
+.upload-form .form-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.upload-form .form-label .required {
+  color: var(--color-fire);
+  margin-left: var(--space-1);
+}
+
+.upload-form .form-input,
+.upload-form .form-textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  background-color: var(--color-surface);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.upload-form .form-input:focus,
+.upload-form .form-textarea:focus {
+  outline: none;
+  border-color: var(--color-wood);
+  box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.1);
+}
+
+.upload-form .form-input[readonly] {
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
+.upload-form .form-hint {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-1);
+}
+
+.upload-form .form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* === Photo Upload Zone === */
+.photo-upload-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  background-color: var(--color-surface);
+}
+
+.photo-upload-zone:hover {
+  border-color: var(--color-wood-light);
+  background-color: rgba(124, 179, 66, 0.02);
+}
+
+.photo-upload-zone .upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.photo-upload-zone .upload-placeholder svg {
+  color: var(--color-wood-light);
+  margin-bottom: var(--space-2);
+}
+
+.photo-upload-zone .upload-placeholder p {
+  font-size: var(--text-base);
+  font-weight: 500;
+}
+
+.photo-upload-zone .upload-hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* === Photo Preview === */
+.photo-preview {
+  position: relative;
+  display: inline-block;
+  max-width: 200px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.btn-remove-photo {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.btn-remove-photo:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+/* === Form Actions === */
+.upload-form .form-actions {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.upload-form .btn-large {
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}

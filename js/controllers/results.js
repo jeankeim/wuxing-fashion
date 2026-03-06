@@ -45,24 +45,21 @@ export class ResultsController extends BaseController {
     const cards = this.container.querySelectorAll('.scheme-card');
     schemes.forEach((scheme, index) => {
       const schemeId = this.getSchemeId(scheme);
-      const state = this.feedbackStates.get(schemeId);
+      const savedState = this.feedbackStates.get(schemeId);
       const card = cards[index];
-      if (!card || !state) return;
+      if (!card || !savedState) return;
       
-      if (state === 'adopt') {
+      const action = savedState?.action || savedState; // 兼容旧数据格式
+      
+      if (action === 'adopt') {
         const adoptBtn = card.querySelector('.feedback-adopt');
         if (adoptBtn) this.setAdoptedButton(adoptBtn);
-      } else if (state === 'dislike') {
+      } else if (action === 'dislike') {
         const dislikeBtn = card.querySelector('.feedback-dislike');
         if (dislikeBtn) {
+          const reasonText = savedState?.reasonText || '已反馈';
           dislikeBtn.classList.add('disliked');
-          dislikeBtn.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-            已反馈
-          `;
+          dislikeBtn.innerHTML = `<span>${reasonText}</span>`;
         }
       }
     });
@@ -590,12 +587,13 @@ export class ResultsController extends BaseController {
     
     const scheme = schemes[index];
     const schemeId = this.getSchemeId(scheme);
-    const currentState = this.feedbackStates.get(schemeId);
+    const savedState = this.feedbackStates.get(schemeId);
+    const currentAction = savedState?.action || savedState; // 兼容旧数据格式
     const cards = this.container.querySelectorAll('.scheme-card');
     const card = cards[index];
     
     if (action === 'adopt') {
-      if (currentState === 'adopt') {
+      if (currentAction === 'adopt') {
         // 已采纳，再次点击取消
         this.feedbackStates.delete(schemeId);
         this.saveFeedbackStates();
@@ -604,7 +602,7 @@ export class ResultsController extends BaseController {
         this.showToast('已取消采纳');
       } else {
         // 采纳：如果之前是不喜欢，先取消不喜欢
-        if (currentState === 'dislike') {
+        if (currentAction === 'dislike') {
           this.resetDislikeButton(card);
         }
         // 设置采纳状态
@@ -615,7 +613,7 @@ export class ResultsController extends BaseController {
         this.showToast('已记录您的采纳，将优化后续推荐');
       }
     } else if (action === 'dislike') {
-      if (currentState === 'dislike') {
+      if (currentAction === 'dislike') {
         // 已不喜欢，再次点击取消
         this.feedbackStates.delete(schemeId);
         this.saveFeedbackStates();
@@ -624,7 +622,7 @@ export class ResultsController extends BaseController {
         this.showToast('已取消反馈');
       } else {
         // 不喜欢：如果之前是采纳，先取消采纳
-        if (currentState === 'adopt') {
+        if (currentAction === 'adopt') {
           const adoptBtn = card.querySelector('.feedback-adopt');
           if (adoptBtn) this.resetAdoptButton(adoptBtn);
         }
@@ -695,27 +693,31 @@ export class ResultsController extends BaseController {
     const schemeId = this.getSchemeId(this.currentFeedbackScheme);
     const index = this.currentFeedbackIndex;
     
-    // 设置不喜欢状态并保存
-    this.feedbackStates.set(schemeId, 'dislike');
+    // 原因映射（简短显示）
+    const reasonTextMap = {
+      'color': '🎨 颜色',
+      'style': '👔 款式',
+      'wuxing': '☯️ 五行',
+      'material': '🧵 材质',
+      'other': '🤔 其他'
+    };
+    const reasonText = reasonTextMap[reason] || '已反馈';
+    
+    // 设置不喜欢状态并保存（包含原因）
+    this.feedbackStates.set(schemeId, { action: 'dislike', reason, reasonText });
     this.saveFeedbackStates();
     
     // 记录负向反馈
     this.recordFeedback(this.currentFeedbackScheme, 'dislike', reason);
     
-    // 更新按钮状态
+    // 更新按钮状态，显示具体原因
     const cards = this.container.querySelectorAll('.scheme-card');
     const card = cards[index];
     if (card) {
       const dislikeBtn = card.querySelector('.feedback-dislike');
       if (dislikeBtn) {
         dislikeBtn.classList.add('disliked');
-        dislikeBtn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-          已反馈
-        `;
+        dislikeBtn.innerHTML = `<span>${reasonText}</span>`;
       }
     }
     

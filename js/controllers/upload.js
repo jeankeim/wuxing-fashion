@@ -1,20 +1,19 @@
 /**
- * Upload Controller - 上传页控制器
+ * Upload Controller - 记录今日穿搭控制器
  */
 
 import { BaseController } from './base.js';
 import { goBack, navigateTo } from '../core/router.js';
-import { updateUploadPreview } from '../utils/render.js';
-import { outfitRepo } from '../data/repository.js';
+import { saveDiaryRecord } from '../utils/diary.js';
 import { getTodayString } from '../utils/upload.js';
-import { saveDiaryRecord, deleteDiaryRecord, getDiaryByDate } from '../utils/diary.js';
 
 export class UploadController extends BaseController {
   constructor() {
     super();
     this.containerId = 'view-upload';
+    this.selectedMood = null;
+    this.imageData = null;
   }
-
 
   onMount() {
     // 动态获取容器（视图是动态加载的）
@@ -24,33 +23,33 @@ export class UploadController extends BaseController {
       return;
     }
     
-    // 重新绑定事件
-    this.bindEvents();
-    // 检查今日是否已有上传
-    const todayImage = outfitRepo.getByDate(getTodayString());
-    if (todayImage) {
-      updateUploadPreview(todayImage);
+    // 初始化表单
+    this.initForm();
+  }
+
+  initForm() {
+    // 设置日期为今天
+    const dateInput = this.container.querySelector('#upload-date');
+    if (dateInput) {
+      dateInput.value = getTodayString();
     }
+    
+    // 重置表单状态
+    this.selectedMood = null;
+    this.imageData = null;
+    
+    // 重置心情选择
+    const moodBtns = this.container.querySelectorAll('.mood-btn');
+    moodBtns.forEach(btn => btn.classList.remove('active'));
+    
+    // 重置照片预览
+    const placeholder = this.container.querySelector('#upload-placeholder');
+    const preview = this.container.querySelector('#photo-preview');
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (preview) preview.classList.add('hidden');
   }
 
   bindEvents() {
-    // 避免重复绑定
-    if (this.eventsBound) {
-      console.log('[UploadController] Events already bound, skipping');
-      return;
-    }
-    this.eventsBound = true;
-    
-    // 获取 DOM 元素
-    this.uploadZone = this.container?.querySelector('#upload-zone');
-    this.fileInput = this.container?.querySelector('#upload-input');
-    
-    console.log('[UploadController] bindEvents called', {
-      container: this.container,
-      uploadZone: this.uploadZone,
-      fileInput: this.fileInput
-    });
-    
     // 返回按钮
     const backBtn = this.container.querySelector('#btn-back-results');
     if (backBtn) {
@@ -67,53 +66,62 @@ export class UploadController extends BaseController {
       });
     }
 
-    // 上传区域点击
-    if (this.uploadZone) {
-      this.addEventListener(this.uploadZone, 'click', (e) => {
-        // 如果点击的是按钮，不触发上传
-        if (e.target.closest('button')) return;
-        this.fileInput?.click();
+    // 心情选择
+    const moodSelector = this.container.querySelector('#mood-selector');
+    if (moodSelector) {
+      this.addEventListener(moodSelector, 'click', (e) => {
+        const moodBtn = e.target.closest('.mood-btn');
+        if (!moodBtn) return;
+        
+        // 移除其他选中状态
+        moodSelector.querySelectorAll('.mood-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // 设置当前选中
+        moodBtn.classList.add('active');
+        this.selectedMood = moodBtn.dataset.mood;
+        
+        // 更新隐藏字段
+        const moodInput = this.container.querySelector('#upload-mood');
+        if (moodInput) moodInput.value = this.selectedMood;
+      });
+    }
+
+    // 照片上传区域点击
+    const photoZone = this.container.querySelector('#photo-upload-zone');
+    const photoInput = this.container.querySelector('#upload-photo');
+    
+    if (photoZone) {
+      this.addEventListener(photoZone, 'click', (e) => {
+        // 如果点击的是移除按钮，不触发上传
+        if (e.target.closest('#btn-remove-photo')) return;
+        photoInput?.click();
       });
     }
 
     // 文件选择
-    if (this.fileInput) {
-      this.addEventListener(this.fileInput, 'change', (e) => {
+    if (photoInput) {
+      this.addEventListener(photoInput, 'change', (e) => {
         this.handleFileSelect(e);
       });
     }
 
-    // 修改图片按钮
-    const changeBtn = this.container.querySelector('#btn-change-image');
-    if (changeBtn) {
-      this.addEventListener(changeBtn, 'click', (e) => {
+    // 移除照片按钮
+    const removePhotoBtn = this.container.querySelector('#btn-remove-photo');
+    if (removePhotoBtn) {
+      this.addEventListener(removePhotoBtn, 'click', (e) => {
         e.stopPropagation();
-        this.fileInput?.click();
+        this.removePhoto();
       });
     }
 
-    // 移除图片
-    const removeBtn = this.container.querySelector('#btn-remove-image');
-    if (removeBtn) {
-      this.addEventListener(removeBtn, 'click', (e) => {
-        e.stopPropagation();
-        this.removeImage();
-      });
-    }
-
-    // 保存反馈
-    const saveFeedbackBtn = this.container.querySelector('#btn-save-feedback');
-    if (saveFeedbackBtn) {
-      this.addEventListener(saveFeedbackBtn, 'click', () => {
-        this.saveFeedback();
-      });
-    }
-
-    // 发朋友圈按钮
-    const shareBtn = this.container.querySelector('#btn-share-moments');
-    if (shareBtn) {
-      this.addEventListener(shareBtn, 'click', () => {
-        this.shareToMoments();
+    // 表单提交
+    const form = this.container.querySelector('#upload-form');
+    if (form) {
+      this.addEventListener(form, 'submit', (e) => {
+        e.preventDefault();
+        this.handleSubmit();
       });
     }
   }
@@ -136,101 +144,89 @@ export class UploadController extends BaseController {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const imageData = event.target.result;
-      const today = getTodayString();
-      
-      // 保存到上传记录
-      outfitRepo.save(today, imageData);
-      
-      // 同步保存到日记（打通功能）
-      saveDiaryRecord(today, {
-        image: imageData,
-        note: '',
-        source: 'upload'
-      });
-      
-      updateUploadPreview(imageData);
-      this.showUploadSuccess();
+      this.imageData = event.target.result;
+      this.showPhotoPreview();
     };
     reader.readAsDataURL(file);
   }
 
-  showUploadSuccess() {
-    // 显示成功提示
-    const successEl = this.container.querySelector('#upload-success');
-    const shareSection = this.container.querySelector('#share-section');
+  showPhotoPreview() {
+    const placeholder = this.container.querySelector('#upload-placeholder');
+    const preview = this.container.querySelector('#photo-preview');
+    const previewImg = this.container.querySelector('#preview-image');
     
-    if (successEl) {
-      successEl.classList.remove('hidden');
-      // 3秒后隐藏
-      setTimeout(() => {
-        successEl.classList.add('hidden');
-      }, 3000);
-    }
-    
-    // 显示操作按钮区域
-    const actionSection = this.container.querySelector('#action-section');
-    if (actionSection) {
-      actionSection.classList.remove('hidden');
-    }
-    
-    this.showToast('上传成功，已同步到日记');
+    if (previewImg) previewImg.src = this.imageData;
+    if (placeholder) placeholder.classList.add('hidden');
+    if (preview) preview.classList.remove('hidden');
   }
 
-  removeImage() {
-    const today = getTodayString();
+  removePhoto() {
+    this.imageData = null;
     
-    // 删除上传记录
-    outfitRepo.remove(today);
+    const placeholder = this.container.querySelector('#upload-placeholder');
+    const preview = this.container.querySelector('#photo-preview');
+    const photoInput = this.container.querySelector('#upload-photo');
     
-    // 删除日记记录
-    deleteDiaryRecord(today);
-    
-    updateUploadPreview(null);
-    
-    // 隐藏操作按钮区域
-    const actionSection = this.container.querySelector('#action-section');
-    if (actionSection) {
-      actionSection.classList.add('hidden');
-    }
-    
-    this.showToast('已删除');
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (preview) preview.classList.add('hidden');
+    if (photoInput) photoInput.value = '';
   }
 
-  shareToMoments() {
-    const today = getTodayString();
-    const imageData = outfitRepo.getByDate(today);
+  handleSubmit() {
+    // 验证必填项
+    if (!this.selectedMood) {
+      this.showToast('请选择今日心情');
+      return;
+    }
     
-    if (!imageData) {
-      this.showToast('请先上传照片');
+    if (!this.imageData) {
+      this.showToast('请上传穿搭照片');
       return;
     }
 
-    // 尝试使用原生分享API
-    if (navigator.share) {
-      navigator.share({
-        title: '今日穿搭',
-        text: '分享我的今日穿搭',
-        url: window.location.href
-      }).then(() => {
-        this.showToast('分享成功');
-      }).catch(() => {
-        // 用户取消或其他错误
-        this.fallbackShare(imageData);
-      });
-    } else {
-      this.fallbackShare(imageData);
-    }
-  }
+    const today = getTodayString();
+    const color = this.container.querySelector('#upload-color')?.value?.trim() || '';
+    const material = this.container.querySelector('#upload-material')?.value?.trim() || '';
+    const note = this.container.querySelector('#upload-note')?.value?.trim() || '';
 
-  fallbackShare(imageData) {
-    // 复制图片到剪贴板或下载
-    const link = document.createElement('a');
-    link.download = `穿搭-${getTodayString()}.png`;
-    link.href = imageData;
-    link.click();
+    // 构建日记记录
+    const diaryRecord = {
+      date: today,
+      mood: this.selectedMood,
+      color: color,
+      material: material,
+      image: this.imageData,
+      note: note,
+      source: 'upload'
+    };
+
+    // 保存记录
+    saveDiaryRecord(today, diaryRecord);
     
-    this.showToast('图片已下载，请手动分享到朋友圈');
+    this.showToast('记录保存成功！');
+    
+    // 延迟跳转到画像页的日记时间线
+    setTimeout(() => {
+      navigateTo('/profile');
+      
+      // 在画像页滚动到日记时间线位置
+      setTimeout(() => {
+        // 找到日记时间线 section（包含"时间线"标题的 diary-section）
+        const diarySections = document.querySelectorAll('.diary-section');
+        let timelineSection = null;
+        
+        diarySections.forEach(section => {
+          const title = section.querySelector('.diary-section-title');
+          if (title && title.textContent.includes('时间线')) {
+            timelineSection = section;
+          }
+        });
+        
+        if (timelineSection) {
+          timelineSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }, 800);
   }
 
   closeApp() {
@@ -244,34 +240,8 @@ export class UploadController extends BaseController {
     }
   }
 
-  saveFeedback() {
-    const textarea = this.container.querySelector('#feedback-text');
-    const feedback = textarea?.value?.trim();
-    
-    if (!feedback) {
-      this.showToast('请输入反馈内容');
-      return;
-    }
-
-    const today = getTodayString();
-    const imageData = outfitRepo.getByDate(today);
-    
-    // 获取现有日记记录或创建新记录
-    const existingRecord = getDiaryByDate(today) || {};
-    
-    // 保存反馈到日记（使用 note 字段存储反馈）
-    saveDiaryRecord(today, {
-      ...existingRecord,
-      image: imageData || existingRecord.image,
-      note: feedback,
-      source: existingRecord.source || 'upload'
-    });
-    
-    this.showToast('反馈已保存到日记');
-    if (textarea) textarea.value = '';
-  }
-
   onUnmount() {
-    this.eventsBound = false;
+    this.selectedMood = null;
+    this.imageData = null;
   }
 }
