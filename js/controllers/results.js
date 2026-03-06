@@ -6,8 +6,6 @@ import { BaseController } from './base.js';
 import { navigateTo, goBack } from '../core/router.js';
 import { renderSchemeCards, renderResultHeader, renderDetailModal, showModal, closeModal } from '../utils/render.js';
 import { StateKeys } from '../core/store.js';
-import { WeatherImpact } from '../components/weather-widget.js';
-import { calculateWeatherBoost } from '../services/weather.js';
 import { getWuxingName } from '../utils/wuxing.js';
 
 export class ResultsController extends BaseController {
@@ -47,9 +45,6 @@ export class ResultsController extends BaseController {
         
         // 渲染今日运势卡片
         this.renderDailyFortune(result);
-        
-        // 渲染天气影响提示
-        this.renderWeatherImpact(result);
         
         // 渲染八字使用状态提示
         this.renderBaziUsageHint(result);
@@ -354,24 +349,6 @@ export class ResultsController extends BaseController {
     ];
     
     return tips[Math.floor(Math.random() * tips.length)];
-  }
-
-  renderWeatherImpact(result) {
-    const container = document.getElementById('weather-impact-container');
-    if (!container || !result.weather) return;
-    
-    // 计算天气加成（取第一个方案作为示例）
-    const scheme = result.schemes?.[0];
-    if (scheme) {
-      const boost = calculateWeatherBoost(scheme, result.weather.current);
-      if (boost > 0) {
-        const weatherImpact = new WeatherImpact(container, {
-          weather: result.weather.current,
-          boost
-        });
-        weatherImpact.mount();
-      }
-    }
   }
 
   /**
