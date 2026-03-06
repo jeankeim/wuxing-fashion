@@ -5,6 +5,8 @@
 import { BaseController } from './base.js';
 import { navigateTo } from '../core/router.js';
 import { StateKeys } from '../core/store.js';
+import { preloadWeather } from '../services/simple-weather.js';
+import { hasValidCache } from '../utils/weather-cache.js';
 
 /**
  * 欢迎页控制器
@@ -36,6 +38,43 @@ export class WelcomeController extends BaseController {
     const termInfo = this.getState(StateKeys.CURRENT_TERM_INFO);
     if (termInfo) {
       this.renderBrandSolarCard(termInfo);
+    }
+    
+    // 【方案3】后台预加载天气数据
+    this.preloadWeatherData();
+  }
+  
+  /**
+   * 预加载天气数据（后台静默执行）
+   * 利用用户在首页停留的时间提前获取天气
+   */
+  preloadWeatherData() {
+    // 检查是否已有有效缓存
+    if (hasValidCache()) {
+      console.log('[Welcome] 天气数据已缓存，跳过预加载');
+      return;
+    }
+    
+    // 使用 requestIdleCallback 在浏览器空闲时执行
+    // 或者 setTimeout 延迟执行，避免阻塞首屏渲染
+    const executePreload = () => {
+      console.log('[Welcome] 开始预加载天气数据...');
+      preloadWeather().then((weather) => {
+        if (weather) {
+          console.log('[Welcome] 天气数据预加载成功:', weather.seasonName);
+        }
+      }).catch((error) => {
+        // 静默失败，不影响用户体验
+        console.warn('[Welcome] 天气预加载失败:', error);
+      });
+    };
+    
+    // 优先使用 requestIdleCallback（浏览器空闲时）
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(executePreload, { timeout: 3000 });
+    } else {
+      // 降级方案：延迟 2 秒执行
+      setTimeout(executePreload, 2000);
     }
   }
   

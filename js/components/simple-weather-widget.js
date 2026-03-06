@@ -5,13 +5,21 @@
 
 import { Component } from './base.js';
 import { getSimpleWeather, getSeasonStyle } from '../services/simple-weather.js';
+import { getCachedWeather } from '../utils/weather-cache.js';
 
 export class SimpleWeatherWidget extends Component {
   init() {
     this.state = {
-      loading: false, // 立即显示，无需加载
+      loading: false,
       weather: null
     };
+    
+    // 【优化】优先使用缓存数据立即显示
+    const cachedWeather = getCachedWeather();
+    if (cachedWeather) {
+      this.state.weather = cachedWeather;
+      console.log('[WeatherWidget] 使用缓存数据立即显示');
+    }
   }
 
   async render() {
@@ -54,9 +62,23 @@ export class SimpleWeatherWidget extends Component {
   }
 
   async onMount() {
-    // 立即加载，无需等待
-    const weather = await getSimpleWeather();
-    this.setState({ weather });
+    // 如果已有缓存数据，先显示缓存，后台更新
+    const cachedWeather = getCachedWeather();
+    
+    try {
+      // 获取最新天气数据（会更新缓存）
+      const weather = await getSimpleWeather();
+      
+      // 只有当数据变化时才重新渲染
+      if (JSON.stringify(weather) !== JSON.stringify(cachedWeather)) {
+        this.setState({ weather });
+      }
+    } catch (error) {
+      // 如果获取失败但已有缓存，保持缓存显示
+      if (!cachedWeather) {
+        console.error('[WeatherWidget] 加载天气失败:', error);
+      }
+    }
   }
 }
 

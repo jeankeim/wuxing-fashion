@@ -5,6 +5,7 @@
 
 import { getUTC8Date } from './solar-terms.js';
 import { getCurrentWeather, getWeatherRecommendation } from './weather.js';
+import { getCachedWeather, setCachedWeather } from '../utils/weather-cache.js';
 
 // 季节配置
 const SEASON_CONFIG = {
@@ -50,10 +51,8 @@ const SEASON_CONFIG = {
   }
 };
 
-// 缓存
-let cachedWeather = null;
-let cacheTime = 0;
-const CACHE_DURATION = 30 * 60 * 1000; // 30分钟
+// 内存缓存（用于同一会话）
+let memoryCache = null;
 
 /**
  * 获取当前季节
@@ -73,15 +72,20 @@ function getCurrentSeason(date = new Date()) {
 }
 
 /**
- * 获取天气数据（优先使用真实天气 API）
+ * 获取天气数据（优先使用缓存，其次真实 API）
  * @returns {Promise<Object>} 天气数据
  */
 export async function getSimpleWeather() {
-  const now = Date.now();
+  // 1. 优先检查内存缓存（同一会话内最快）
+  if (memoryCache) {
+    return memoryCache;
+  }
   
-  // 检查缓存
-  if (cachedWeather && (now - cacheTime) < CACHE_DURATION) {
-    return cachedWeather;
+  // 2. 检查 LocalStorage 缓存（跨会话）
+  const localCache = getCachedWeather();
+  if (localCache) {
+    memoryCache = localCache;
+    return localCache;
   }
   
   try {
@@ -115,9 +119,9 @@ export async function getSimpleWeather() {
       raw: realWeather                       // 保留原始数据
     };
     
-    // 更新缓存
-    cachedWeather = weather;
-    cacheTime = now;
+    // 更新缓存（内存 + LocalStorage）
+    memoryCache = weather;
+    setCachedWeather(weather);
     
     return weather;
   } catch (error) {
@@ -149,11 +153,32 @@ export async function getSimpleWeather() {
       source: 'simple'
     };
     
-    // 更新缓存
-    cachedWeather = weather;
-    cacheTime = now;
+    // 更新缓存（内存 + LocalStorage）
+    memoryCache = weather;
+    setCachedWeather(weather);
     
     return weather;
+  }
+}
+
+/**
+ * 预加载天气数据（用于后台静默加载）
+ * @returns {Promise<Object|null>} 天气数据或null
+ */
+export async function preloadWeather() {
+  try {
+    // 检查是否已有缓存
+    if (memoryCache || getCachedWeather()) {
+      return memoryCache || getCachedWeather();
+    }
+    
+    // 静默加载天气
+    const weather = await getSimpleWeather();
+    return weather;
+  } catch (error) {
+    // 静默失败，不抛出错误
+    console.warn('[SimpleWeather] 预加载失败:', error);
+    return null;
   }
 }
 
