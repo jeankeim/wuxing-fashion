@@ -19,13 +19,14 @@ import {
   MOODS
 } from '../utils/diary.js';
 import { analyzeBaziPrecise } from '../services/bazi.js';
+import { clearAllData, renderDataManagerPanel } from '../data/data-manager.js';
 
 export class ProfileController extends BaseController {
   constructor() {
     super();
     this.containerId = 'view-profile';
     this.currentTab = 'profile';
-    this.tabs = ['profile', 'diary'];
+    this.tabs = ['profile', 'diary', 'coming-soon'];
   }
 
   onMount() {
@@ -1761,6 +1762,19 @@ export class ProfileController extends BaseController {
 
   clearData() {
     if (confirm('确定要清除所有数据吗？此操作不可恢复。')) {
+      // 执行清除所有数据
+      clearAllData();
+      
+      // 重新渲染数据管理面板，更新统计显示为0
+      const dataContainer = document.getElementById('data-manager-container');
+      if (dataContainer) {
+        dataContainer.innerHTML = renderDataManagerPanel();
+      }
+      
+      // 同时刷新画像页面的其他数据展示
+      this.renderWuxingRadar();
+      this.renderPreferenceBars();
+      
       this.showToast('数据已清除');
     }
   }

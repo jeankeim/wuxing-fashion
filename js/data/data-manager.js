@@ -337,10 +337,6 @@ export function renderDataManagerPanel() {
           清除所有数据
         </button>
       </div>
-      
-      <div class="data-notice">
-        <p>💡 所有数据仅存储在您的设备上，导出文件可用于备份或迁移到新设备</p>
-      </div>
     </div>
   `;
 }
