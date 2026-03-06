@@ -21,7 +21,82 @@
     <p class="page-subtitle" id="results-subtitle">根据雨水节气，为您精选 3 套五行搭配</p>
   </div>
   
-  <div class="results-body">
+  <!-- Skeleton Loading Screen -->
+  <div id="results-skeleton" class="results-skeleton">
+    <!-- Header Skeleton -->
+    <div class="skeleton-header">
+      <div class="skeleton-circle small"></div>
+      <div class="skeleton-line medium"></div>
+      <div class="skeleton-circle small"></div>
+    </div>
+    
+    <!-- Title Skeleton -->
+    <div class="skeleton-title-section">
+      <div class="skeleton-line title"></div>
+      <div class="skeleton-line subtitle"></div>
+    </div>
+    
+    <!-- Fortune Card Skeleton -->
+    <div class="skeleton-fortune-card">
+      <div class="skeleton-fortune-header">
+        <div class="skeleton-circle"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="skeleton-fortune-content">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line long"></div>
+      </div>
+    </div>
+    
+    <!-- Scheme Cards Skeleton x3 -->
+    <div class="skeleton-schemes">
+      <div class="skeleton-scheme-card">
+        <div class="skeleton-color-bar"></div>
+        <div class="skeleton-scheme-content">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-tags">
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-scheme-card">
+        <div class="skeleton-color-bar"></div>
+        <div class="skeleton-scheme-content">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-tags">
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-scheme-card">
+        <div class="skeleton-color-bar"></div>
+        <div class="skeleton-scheme-content">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-tags">
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions Skeleton -->
+    <div class="skeleton-actions">
+      <div class="skeleton-button"></div>
+      <div class="skeleton-button primary"></div>
+    </div>
+  </div>
+  
+  <div class="results-body hidden" id="results-content">
     <!-- 八字使用状态提示 -->
     <div id="bazi-usage-hint" class="bazi-usage-hint hidden">
       <div class="usage-hint-content">
