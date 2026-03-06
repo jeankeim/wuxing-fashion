@@ -124,8 +124,19 @@ export class ResultsController extends BaseController {
     const schemes = result.schemes || [];
     
     // 渲染场景和心愿
-    sceneEl.innerHTML = scene ? `场景：${scene.name} ${scene.icon}` : '';
-    wishEl.innerHTML = wish ? `心愿：${wish.name} ${wish.icon}` : '';
+    if (scene) {
+      sceneEl.innerHTML = `场景：${scene.name} ${scene.icon}`;
+      sceneEl.style.display = '';
+    } else {
+      sceneEl.style.display = 'none';
+    }
+    
+    if (wish) {
+      wishEl.innerHTML = `心愿：${wish.name} ${wish.icon}`;
+      wishEl.style.display = '';
+    } else {
+      wishEl.style.display = 'none';
+    }
     
     // 渲染幸运色系（带颜色样式，空格分隔）
     const luckyColorsHtml = this.renderLuckyColors(schemes.slice(0, 2));
