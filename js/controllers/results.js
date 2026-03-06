@@ -535,14 +535,8 @@ export class ResultsController extends BaseController {
   }
 
   handleCardClick(e) {
-    const shareBtn = e.target.closest('.scheme-share-btn');
     const detailBtn = e.target.closest('.scheme-detail-btn');
     const feedbackBtn = e.target.closest('.feedback-btn');
-
-    if (shareBtn) {
-      const index = parseInt(shareBtn.dataset.index, 10);
-      this.shareScheme(index);
-    }
 
     if (detailBtn) {
       const index = parseInt(detailBtn.dataset.index, 10);

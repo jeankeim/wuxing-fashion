@@ -152,24 +152,10 @@ function createSchemeCard(scheme, index, hasBazi = false) {
   card.innerHTML = `
     <div class="scheme-color-bar" style="background-color: ${scheme.color.hex}"></div>
     ${typeLabel}
-    <div class="scheme-keywords">
-      <span class="scheme-keyword">${scheme.color.name}</span>
-      <span class="scheme-keyword">${scheme.material}</span>
-      <span class="scheme-keyword">${scheme.feeling}</span>
-    </div>
     <p class="scheme-annotation">${scheme.annotation}</p>
     <p class="scheme-source">${scheme.source}</p>
     ${explanationHtml}
     <div class="scheme-actions">
-      <button class="scheme-share-btn" data-index="${index}" type="button" aria-label="分享">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="18" cy="5" r="3"/>
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-      </button>
       <button class="scheme-detail-btn" data-index="${index}" type="button">
         查看详解
       </button>
@@ -278,9 +264,6 @@ function generateSchemeExplanation(scheme, index, hasBazi = false) {
   
   if (explanations.length === 0) return '';
   
-  // 构建计算公式文本（取前3个）
-  const formula = formulaParts.slice(0, 3).join(' + ');
-  
   return `
     <div class="scheme-explanation">
       <button class="explanation-toggle" data-index="${index}" type="button">
@@ -290,11 +273,6 @@ function generateSchemeExplanation(scheme, index, hasBazi = false) {
         </svg>
       </button>
       <div class="explanation-content hidden" id="explanation-${index}">
-        <div class="explanation-formula">${formula} = 高分推荐</div>
-        <div class="explanation-score-total">
-          <span class="score-label">综合得分</span>
-          <span class="score-value">${Math.round(scheme._score)}</span>
-        </div>
         <div class="explanation-list">
           ${explanations.join('')}
         </div>
@@ -330,35 +308,7 @@ export function renderDetailModal(scheme, context = null) {
   const body = document.getElementById('modal-detail-body');
   if (!body || !scheme) return;
   
-  let explanationHtml = '';
-  let reasonTextHtml = '';
-  
-  if (context) {
-    explanationHtml = renderExplanationCard(scheme, context);
-    // 生成推荐理由文字描述
-    reasonTextHtml = generateReasonText(scheme, context);
-  }
-  
   body.innerHTML = `
-    <div class="detail-section">
-      <div class="scheme-color-bar" style="background-color: ${scheme.color.hex}; height: 40px; border-radius: 8px;"></div>
-    </div>
-    
-    <div class="detail-section">
-      <p class="detail-label">色彩</p>
-      <p class="detail-text">${scheme.color.name} (${scheme.color.hex})</p>
-    </div>
-    
-    <div class="detail-section">
-      <p class="detail-label">材质</p>
-      <p class="detail-text">${scheme.material}</p>
-    </div>
-    
-    <div class="detail-section">
-      <p class="detail-label">感受</p>
-      <p class="detail-text">${scheme.feeling}</p>
-    </div>
-    
     <div class="detail-section">
       <p class="detail-label">五行解读</p>
       <p class="detail-text">${scheme.annotation}</p>
@@ -368,10 +318,6 @@ export function renderDetailModal(scheme, context = null) {
       <p class="detail-label">典籍出处</p>
       <div class="detail-quote">${scheme.source}</div>
     </div>
-    
-    ${explanationHtml}
-    
-    ${reasonTextHtml}
   `;
 }
 
