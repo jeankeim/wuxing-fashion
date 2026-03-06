@@ -4,7 +4,7 @@
 
 import { BaseController } from './base.js';
 import { goBack, navigateTo } from '../core/router.js';
-import { saveDiaryRecord } from '../utils/diary.js';
+import { saveDiaryRecord, getDiaryByDate } from '../utils/diary.js';
 import { getTodayString } from '../utils/upload.js';
 
 export class UploadController extends BaseController {
@@ -28,12 +28,63 @@ export class UploadController extends BaseController {
   }
 
   initForm() {
+    const today = getTodayString();
+    
     // 设置日期为今天
     const dateInput = this.container.querySelector('#upload-date');
     if (dateInput) {
-      dateInput.value = getTodayString();
+      dateInput.value = today;
     }
     
+    // 尝试加载今天的记录
+    const existingRecord = getDiaryByDate(today);
+    
+    if (existingRecord) {
+      // 填充已有记录
+      this.loadExistingRecord(existingRecord);
+    } else {
+      // 重置表单状态
+      this.resetForm();
+    }
+  }
+  
+  loadExistingRecord(record) {
+    // 加载心情
+    this.selectedMood = record.mood || null;
+    if (this.selectedMood) {
+      const moodBtns = this.container.querySelectorAll('.mood-btn');
+      moodBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mood === this.selectedMood);
+      });
+      const moodInput = this.container.querySelector('#upload-mood');
+      if (moodInput) moodInput.value = this.selectedMood;
+    }
+    
+    // 加载颜色
+    const colorInput = this.container.querySelector('#upload-color');
+    if (colorInput) colorInput.value = record.color || '';
+    
+    // 加载材质
+    const materialInput = this.container.querySelector('#upload-material');
+    if (materialInput) materialInput.value = record.material || '';
+    
+    // 加载照片
+    if (record.image) {
+      this.imageData = record.image;
+      const placeholder = this.container.querySelector('#upload-placeholder');
+      const preview = this.container.querySelector('#photo-preview');
+      const previewImg = this.container.querySelector('#preview-image');
+      if (previewImg) previewImg.src = this.imageData;
+      if (placeholder) placeholder.classList.add('hidden');
+      if (preview) preview.classList.remove('hidden');
+    }
+    
+    // 加载备注
+    const noteInput = this.container.querySelector('#upload-note');
+    if (noteInput) noteInput.value = record.note || '';
+  }
+  
+  resetForm() {
     // 重置表单状态
     this.selectedMood = null;
     this.imageData = null;
@@ -42,11 +93,23 @@ export class UploadController extends BaseController {
     const moodBtns = this.container.querySelectorAll('.mood-btn');
     moodBtns.forEach(btn => btn.classList.remove('active'));
     
+    // 重置颜色
+    const colorInput = this.container.querySelector('#upload-color');
+    if (colorInput) colorInput.value = '';
+    
+    // 重置材质
+    const materialInput = this.container.querySelector('#upload-material');
+    if (materialInput) materialInput.value = '';
+    
     // 重置照片预览
     const placeholder = this.container.querySelector('#upload-placeholder');
     const preview = this.container.querySelector('#photo-preview');
     if (placeholder) placeholder.classList.remove('hidden');
     if (preview) preview.classList.add('hidden');
+    
+    // 重置备注
+    const noteInput = this.container.querySelector('#upload-note');
+    if (noteInput) noteInput.value = '';
   }
 
   bindEvents() {
