@@ -36,9 +36,15 @@ export class ProfileController extends BaseController {
       return;
     }
     
-    // 初始化当前 Tab
-    this.currentTab = 'profile';
-    this.switchTab('profile');
+    // 初始化当前 Tab（检查是否有自动切换标志）
+    const autoSwitchTab = sessionStorage.getItem('profile_auto_switch_tab');
+    if (autoSwitchTab && this.tabs.includes(autoSwitchTab)) {
+      this.currentTab = autoSwitchTab;
+      sessionStorage.removeItem('profile_auto_switch_tab');
+    } else {
+      this.currentTab = 'profile';
+    }
+    this.switchTab(this.currentTab);
     
     // 绑定事件
     this.bindEvents();

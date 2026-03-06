@@ -205,27 +205,11 @@ export class UploadController extends BaseController {
     
     this.showToast('记录保存成功！');
     
-    // 延迟跳转到画像页的日记时间线
+    // 延迟跳转到画像页的日记标签
     setTimeout(() => {
+      // 设置标志，让画像页自动切换到日记标签
+      sessionStorage.setItem('profile_auto_switch_tab', 'diary');
       navigateTo('/profile');
-      
-      // 在画像页滚动到日记时间线位置
-      setTimeout(() => {
-        // 找到日记时间线 section（包含"时间线"标题的 diary-section）
-        const diarySections = document.querySelectorAll('.diary-section');
-        let timelineSection = null;
-        
-        diarySections.forEach(section => {
-          const title = section.querySelector('.diary-section-title');
-          if (title && title.textContent.includes('时间线')) {
-            timelineSection = section;
-          }
-        });
-        
-        if (timelineSection) {
-          timelineSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 300);
     }, 800);
   }
 
