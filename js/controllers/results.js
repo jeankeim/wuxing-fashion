@@ -27,25 +27,71 @@ export class ResultsController extends BaseController {
     
     // 重新绑定事件
     this.bindEvents();
-    // 渲染结果
+    
+    // 获取结果数据
     const result = this.getState(StateKeys.CURRENT_RESULT);
+    
     if (result) {
-      // 检查是否有八字数据
-      const baziData = this.getState(StateKeys.BAZI_DATA);
-      const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
+      // 有数据：先显示骨架屏，然后渲染内容
+      this.showSkeleton();
       
-      this.renderPageSubtitle(result);
-      renderResultHeader(result.termInfo);
-      renderSchemeCards(result.schemes, { hasBazi });
-      
-      // 渲染今日运势卡片
-      this.renderDailyFortune(result);
-      
-      // 渲染天气影响提示
-      this.renderWeatherImpact(result);
-      
-      // 渲染八字使用状态提示
-      this.renderBaziUsageHint(result);
+      // 使用 requestAnimationFrame 确保骨架屏先渲染
+      requestAnimationFrame(() => {
+        // 检查是否有八字数据
+        const baziData = this.getState(StateKeys.BAZI_DATA);
+        const hasBazi = baziData && baziData.year && baziData.month && baziData.day;
+        
+        this.renderPageSubtitle(result);
+        renderResultHeader(result.termInfo);
+        renderSchemeCards(result.schemes, { hasBazi });
+        
+        // 渲染今日运势卡片
+        this.renderDailyFortune(result);
+        
+        // 渲染天气影响提示
+        this.renderWeatherImpact(result);
+        
+        // 渲染八字使用状态提示
+        this.renderBaziUsageHint(result);
+        
+        // 延迟隐藏骨架屏，确保内容渲染完成
+        setTimeout(() => {
+          this.hideSkeleton();
+        }, 300);
+      });
+    } else {
+      // 无数据：直接隐藏骨架屏，显示空状态
+      this.hideSkeleton();
+    }
+  }
+  
+  /**
+   * 显示骨架屏
+   */
+  showSkeleton() {
+    const skeleton = document.getElementById('results-skeleton');
+    const content = document.getElementById('results-content');
+    
+    if (skeleton) {
+      skeleton.classList.remove('hidden');
+    }
+    if (content) {
+      content.classList.add('hidden');
+    }
+  }
+  
+  /**
+   * 隐藏骨架屏，显示内容
+   */
+  hideSkeleton() {
+    const skeleton = document.getElementById('results-skeleton');
+    const content = document.getElementById('results-content');
+    
+    if (skeleton) {
+      skeleton.classList.add('hidden');
+    }
+    if (content) {
+      content.classList.remove('hidden');
     }
   }
 
@@ -81,11 +127,9 @@ export class ResultsController extends BaseController {
     sceneEl.innerHTML = scene ? `场景：${scene.name} ${scene.icon}` : '';
     wishEl.innerHTML = wish ? `心愿：${wish.name} ${wish.icon}` : '';
     
-    // 渲染幸运色系
-    const luckyColors = schemes.slice(0, 2).map(s => s.color.name);
-    colorsEl.innerHTML = luckyColors.length > 0 
-      ? `<span class="colors-label">🎨 幸运色系：</span><span class="colors-value">${luckyColors.join(' + ')}</span>`
-      : '';
+    // 渲染幸运色系（带颜色样式，空格分隔）
+    const luckyColorsHtml = this.renderLuckyColors(schemes.slice(0, 2));
+    colorsEl.innerHTML = luckyColorsHtml;
     
     // 生成五行解析
     const analysis = this.generateFortuneAnalysis(termInfo, bazi, scene, wish, schemes);
@@ -119,25 +163,117 @@ export class ResultsController extends BaseController {
   }
   
   getWishInfo(wishId) {
+    // 支持中文心愿名称（与 entry.html 中的 data-wish 对应）
     const wishes = {
-      career: { name: '事业顺利', icon: '📈' },
-      wealth: { name: '财运亨通', icon: '💰' },
-      love: { name: '桃花朵朵', icon: '🌸' },
-      health: { name: '身体健康', icon: '💪' },
-      study: { name: '学业进步', icon: '🎓' },
-      harmony: { name: '家庭和睦', icon: '👨‍👩‍👧' },
-      promotion: { name: '升职加薪', icon: '📋' },
-      interview: { name: '求职顺利', icon: '🎯' },
-      negotiation: { name: '谈判成功', icon: '✅' },
-      confession: { name: '表白成功', icon: '💝' },
-      reconcile: { name: '感情修复', icon: '💞' },
-      meet: { name: '遇见正缘', icon: '🤝' },
-      safe: { name: '出入平安', icon: '🛡️' },
-      energy: { name: '精力充沛', icon: '⚡' },
-      mood: { name: '心情愉悦', icon: '😊' },
-      confidence: { name: '增强自信', icon: '💫' }
+      // 事业财运
+      '求职': { name: '求职顺利', icon: '🎯' },
+      '升职加薪': { name: '升职加薪', icon: '📈' },
+      '签单顺利': { name: '签单顺利', icon: '🤝' },
+      '贵人运': { name: '贵人运', icon: '🌟' },
+      '防小人避坑': { name: '防小人避坑', icon: '🛡️' },
+      // 情感人际
+      '桃花朵朵': { name: '桃花朵朵', icon: '🌸' },
+      '家庭和睦': { name: '家庭和睦', icon: '🏠' },
+      '挽回缓和': { name: '挽回缓和', icon: '💝' },
+      '新朋友缘': { name: '新朋友缘', icon: '🤗' },
+      // 身心状态
+      '精力充沛': { name: '精力充沛', icon: '⚡' },
+      '安神助眠': { name: '安神助眠', icon: '🌙' },
+      '增强自信': { name: '增强自信', icon: '💪' },
+      // 健康平安
+      '身体健康': { name: '身体健康', icon: '🍀' },
+      '出入平安': { name: '出入平安', icon: '🧧' },
+      '远离疾厄': { name: '远离疾厄', icon: '✨' }
     };
     return wishes[wishId];
+  }
+  
+  /**
+   * 渲染幸运色系（带颜色样式，空格分隔）
+   * @param {Array} schemes - 方案数组
+   * @returns {string} HTML字符串
+   */
+  renderLuckyColors(schemes) {
+    if (!schemes || schemes.length === 0) return '';
+    
+    // 颜色名称到文字颜色的映射
+    const colorTextMap = {
+      '榴红': '#C62828',
+      '莲粉': '#F48FB1',
+      '桃红': '#EC407A',
+      '玫红': '#D81B60',
+      '樱粉': '#F8BBD9',
+      '绯红': '#E53935',
+      '朱红': '#D32F2F',
+      '殷红': '#B71C1C',
+      '茜红': '#C2185B',
+      '绛红': '#AD1457',
+      '翠绿': '#2E7D32',
+      '竹青': '#558B2F',
+      '松绿': '#33691E',
+      '葱绿': '#7CB342',
+      '柳绿': '#8BC34A',
+      '苔绿': '#689F38',
+      '薄荷绿': '#4CAF50',
+      '湖水绿': '#009688',
+      '墨绿': '#1B5E20',
+      '蔚蓝': '#1976D2',
+      '天蓝': '#42A5F5',
+      '湖蓝': '#0288D1',
+      '靛蓝': '#303F9F',
+      '藏蓝': '#1A237E',
+      '宝石蓝': '#3F51B5',
+      '海蓝': '#0277BD',
+      '钴蓝': '#1565C0',
+      '明黄': '#FBC02D',
+      '鹅黄': '#FFF176',
+      '杏黄': '#FFCC80',
+      '橘黄': '#FFB74D',
+      '柠檬黄': '#FFF59D',
+      '金黄': '#F9A825',
+      '土黄': '#F57F17',
+      '奶白': '#FFF8E1',
+      '米白': '#F5F5DC',
+      '象牙白': '#FFFFF0',
+      '珍珠白': '#FAFAFA',
+      '银白': '#E0E0E0',
+      '霜白': '#F5F5F5',
+      '雪白': '#FFFFFF',
+      '炭黑': '#212121',
+      '玄黑': '#000000',
+      '墨黑': '#1a1a1a',
+      '青黑': '#263238',
+      '铁灰': '#616161',
+      '银灰': '#9E9E9E',
+      '烟灰': '#757575',
+      '雾灰': '#BDBDBD',
+      '咖啡': '#795548',
+      '驼色': '#8D6E63',
+      '卡其': '#A1887F',
+      '棕色': '#5D4037',
+      '赭石': '#6D4C41',
+      '栗色': '#4E342E',
+      '紫色': '#7B1FA2',
+      '紫罗兰': '#9C27B0',
+      '茄紫': '#6A1B9A',
+      '葡萄紫': '#8E24AA',
+      '藕荷': '#CE93D8',
+      '青紫': '#AB47BC',
+      '橙红': '#FF5722',
+      '珊瑚': '#FF7043',
+      '橘红': '#FF8A65',
+      '柿子': '#FFAB91',
+      '橙色': '#FF9800',
+      '赤橙': '#F57C00'
+    };
+    
+    const colorsHtml = schemes.map(scheme => {
+      const colorName = scheme.color.name;
+      const textColor = colorTextMap[colorName] || scheme.color.hex || '#333';
+      return `<span class="lucky-color-item" style="color: ${textColor}; font-weight: 600;">${colorName}</span>`;
+    }).join(' ');
+    
+    return `<span class="colors-label">🎨 幸运色系：</span><span class="colors-value">${colorsHtml}</span>`;
   }
   
   generateFortuneAnalysis(termInfo, bazi, scene, wish, schemes) {
