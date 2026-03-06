@@ -1406,7 +1406,7 @@ export class ProfileController extends BaseController {
       timeline.innerHTML = `
         <div class="empty-state">
           <p>暂无穿搭记录</p>
-          <p class="text-muted">点击右上角"记一笔"开始记录</p>
+          <p class="text-muted">点击上方日历，选择日期开始记录</p>
         </div>
       `;
       return;
