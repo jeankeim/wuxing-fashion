@@ -432,17 +432,21 @@ export async function generateRecommendation(termInfo, wishId, baziResult, optio
  * 重新生成 (换一批)
  */
 export async function regenerateRecommendation(termInfo, wishId, baziResult, excludeIds = [], options = {}) {
-  const { sceneId = 'daily' } = options;
+  const { sceneId = 'daily', userPreferences = null } = options;
   const schemes = await loadSchemes();
   if (!schemes || !schemes.schemes) return null;
   
   // 过滤已排除的方案
   const available = schemes.schemes.filter(s => !excludeIds.includes(s.id));
   
+  // 构建用户画像和上下文（与 generateRecommendation 保持一致）
+  const userProfile = buildUserProfile(baziResult, userPreferences);
   const context = buildContext(termInfo, wishId, baziResult);
   context.termId = termInfo?.current?.id;
+  context.sceneId = sceneId;
   
-  const selectedSchemes = selectSchemes(available, context, 3, sceneId);
+  // 选择方案（参数顺序：schemes, userProfile, context, count）
+  const selectedSchemes = selectSchemes(available, userProfile, context, 3);
   const dailyLuck = getDailyLuckDescription();
   
   return {

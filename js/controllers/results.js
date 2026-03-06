@@ -521,6 +521,8 @@ export class ResultsController extends BaseController {
   async handleRegenerate() {
     // 获取当前结果数据
     const result = this.getState(StateKeys.CURRENT_RESULT);
+    console.log('[ResultsController] 换一批 - 当前结果:', result);
+    
     if (!result || !result.schemes || result.schemes.length === 0) {
       this.showToast('暂无推荐数据');
       return;
@@ -530,9 +532,11 @@ export class ResultsController extends BaseController {
     
     // 获取当前已显示方案的ID，用于排除
     const excludeIds = result.schemes.map(s => s.id).filter(Boolean);
+    console.log('[ResultsController] 换一批 - 排除ID:', excludeIds);
     
     try {
       // 调用引擎重新生成推荐（排除已显示的方案）
+      console.log('[ResultsController] 换一批 - 调用 regenerateRecommendation');
       const newResult = await regenerateRecommendation(
         result.termInfo,
         result.wishId,
@@ -540,6 +544,8 @@ export class ResultsController extends BaseController {
         excludeIds,
         { sceneId: result.sceneId || 'daily' }
       );
+      
+      console.log('[ResultsController] 换一批 - 新结果:', newResult);
       
       if (!newResult || !newResult.schemes || newResult.schemes.length === 0) {
         this.showToast('暂无更多推荐方案');
