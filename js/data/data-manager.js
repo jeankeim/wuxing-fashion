@@ -220,12 +220,11 @@ export function readImportFile(file) {
 }
 
 /**
- * 清除所有数据
+ * 清除所有数据（包括所有 localStorage 数据）
  */
 export function clearAllData() {
-  DATA_KEYS.forEach(key => {
-    storage.removeItem(key);
-  });
+  // 清除所有 localStorage 数据
+  localStorage.clear();
 }
 
 /**
@@ -331,23 +330,6 @@ export function renderDataManagerPanel() {
       </div>
       
       <div class="data-actions">
-        <button class="btn btn-primary" id="btn-export-data" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-          </svg>
-          导出备份
-        </button>
-        
-        <div class="import-zone">
-          <input type="file" id="import-file-input" accept=".json" hidden>
-          <button class="btn btn-secondary" id="btn-import-data" type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-            </svg>
-            导入恢复
-          </button>
-        </div>
-        
         <button class="btn btn-danger btn-ghost" id="btn-clear-data" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>

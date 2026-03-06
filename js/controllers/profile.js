@@ -507,17 +507,30 @@ export class ProfileController extends BaseController {
         
         // 农历月份（包括闰月）
         try {
-          const sampleLunar = Lunar.fromYmd(2024, 1, 1);
-          const months = sampleLunar.getMonthsInYear();
-          
-          months.forEach((month, index) => {
+          if (typeof Lunar !== 'undefined' && Lunar.fromYmd) {
+            const sampleLunar = Lunar.fromYmd(2024, 1, 1);
+            const months = sampleLunar.getMonthsInYear();
+            
+            months.forEach((month, index) => {
+              const option = document.createElement('option');
+              option.value = index + 1;
+              option.textContent = month;
+              monthSelect.appendChild(option);
+            });
+          } else {
+            throw new Error('Lunar library not available');
+          }
+        } catch (e) {
+          console.error('[Profile] Failed to get lunar months:', e);
+          // 备用方案：填充标准农历月份（1-12月）
+          const lunarMonths = ['正月', '二月', '三月', '四月', '五月', '六月', 
+                               '七月', '八月', '九月', '十月', '冬月', '腊月'];
+          lunarMonths.forEach((month, index) => {
             const option = document.createElement('option');
             option.value = index + 1;
             option.textContent = month;
             monthSelect.appendChild(option);
           });
-        } catch (e) {
-          console.error('[Profile] Failed to get lunar months:', e);
         }
         
         // 动态更新日期
