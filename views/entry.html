@@ -25,11 +25,17 @@
     
     <!-- Scene Selection -->
     <div class="scene-section">
-      <p class="section-hint">选择今日场景</p>
+      <div class="section-header">
+        <span class="section-icon">🎭</span>
+        <p class="section-hint">选择今日场景</p>
+      </div>
       <div class="scene-categories">
         <!-- 常用场景 -->
         <div class="scene-category">
-          <span class="category-label">常用</span>
+          <div class="category-header">
+            <span class="category-icon">⭐</span>
+            <span class="category-label">常用</span>
+          </div>
           <div class="scene-tags" role="radiogroup" aria-label="常用场景">
             <button class="scene-tag active" data-scene="daily" type="button">🌿 日常</button>
             <button class="scene-tag" data-scene="work" type="button">💼 职场</button>
@@ -39,7 +45,10 @@
         </div>
         <!-- 工作场景 -->
         <div class="scene-category">
-          <span class="category-label">工作</span>
+          <div class="category-header">
+            <span class="category-icon">💼</span>
+            <span class="category-label">工作</span>
+          </div>
           <div class="scene-tags" role="radiogroup" aria-label="工作场景">
             <button class="scene-tag" data-scene="interview" type="button">🎤 面试/答辩</button>
             <button class="scene-tag" data-scene="negotiation" type="button">🤝 商务谈判</button>
@@ -47,7 +56,10 @@
         </div>
         <!-- 情感场景 -->
         <div class="scene-category">
-          <span class="category-label">情感</span>
+          <div class="category-header">
+            <span class="category-icon">💕</span>
+            <span class="category-label">情感</span>
+          </div>
           <div class="scene-tags" role="radiogroup" aria-label="情感场景">
             <button class="scene-tag" data-scene="date" type="button">💕 约会</button>
             <button class="scene-tag" data-scene="blind_date" type="button">🌸 初次见面</button>
@@ -56,7 +68,10 @@
         </div>
         <!-- 社交场景 -->
         <div class="scene-category">
-          <span class="category-label">社交</span>
+          <div class="category-header">
+            <span class="category-icon">🎉</span>
+            <span class="category-label">社交</span>
+          </div>
           <div class="scene-tags" role="radiogroup" aria-label="社交场景">
             <button class="scene-tag" data-scene="party" type="button">🎉 聚会</button>
             <button class="scene-tag" data-scene="friend_gathering" type="button">🍻 朋友聚餐</button>
@@ -65,7 +80,10 @@
         </div>
         <!-- 生活场景 -->
         <div class="scene-category">
-          <span class="category-label">生活</span>
+          <div class="category-header">
+            <span class="category-icon">🌈</span>
+            <span class="category-label">生活</span>
+          </div>
           <div class="scene-tags" role="radiogroup" aria-label="生活场景">
             <button class="scene-tag" data-scene="sport" type="button">⚡ 运动</button>
             <button class="scene-tag" data-scene="travel" type="button">✈️ 旅行/户外</button>
@@ -74,7 +92,10 @@
         </div>
         <!-- 运势场景 -->
         <div class="scene-category">
-          <span class="category-label">运势</span>
+          <div class="category-header">
+            <span class="category-icon">🧧</span>
+            <span class="category-label">运势</span>
+          </div>
           <div class="scene-tags" role="radiogroup" aria-label="运势场景">
             <button class="scene-tag" data-scene="benming" type="button">🧧 本命年化煞</button>
           </div>
@@ -84,47 +105,113 @@
     
     <!-- Wish Selection -->
     <div class="wish-section">
-      <p class="section-hint">选择一个当下的心愿（可选）</p>
+      <div class="section-header">
+        <span class="section-icon">✨</span>
+        <p class="section-hint">选择一个当下的心愿（可选）</p>
+      </div>
       <div class="wish-categories">
         <!-- 事业财运 -->
         <div class="wish-category">
-          <span class="category-label">事业财运</span>
+          <div class="category-header">
+            <span class="category-icon">💼</span>
+            <span class="category-label">事业财运</span>
+          </div>
           <div class="wish-tags" role="radiogroup" aria-label="事业财运心愿">
-            <button class="wish-tag" data-wish="求职" type="button">求职顺利</button>
-            <button class="wish-tag" data-wish="升职加薪" type="button">升职加薪</button>
-            <button class="wish-tag" data-wish="签单顺利" type="button">签单顺利</button>
-            <button class="wish-tag" data-wish="贵人运" type="button">贵人运</button>
-            <button class="wish-tag" data-wish="防小人避坑" type="button">防小人避坑</button>
+            <button class="wish-tag" data-wish="求职" type="button">
+              <span class="wish-icon">🎯</span>
+              <span class="wish-text">求职顺利</span>
+            </button>
+            <button class="wish-tag" data-wish="升职加薪" type="button">
+              <span class="wish-icon">📈</span>
+              <span class="wish-text">升职加薪</span>
+            </button>
+            <button class="wish-tag" data-wish="签单顺利" type="button">
+              <span class="wish-icon">🤝</span>
+              <span class="wish-text">签单顺利</span>
+            </button>
+            <button class="wish-tag" data-wish="贵人运" type="button">
+              <span class="wish-icon">🌟</span>
+              <span class="wish-text">贵人运</span>
+            </button>
+            <button class="wish-tag" data-wish="防小人避坑" type="button">
+              <span class="wish-icon">🛡️</span>
+              <span class="wish-text">防小人避坑</span>
+            </button>
           </div>
         </div>
         <!-- 情感人际 -->
         <div class="wish-category">
-          <span class="category-label">情感人际</span>
+          <div class="category-header">
+            <span class="category-icon">💕</span>
+            <span class="category-label">情感人际</span>
+          </div>
           <div class="wish-tags" role="radiogroup" aria-label="情感人际心愿">
-            <button class="wish-tag" data-wish="桃花朵朵" type="button">桃花朵朵</button>
-            <button class="wish-tag" data-wish="家庭和睦" type="button">家庭和睦</button>
-            <button class="wish-tag" data-wish="挽回缓和" type="button">挽回缓和</button>
-            <button class="wish-tag" data-wish="新朋友缘" type="button">新朋友缘</button>
+            <button class="wish-tag" data-wish="桃花朵朵" type="button">
+              <span class="wish-icon">🌸</span>
+              <span class="wish-text">桃花朵朵</span>
+            </button>
+            <button class="wish-tag" data-wish="家庭和睦" type="button">
+              <span class="wish-icon">🏠</span>
+              <span class="wish-text">家庭和睦</span>
+            </button>
+            <button class="wish-tag" data-wish="挽回缓和" type="button">
+              <span class="wish-icon">💝</span>
+              <span class="wish-text">挽回缓和</span>
+            </button>
+            <button class="wish-tag" data-wish="新朋友缘" type="button">
+              <span class="wish-icon">🤗</span>
+              <span class="wish-text">新朋友缘</span>
+            </button>
           </div>
         </div>
         <!-- 身心状态 -->
         <div class="wish-category">
-          <span class="category-label">身心状态</span>
+          <div class="category-header">
+            <span class="category-icon">🧘</span>
+            <span class="category-label">身心状态</span>
+          </div>
           <div class="wish-tags" role="radiogroup" aria-label="身心状态心愿">
-            <button class="wish-tag" data-wish="精力充沛" type="button">精力充沛</button>
-            <button class="wish-tag" data-wish="安神助眠" type="button">安神助眠</button>
-            <button class="wish-tag" data-wish="增强自信" type="button">增强自信</button>
-            <button class="wish-tag" data-wish="静心专注" type="button">静心专注</button>
+            <button class="wish-tag" data-wish="精力充沛" type="button">
+              <span class="wish-icon">⚡</span>
+              <span class="wish-text">精力充沛</span>
+            </button>
+            <button class="wish-tag" data-wish="安神助眠" type="button">
+              <span class="wish-icon">🌙</span>
+              <span class="wish-text">安神助眠</span>
+            </button>
+            <button class="wish-tag" data-wish="增强自信" type="button">
+              <span class="wish-icon">💪</span>
+              <span class="wish-text">增强自信</span>
+            </button>
+            <button class="wish-tag" data-wish="静心专注" type="button">
+              <span class="wish-icon">🧘‍♀️</span>
+              <span class="wish-text">静心专注</span>
+            </button>
           </div>
         </div>
         <!-- 健康平安 -->
         <div class="wish-category">
-          <span class="category-label">健康平安</span>
+          <div class="category-header">
+            <span class="category-icon">🍀</span>
+            <span class="category-label">健康平安</span>
+          </div>
           <div class="wish-tags" role="radiogroup" aria-label="健康平安心愿">
-            <button class="wish-tag" data-wish="健康舒畅" type="button">健康舒畅</button>
-            <button class="wish-tag" data-wish="身体康复" type="button">身体康复</button>
-            <button class="wish-tag" data-wish="出行平安" type="button">出行平安</button>
-            <button class="wish-tag" data-wish="远行顺利" type="button">远行顺利</button>
+            <button class="wish-tag" data-wish="健康舒畅" type="button">
+              <span class="wish-icon">🌿</span>
+              <span class="wish-text">健康舒畅</span>
+            </button>
+            <button class="wish-tag" data-wish="身体康复" type="button">
+              <span class="wish-icon">💊</span>
+              <span class="wish-text">身体康复</span>
+            </button>
+            <button class="wish-tag" data-wish="出行平安" type="button">
+              <span class="wish-icon">🚗</span>
+              <span class="wish-text">出行平安</span>
+            </button>
+            <button class="wish-tag" data-wish="远行顺利" type="button">
+              <span class="wish-icon">✈️</span>
+              <span class="wish-text">远行顺利</span>
+            </button>
           </div>
         </div>
       </div>

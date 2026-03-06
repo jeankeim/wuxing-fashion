@@ -95,29 +95,29 @@
   background-color: var(--color-border-light);
 }
 
-/* === Scene Tags === */
+/* === Scene Section === */
 .scene-section {
   margin-bottom: var(--space-6);
 }
 
-.scene-section-title {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-4);
+.scene-section .section-header {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
-.scene-section-title::before {
-  content: '';
-  width: 4px;
-  height: 20px;
-  background: var(--color-wood-gradient);
-  border-radius: var(--radius-full);
+.scene-section .section-icon {
+  font-size: 20px;
 }
 
+.scene-section .section-hint {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+/* === Scene Categories === */
 .scene-categories {
   display: flex;
   flex-direction: column;
@@ -128,22 +128,29 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding: var(--space-4);
+  background: linear-gradient(135deg, rgba(124, 179, 66, 0.05), rgba(255, 255, 255, 0.8));
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(124, 179, 66, 0.1);
 }
 
-.category-label {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
+.scene-category .category-header {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
-.category-label::before {
-  content: '•';
-  color: var(--color-wood);
+.scene-category .category-icon {
+  font-size: 18px;
+}
+
+.scene-category .category-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .scene-tags {
@@ -207,38 +214,100 @@
 .scene-tag[data-scene="travel"]:hover { border-color: var(--color-wood); color: var(--color-wood-dark); }
 .scene-tag[data-scene="study"]:hover { border-color: var(--color-water); color: var(--color-water-dark); }
 
-/* === Wish Tags === */
+/* === Wish Section === */
+.wish-section .section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.wish-section .section-icon {
+  font-size: 20px;
+}
+
+.wish-section .section-hint {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+/* === Wish Categories === */
 .wish-categories {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .wish-category {
   display: flex;
   flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.category-icon {
+  font-size: 18px;
+}
+
+.category-label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+}
+
+/* === Wish Tags === */
+.wish-tags {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
 
 .wish-tag {
-  padding: var(--space-2) var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   background-color: var(--color-surface);
   color: var(--color-text-secondary);
   transition: all var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+}
+
+.wish-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.wish-text {
+  white-space: nowrap;
 }
 
 .wish-tag:hover {
   border-color: var(--color-wood);
   color: var(--color-wood);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(124, 179, 66, 0.15);
 }
 
 .wish-tag.active {
-  background-color: var(--color-wood);
+  background: linear-gradient(135deg, var(--color-wood), var(--color-wood-dark));
   border-color: var(--color-wood);
   color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(124, 179, 66, 0.3);
 }
 
 /* === Scheme Cards === */
